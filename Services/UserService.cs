@@ -1,66 +1,85 @@
-﻿using G3NexusBackend.Models;
+﻿using G3NexusBackend.DTOs;
+using G3NexusBackend.Interfaces;
+using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Identity;
 
 namespace G3NexusBackend.Services
 {
     public class UserService : IUserService
     {
-        private readonly G3NexusDbContext _dbContext;
+        private readonly G3NexusDbContext _context;
 
-        public UserService(G3NexusDbContext dbContext)
+        public UserService(G3NexusDbContext context)
         {
-            _dbContext = dbContext;
+            _context = context;
         }
 
-        public async Task<User> AddUserAsync(User user)
+        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
-            // Hash the password before saving
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-
-            // Add the user to the database
-            _dbContext.Users.Add(user);
-            await _dbContext.SaveChangesAsync();
-
-            return user;
-        }
-
-        public async Task<User> UpdateUserAsync(int userId, User user)
-        {
-            var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (existingUser == null)
+            return await _context.Users.Select(user => new UserDTO
             {
-                return null; // User not found
-            }
+                UserId = user.UserId,
+                Name = user.Name,
+                ContactNo = user.ContactNo,
+                EmailAddress = user.EmailAddress,
+                Address = user.Address,
+                Password = user.Password,
+                Role = user.Role
+            }).ToListAsync();
+        }
 
-            // Update the properties
-            existingUser.Name = user.Name;
-            existingUser.ContactNo = user.ContactNo;
-            existingUser.EmailAddress = user.EmailAddress;
-            existingUser.Address = user.Address;
+        public async Task<UserDTO> GetUserByIdAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return null;
 
-            // Optionally update the password if it's provided
-            if (!string.IsNullOrEmpty(user.Password))
+            return new UserDTO
             {
-                existingUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-            }
-
-            existingUser.Role = user.Role;
-
-            _dbContext.Users.Update(existingUser);
-            await _dbContext.SaveChangesAsync();
-
-            return existingUser;
+                UserId = user.UserId,
+                Name = user.Name,
+                ContactNo = user.ContactNo,
+                EmailAddress = user.EmailAddress,
+                Address = user.Address,
+                Password = user.Password,
+                Role = user.Role
+            };
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        public async Task AddUserAsync(UserDTO userDto)
         {
-            return await _dbContext.Users.ToListAsync();
-        }
+            var user = new User
+            {
+                Name = userDto.Name,
+                ContactNo = userDto.ContactNo,
+                EmailAddress = userDto.EmailAddress,
+                Address = userDto.Address,
+                Role = userDto.Role
+            };
 
-        public async Task<User> GetUserByIdAsync(int userId)
+            var passwordHasher = new PasswordHasher<User>();
+            user.Password = passwordHasher.HashPassword(user, userDto.Password);
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+        
+        public async Task UpdateUserAsync(int userId, UserDTO userDto)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return;
+
+            user.Name = userDto.Name;
+            user.ContactNo = userDto.ContactNo;
+            user.EmailAddress = userDto.EmailAddress;
+            user.Address = userDto.Address;
+            user.Role = userDto.Role;
+            
+            var passwordHasher = new PasswordHasher<User>();
+            user.Password = passwordHasher.HashPassword(user, userDto.Password);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

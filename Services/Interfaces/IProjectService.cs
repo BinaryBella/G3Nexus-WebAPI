@@ -1,14 +1,14 @@
-﻿using G3NexusBackend.Models;
+﻿using G3NexusBackend.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace G3NexusBackend.Services
+namespace G3NexusBackend.Interfaces
 {
     public interface IProjectService
     {
-        Task<Project> AddProjectAsync(Project project);
-        Task<Project> UpdateProjectAsync(int projectId, Project project);
-        Task<IEnumerable<Project>> GetAllProjectsAsync();
-        Task<Project> GetProjectByIdAsync(int projectId);
+        Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
+        Task<ProjectDTO> GetProjectByIdAsync(int projectId);
+        Task AddProjectAsync(ProjectDTO projectDto);
+        Task UpdateProjectAsync(int projectId, ProjectDTO projectDto);
     }
 }

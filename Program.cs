@@ -1,3 +1,4 @@
+using G3NexusBackend.Interfaces;
 using G3NexusBackend.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,10 @@ builder.Services.AddDbContext<G3NexusDbContext>(options =>
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IBugService, BugService>();
+builder.Services.AddScoped<IRequirementService, RequirementService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IVerificationService, VerificationService>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

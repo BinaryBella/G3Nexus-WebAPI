@@ -1,69 +1,50 @@
-﻿using G3NexusBackend.Models;
-using G3NexusBackend.Services;
+﻿using G3NexusBackend.DTOs;
+using G3NexusBackend.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace G3NexusBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
         }
 
-        [HttpPost("add")]
-        public async Task<IActionResult> AddUser(User user)
-        {
-            if (user == null)
-            {
-                return BadRequest("User is null.");
-            }
-
-            // Validate the user object (you can use ModelState for validation if needed)
-            var createdUser = await _userService.AddUserAsync(user);
-            return Ok(createdUser);
-        }
-
-        [HttpPut("edit/{userId}")]
-        public async Task<IActionResult> EditUser(int userId, User user)
-        {
-            if (user == null)
-            {
-                return BadRequest("User is null.");
-            }
-
-            var updatedUser = await _userService.UpdateUserAsync(userId, user);
-
-            if (updatedUser == null)
-            {
-                return NotFound($"User with ID {userId} not found.");
-            }
-
-            return Ok(updatedUser);
-        }
-
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllUsers()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetUserById(int userId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserDTO>> GetUserById(int id)
         {
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null)
-            {
-                return NotFound($"User with ID {userId} not found.");
-            }
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null) return NotFound();
 
             return Ok(user);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddUser(UserDTO userDto)
+        {
+            await _userService.AddUserAsync(userDto);
+            return CreatedAtAction(nameof(GetUserById), new { id = userDto.UserId }, userDto);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateUser(int id, UserDTO userDto)
+        {
+            await _userService.UpdateUserAsync(id, userDto);
+            return NoContent();
         }
     }
 }
