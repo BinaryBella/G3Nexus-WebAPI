@@ -2,9 +2,6 @@ using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
 using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Services
 {
@@ -17,36 +14,7 @@ namespace G3NexusBackend.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<BugDTO>> GetAllBugsAsync()
-        {
-            return await _context.Bugs.Select(bug => new BugDTO
-            {
-                BugId = bug.BugId,
-                ProjectId = bug.ProjectId,
-                BugTitle = bug.BugTitle,
-                Severity = bug.Severity,
-                BugDescription = bug.BugDescription,
-                Attachment = bug.Attachment
-            }).ToListAsync();
-        }
-
-        public async Task<BugDTO> GetBugByIdAsync(int bugId)
-        {
-            var bug = await _context.Bugs.FindAsync(bugId);
-            if (bug == null) return null;
-
-            return new BugDTO
-            {
-                BugId = bug.BugId,
-                ProjectId = bug.ProjectId,
-                BugTitle = bug.BugTitle,
-                Severity = bug.Severity,
-                BugDescription = bug.BugDescription,
-                Attachment = bug.Attachment
-            };
-        }
-
-        public async Task AddBugAsync(BugDTO bugDto)
+        public async Task<ApiResponse> AddBug(BugDTO bugDto)
         {
             var bug = new Bug
             {
@@ -59,12 +27,17 @@ namespace G3NexusBackend.Services
 
             _context.Bugs.Add(bug);
             await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "Bug added successfully" };
         }
 
-        public async Task UpdateBugAsync(int bugId, BugDTO bugDto)
+        public async Task<ApiResponse> EditBug(BugDTO bugDto)
         {
-            var bug = await _context.Bugs.FindAsync(bugId);
-            if (bug == null) return;
+            var bug = await _context.Bugs.FindAsync(bugDto.BugId);
+            if (bug == null)
+            {
+                return new ApiResponse { Status = false, Message = "Bug not found" };
+            }
 
             bug.ProjectId = bugDto.ProjectId;
             bug.BugTitle = bugDto.BugTitle;
@@ -72,7 +45,27 @@ namespace G3NexusBackend.Services
             bug.BugDescription = bugDto.BugDescription;
             bug.Attachment = bugDto.Attachment;
 
+            _context.Bugs.Update(bug);
             await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "Bug updated successfully" };
+        }
+
+        public async Task<ApiResponse> GetAllBugs()
+        {
+            var bugs = await _context.Bugs.ToListAsync();
+            return new ApiResponse { Status = true, Data = bugs };
+        }
+
+        public async Task<ApiResponse> GetBugById(int bugId)
+        {
+            var bug = await _context.Bugs.FindAsync(bugId);
+            if (bug == null)
+            {
+                return new ApiResponse { Status = false, Message = "Bug not found" };
+            }
+
+            return new ApiResponse { Status = true, Data = bug };
         }
     }
 }

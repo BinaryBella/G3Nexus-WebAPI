@@ -4,9 +4,9 @@ namespace G3NexusBackend.Interfaces
 {
     public interface IPaymentService
     {
-        Task<IEnumerable<PaymentDTO>> GetAllPaymentsAsync();
-        Task<PaymentDTO> GetPaymentByIdAsync(int paymentId);
-        Task AddPaymentAsync(PaymentDTO paymentDto);
-        Task UpdatePaymentAsync(int paymentId, PaymentDTO paymentDto);
+        Task<ApiResponse> AddPayment(PaymentDTO paymentDto);
+        Task<ApiResponse> EditPayment(PaymentDTO paymentDto);
+        Task<ApiResponse> GetAllPayments();
+        Task<ApiResponse> GetPaymentById(int paymentId);
     }
 }

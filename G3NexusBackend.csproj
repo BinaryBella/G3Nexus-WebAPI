@@ -10,6 +10,7 @@
     <!-- Swagger for API documentation -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
 
     <!-- Entity Framework Core and SQL Server provider -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />

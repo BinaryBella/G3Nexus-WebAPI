@@ -6,43 +6,42 @@ namespace G3NexusBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProjectsController : ControllerBase
+    public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
 
-        public ProjectsController(IProjectService projectService)
+        public ProjectController(IProjectService projectService)
         {
             _projectService = projectService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProjectDTO>>> GetAllProjects()
+        [HttpPost("add")]
+        public async Task<IActionResult> AddProject([FromBody] ProjectDTO projectDto)
         {
-            var projects = await _projectService.GetAllProjectsAsync();
-            return Ok(projects);
+            var response = await _projectService.AddProject(projectDto);
+            return Ok(response);
+        }
+
+        [HttpPut("edit")]
+        public async Task<IActionResult> EditProject([FromBody] ProjectDTO projectDto)
+        {
+            var response = await _projectService.EditProject(projectDto);
+            return Ok(response);
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllProjects()
+        {
+            var response = await _projectService.GetAllProjects();
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProjectDTO>> GetProjectById(int id)
+        public async Task<IActionResult> GetProjectById(int id)
         {
-            var project = await _projectService.GetProjectByIdAsync(id);
-            if (project == null) return NotFound();
-
-            return Ok(project);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> AddProject(ProjectDTO projectDto)
-        {
-            await _projectService.AddProjectAsync(projectDto);
-            return CreatedAtAction(nameof(GetProjectById), new { id = projectDto.ProjectId }, projectDto);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateProject(int id, ProjectDTO projectDto)
-        {
-            await _projectService.UpdateProjectAsync(id, projectDto);
-            return NoContent();
+            var response = await _projectService.GetProjectById(id);
+            return Ok(response);
         }
     }
+
 }

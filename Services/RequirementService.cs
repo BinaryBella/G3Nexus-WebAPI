@@ -2,9 +2,7 @@ using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
 using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace G3NexusBackend.Services
 {
@@ -17,62 +15,58 @@ namespace G3NexusBackend.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<RequirementDTO>> GetAllRequirementsAsync()
+         public async Task<ApiResponse> AddRequirement(RequirementDTO requirementDto)
+    {
+        var requirement = new Requirement
         {
-            return await _context.Requirements.Select(req => new RequirementDTO
-            {
-                RequirementId = req.RequirementId,
-                ProjectId = req.ProjectId,
-                RequirementTitle = req.RequirementTitle,
-                Priority = req.Priority,
-                RequirementDescription = req.RequirementDescription,
-                Attachment = req.Attachment
-            }).ToListAsync();
+            ProjectId = requirementDto.ProjectId,
+            RequirementTitle = requirementDto.RequirementTitle,
+            Priority = requirementDto.Priority,
+            RequirementDescription = requirementDto.RequirementDescription,
+            Attachment = requirementDto.Attachment
+        };
+
+        _context.Requirements.Add(requirement);
+        await _context.SaveChangesAsync();
+
+        return new ApiResponse { Status = true, Message = "Requirement added successfully" };
+    }
+
+    public async Task<ApiResponse> EditRequirement(RequirementDTO requirementDto)
+    {
+        var requirement = await _context.Requirements.FindAsync(requirementDto.RequirementId);
+        if (requirement == null)
+        {
+            return new ApiResponse { Status = false, Message = "Requirement not found" };
         }
 
-        public async Task<RequirementDTO> GetRequirementByIdAsync(int requirementId)
-        {
-            var req = await _context.Requirements.FindAsync(requirementId);
-            if (req == null) return null;
+        requirement.ProjectId = requirementDto.ProjectId;
+        requirement.RequirementTitle = requirementDto.RequirementTitle;
+        requirement.Priority = requirementDto.Priority;
+        requirement.RequirementDescription = requirementDto.RequirementDescription;
+        requirement.Attachment = requirementDto.Attachment;
 
-            return new RequirementDTO
-            {
-                RequirementId = req.RequirementId,
-                ProjectId = req.ProjectId,
-                RequirementTitle = req.RequirementTitle,
-                Priority = req.Priority,
-                RequirementDescription = req.RequirementDescription,
-                Attachment = req.Attachment
-            };
+        _context.Requirements.Update(requirement);
+        await _context.SaveChangesAsync();
+
+        return new ApiResponse { Status = true, Message = "Requirement updated successfully" };
+    }
+
+    public async Task<ApiResponse> GetAllRequirements()
+    {
+        var requirements = await _context.Requirements.ToListAsync();
+        return new ApiResponse { Status = true, Data = requirements };
+    }
+
+    public async Task<ApiResponse> GetRequirementById(int requirementId)
+    {
+        var requirement = await _context.Requirements.FindAsync(requirementId);
+        if (requirement == null)
+        {
+            return new ApiResponse { Status = false, Message = "Requirement not found" };
         }
 
-        public async Task AddRequirementAsync(RequirementDTO requirementDto)
-        {
-            var requirement = new Requirement
-            {
-                ProjectId = requirementDto.ProjectId,
-                RequirementTitle = requirementDto.RequirementTitle,
-                Priority = requirementDto.Priority,
-                RequirementDescription = requirementDto.RequirementDescription,
-                Attachment = requirementDto.Attachment
-            };
-
-            _context.Requirements.Add(requirement);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateRequirementAsync(int requirementId, RequirementDTO requirementDto)
-        {
-            var req = await _context.Requirements.FindAsync(requirementId);
-            if (req == null) return;
-
-            req.ProjectId = requirementDto.ProjectId;
-            req.RequirementTitle = requirementDto.RequirementTitle;
-            req.Priority = requirementDto.Priority;
-            req.RequirementDescription = requirementDto.RequirementDescription;
-            req.Attachment = requirementDto.Attachment;
-
-            await _context.SaveChangesAsync();
-        }
+        return new ApiResponse { Status = true, Data = requirement };
+    }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using G3NexusBackend.DTOs;
-using G3NexusBackend.Interfaces;
 using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.AspNetCore.Identity;
 
 namespace G3NexusBackend.Services
@@ -16,39 +14,9 @@ namespace G3NexusBackend.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
+        public async Task<ApiResponse> AddUser(UserDTO userDto)
         {
-            return await _context.Users.Select(user => new UserDTO
-            {
-                UserId = user.UserId,
-                Name = user.Name,
-                ContactNo = user.ContactNo,
-                EmailAddress = user.EmailAddress,
-                Address = user.Address,
-                Password = user.Password,
-                Role = user.Role
-            }).ToListAsync();
-        }
-
-        public async Task<UserDTO> GetUserByIdAsync(int userId)
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return null;
-
-            return new UserDTO
-            {
-                UserId = user.UserId,
-                Name = user.Name,
-                ContactNo = user.ContactNo,
-                EmailAddress = user.EmailAddress,
-                Address = user.Address,
-                Password = user.Password,
-                Role = user.Role
-            };
-        }
-
-        public async Task AddUserAsync(UserDTO userDto)
-        {
+            // Create a new User entity
             var user = new User
             {
                 Name = userDto.Name,
@@ -58,28 +26,64 @@ namespace G3NexusBackend.Services
                 Role = userDto.Role
             };
 
+            // Use PasswordHasher to hash the user's password
             var passwordHasher = new PasswordHasher<User>();
             user.Password = passwordHasher.HashPassword(user, userDto.Password);
 
+            // Add the user to the database
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "User added successfully" };
         }
         
-        public async Task UpdateUserAsync(int userId, UserDTO userDto)
+        public async Task<ApiResponse> EditUser(UserDTO userDto)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return;
+            var user = await _context.Users.FindAsync(userDto.UserId);
+    
+            if (user == null)
+            {
+                return new ApiResponse { Status = false, Message = "User not found" };
+            }
 
+            // Update other fields
             user.Name = userDto.Name;
             user.ContactNo = userDto.ContactNo;
             user.EmailAddress = userDto.EmailAddress;
             user.Address = userDto.Address;
-            user.Role = userDto.Role;
-            
-            var passwordHasher = new PasswordHasher<User>();
-            user.Password = passwordHasher.HashPassword(user, userDto.Password);
 
+            // Hash the password only if the user is trying to update the password
+            if (!string.IsNullOrEmpty(userDto.Password))
+            {
+                var passwordHasher = new PasswordHasher<User>();
+                user.Password = passwordHasher.HashPassword(user, userDto.Password);
+            }
+
+            // Update the role
+            user.Role = userDto.Role;
+
+            // Save changes to the database
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "User updated successfully" };
+        }
+
+        public async Task<ApiResponse> GetAllUsers()
+        {
+            var users = await _context.Users.ToListAsync();
+            return new ApiResponse { Status = true, Data = users };
+        }
+
+        public async Task<ApiResponse> GetUserById(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return new ApiResponse { Status = false, Message = "User not found" };
+            }
+
+            return new ApiResponse { Status = true, Data = user };
         }
     }
 }

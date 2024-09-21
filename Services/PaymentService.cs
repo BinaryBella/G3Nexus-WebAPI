@@ -2,9 +2,6 @@ using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
 using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Services
 {
@@ -17,38 +14,7 @@ namespace G3NexusBackend.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<PaymentDTO>> GetAllPaymentsAsync()
-        {
-            return await _context.Payments.Select(payment => new PaymentDTO
-            {
-                PaymentId = payment.PaymentId,
-                ProjectId = payment.ProjectId,
-                PaymentAmount = payment.PaymentAmount,
-                PaymentType = payment.PaymentType,
-                PaymentDescription = payment.PaymentDescription,
-                PaymentDate = payment.PaymentDate,
-                Attachment = payment.Attachment
-            }).ToListAsync();
-        }
-
-        public async Task<PaymentDTO> GetPaymentByIdAsync(int paymentId)
-        {
-            var payment = await _context.Payments.FindAsync(paymentId);
-            if (payment == null) return null;
-
-            return new PaymentDTO
-            {
-                PaymentId = payment.PaymentId,
-                ProjectId = payment.ProjectId,
-                PaymentAmount = payment.PaymentAmount,
-                PaymentType = payment.PaymentType,
-                PaymentDescription = payment.PaymentDescription,
-                PaymentDate = payment.PaymentDate,
-                Attachment = payment.Attachment
-            };
-        }
-
-        public async Task AddPaymentAsync(PaymentDTO paymentDto)
+        public async Task<ApiResponse> AddPayment(PaymentDTO paymentDto)
         {
             var payment = new Payment
             {
@@ -62,12 +28,17 @@ namespace G3NexusBackend.Services
 
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "Payment added successfully" };
         }
 
-        public async Task UpdatePaymentAsync(int paymentId, PaymentDTO paymentDto)
+        public async Task<ApiResponse> EditPayment(PaymentDTO paymentDto)
         {
-            var payment = await _context.Payments.FindAsync(paymentId);
-            if (payment == null) return;
+            var payment = await _context.Payments.FindAsync(paymentDto.PaymentId);
+            if (payment == null)
+            {
+                return new ApiResponse { Status = false, Message = "Payment not found" };
+            }
 
             payment.ProjectId = paymentDto.ProjectId;
             payment.PaymentAmount = paymentDto.PaymentAmount;
@@ -76,7 +47,27 @@ namespace G3NexusBackend.Services
             payment.PaymentDate = paymentDto.PaymentDate;
             payment.Attachment = paymentDto.Attachment;
 
+            _context.Payments.Update(payment);
             await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "Payment updated successfully" };
+        }
+
+        public async Task<ApiResponse> GetAllPayments()
+        {
+            var payments = await _context.Payments.ToListAsync();
+            return new ApiResponse { Status = true, Data = payments };
+        }
+
+        public async Task<ApiResponse> GetPaymentById(int paymentId)
+        {
+            var payment = await _context.Payments.FindAsync(paymentId);
+            if (payment == null)
+            {
+                return new ApiResponse { Status = false, Message = "Payment not found" };
+            }
+
+            return new ApiResponse { Status = true, Data = payment };
         }
     }
 }

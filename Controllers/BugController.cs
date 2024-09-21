@@ -6,43 +6,42 @@ namespace G3NexusBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BugsController : ControllerBase
+    public class BugController : ControllerBase
     {
         private readonly IBugService _bugService;
 
-        public BugsController(IBugService bugService)
+        public BugController(IBugService bugService)
         {
             _bugService = bugService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<BugDTO>>> GetAllBugs()
+        [HttpPost("add")]
+        public async Task<IActionResult> AddBug([FromBody] BugDTO bugDto)
         {
-            var bugs = await _bugService.GetAllBugsAsync();
-            return Ok(bugs);
+            var response = await _bugService.AddBug(bugDto);
+            return Ok(response);
+        }
+
+        [HttpPut("edit")]
+        public async Task<IActionResult> EditBug([FromBody] BugDTO bugDto)
+        {
+            var response = await _bugService.EditBug(bugDto);
+            return Ok(response);
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllBugs()
+        {
+            var response = await _bugService.GetAllBugs();
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<BugDTO>> GetBugById(int id)
+        public async Task<IActionResult> GetBugById(int id)
         {
-            var bug = await _bugService.GetBugByIdAsync(id);
-            if (bug == null) return NotFound();
-
-            return Ok(bug);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> AddBug(BugDTO bugDto)
-        {
-            await _bugService.AddBugAsync(bugDto);
-            return CreatedAtAction(nameof(GetBugById), new { id = bugDto.BugId }, bugDto);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateBug(int id, BugDTO bugDto)
-        {
-            await _bugService.UpdateBugAsync(id, bugDto);
-            return NoContent();
+            var response = await _bugService.GetBugById(id);
+            return Ok(response);
         }
     }
+
 }

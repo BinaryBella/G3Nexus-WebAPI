@@ -8,43 +8,42 @@ namespace G3NexusBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RequirementsController : ControllerBase
+    public class RequirementController : ControllerBase
     {
         private readonly IRequirementService _requirementService;
 
-        public RequirementsController(IRequirementService requirementService)
+        public RequirementController(IRequirementService requirementService)
         {
             _requirementService = requirementService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<RequirementDTO>>> GetAllRequirements()
+        [HttpPost("add")]
+        public async Task<IActionResult> AddRequirement([FromBody] RequirementDTO requirementDto)
         {
-            var requirements = await _requirementService.GetAllRequirementsAsync();
-            return Ok(requirements);
+            var response = await _requirementService.AddRequirement(requirementDto);
+            return Ok(response);
+        }
+
+        [HttpPut("edit")]
+        public async Task<IActionResult> EditRequirement([FromBody] RequirementDTO requirementDto)
+        {
+            var response = await _requirementService.EditRequirement(requirementDto);
+            return Ok(response);
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllRequirements()
+        {
+            var response = await _requirementService.GetAllRequirements();
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<RequirementDTO>> GetRequirementById(int id)
+        public async Task<IActionResult> GetRequirementById(int id)
         {
-            var requirement = await _requirementService.GetRequirementByIdAsync(id);
-            if (requirement == null) return NotFound();
-
-            return Ok(requirement);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> AddRequirement(RequirementDTO requirementDto)
-        {
-            await _requirementService.AddRequirementAsync(requirementDto);
-            return CreatedAtAction(nameof(GetRequirementById), new { id = requirementDto.RequirementId }, requirementDto);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateRequirement(int id, RequirementDTO requirementDto)
-        {
-            await _requirementService.UpdateRequirementAsync(id, requirementDto);
-            return NoContent();
+            var response = await _requirementService.GetRequirementById(id);
+            return Ok(response);
         }
     }
+
 }
