@@ -62,8 +62,14 @@ public class AuthService : IAuthService
         await _dbContext.Verifications.AddAsync(verification);
         await _dbContext.SaveChangesAsync();
 
-        // Send verification code via email
-        await _emailService.SendEmailAsync(user.EmailAddress, "Password Reset Verification Code", $"Your code is {verificationCode}");
+        // Get the email template
+        var emailTemplate = await _emailService.GetEmailTemplateAsync("VerificationEmailTemplate.html");
+
+        // Replace the placeholder with the actual verification code
+        var emailBody = emailTemplate.Replace("{{VerificationCode}}", verificationCode);
+
+        // Send verification code via email using the HTML template
+        await _emailService.SendEmailAsync(user.EmailAddress, "Password Reset Verification Code", emailBody, true);
 
         return new ApiResponse { Status = true, Message = "Verification code sent to email." };
     }
