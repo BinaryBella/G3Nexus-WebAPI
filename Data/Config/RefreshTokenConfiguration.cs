@@ -17,7 +17,7 @@ namespace G3NexusBackend.Data.Configurations
                 .HasMaxLength(256);
 
             // Configure Expires as a required field
-            builder.Property(rt => rt.Expires)
+            builder.Property(rt => rt.ExpiryDate)
                 .IsRequired();
 
             // Configure IsRevoked with default value false

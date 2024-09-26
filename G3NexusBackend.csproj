@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\VerificationsController.cs" />
+    <Compile Remove="Data\DTO\ForgotPasswordDTO.cs" />
+    <Compile Remove="Data\DTO\VerificationDTO.cs" />
+    <Compile Remove="Services\Interfaces\IVerificationService.cs" />
+    <Compile Remove="Services\VerificationService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Swagger for API documentation -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

@@ -2,7 +2,10 @@ using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using G3NexusBackend.Models;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using G3NexusBackend.Data.DTO;
+using G3NexusBackend.Services;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -10,118 +13,178 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly IJwtService _jwtService;
+    private readonly G3NexusDbContext _context;
 
-    public AuthController(IAuthService authService,IJwtService jwtService)
+    public AuthController(IAuthService authService, IJwtService jwtService, G3NexusDbContext context)
     {
+        _context = context;
         _authService = authService;
         _jwtService = jwtService;
     }
 
-    [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<ApiResponse>> Login([FromBody] LoginDTO userModel)
+    public async Task<IActionResult> Login(LoginDTO loginDTO)
     {
-        var response = new ApiResponse
-        {
-            Status = true
-        };
+        // Fetch the user by email (case-insensitive)
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.EmailAddress.ToLower() == loginDTO.EmailAddress.ToLower());
 
-        try
+        if (user == null)
         {
-            // Validate the incoming request model
-            if (!ModelState.IsValid)
+            return Unauthorized(new ApiResponse
             {
-                response.Status = false;
-                response.Error = "Invalid Data";
-                return BadRequest(response);
-            }
-
-            // Authenticate the user (this should return a user object if authentication is successful)
-            var user = _authService.IsAuthenticated(userModel.EmailAddress, userModel.Password);
-
-            if (user != null)
-            {
-                
-                // Ensure the role from the DTO matches the user's role
-                // if (user.Role != userModel.Role)
-                {
-                    response.Status = false;
-                    response.Message = "Unauthorized: Incorrect role";
-                    return new JsonResult(response);
-                }
-
-                // Define valid job titles for authentication based on the user's role
-                string[] validRoles;
-                string errorMessage;
-
-                if (user.Role == "Company-Admin" || user.Role == "Employee")
-                {
-                    validRoles = new[] { "Company-Admin", "Employee" };
-                    errorMessage = "Unauthorized: Only Company-Admin or Employee can login";
-                }
-                else if (user.Role == "Client-Admin" || user.Role == "Client")
-                {
-                    validRoles = new[] { "Client-Admin", "Client" };
-                    errorMessage = "Unauthorized: Only Client-Admin or Client can login";
-                }
-                else
-                {
-                    response.Status = false;
-                    response.Message = "Unauthorized: Your role does not have access to this endpoint";
-                    return new JsonResult(response);
-                }
-
-                // Check if the user's role is valid for this endpoint
-                if (validRoles.Contains(user.Role))
-                {
-                    // Generate access token with user's email and roles
-                    var accessToken = _jwtService.GenerateAccessToken(user.EmailAddress, new[] { user.Role });
-
-                    // Generate a refresh token
-                    var refreshToken = _jwtService.GenerateRefreshToken();
-
-                    // Create a new RefreshToken model to store in the database
-                    var refreshTokenModel = new RefreshToken
-                    {
-                        Token = refreshToken,
-                        Expires = DateTime.UtcNow.AddMinutes(60), // Adjust token expiration as per your requirement
-                        IsRevoked = false
-                    };
-
-                    // Save the refresh token in the database asynchronously
-                    await _jwtService.AddRefreshTokenAsync(refreshTokenModel);
-
-                    // Return access token, refresh token, and user information in the response
-                    response.Data = new
-                    {
-                        AccessToken = accessToken,
-                        RefreshToken = refreshToken,
-                        Role = user.Role,
-                        UserId = user.UserId,
-                        EmailAddress = user.EmailAddress
-                    };
-
-                    return new JsonResult(response);
-                }
-                else
-                {
-                    // Role is not authorized for this action
-                    response.Status = false;
-                    response.Message = errorMessage;
-                    return new JsonResult(response);
-                }
-            }
-
-            // If the user is not authenticated, return invalid email/password error
-            response.Status = false;
-            response.Message = "Invalid email or password";
-            return new JsonResult(response);
+                Status = false,
+                Message = "Unauthorized",
+                Error = "Invalid credentials",
+                Data = null
+            });
         }
-        catch (Exception error)
+
+        // Use PasswordHasher to verify the provided password
+        var passwordHasher = new PasswordHasher<User>();
+        var verificationResult = passwordHasher.VerifyHashedPassword(user, user.Password, loginDTO.Password);
+
+        // Check if the password is correct
+        if (verificationResult == PasswordVerificationResult.Failed)
         {
-            response.Status = false;
-            response.Error = "An internal error occurred";
-            return StatusCode(500, response);
+            return Unauthorized(new ApiResponse
+            {
+                Status = false,
+                Message = "Unauthorized",
+                Error = "Invalid credentials",
+                Data = null
+            });
         }
+
+        // If the credentials are valid, generate JWT token and refresh token
+        var token = _jwtService.GenerateAccessToken(user.EmailAddress, new[] { user.Role });
+        var refreshToken = _jwtService.GenerateRefreshToken();
+
+        // Optionally, save the refresh token in the database
+        await _jwtService.AddRefreshTokenAsync(new RefreshToken
+        {
+            Token = refreshToken,
+            UserId = user.UserId,
+            ExpiryDate = DateTime.UtcNow.AddDays(7) // Example expiration for refresh token
+        });
+
+        return Ok(new ApiResponse
+        {
+            Status = true,
+            Message = "Login successful",
+            Data = new
+            {
+                AccessToken = token,
+                RefreshToken = refreshToken
+            }
+        });
+    }
+
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDTO refreshTokenDTO)
+    {
+        // Validate the refresh token and access token
+        var principal = _jwtService.GetPrincipalFromExpiredToken(refreshTokenDTO.AccessToken);
+
+        var email = principal?.Identity?.Name;
+        if (email == null)
+        {
+            return BadRequest(new ApiResponse
+            {
+                Status = false,
+                Message = "Invalid token",
+                Error = "Access token is invalid",
+                Data = null
+            });
+        }
+
+        // Find the refresh token in the database
+        var storedRefreshToken = await _jwtService.GetRefreshTokenData(refreshTokenDTO.RefreshToken);
+        if (storedRefreshToken == null || storedRefreshToken.IsRevoked ||
+            storedRefreshToken.ExpiryDate < DateTime.UtcNow)
+        {
+            return Unauthorized(new ApiResponse
+            {
+                Status = false,
+                Message = "Invalid refresh token",
+                Error = "Refresh token is either invalid, expired, or revoked",
+                Data = null
+            });
+        }
+
+        // Generate a new access token and refresh token
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.EmailAddress == email);
+        if (user == null)
+        {
+            return Unauthorized(new ApiResponse
+            {
+                Status = false,
+                Message = "Unauthorized",
+                Error = "User not found",
+                Data = null
+            });
+        }
+
+        var roles = new[] { user.Role }; // Assuming the user has one role
+        var newAccessToken = _jwtService.GenerateAccessToken(user.EmailAddress, roles);
+        var newRefreshToken = _jwtService.GenerateRefreshToken();
+
+        // Revoke the old refresh token and add the new one
+        storedRefreshToken.IsRevoked = true;
+        await _jwtService.AddRefreshTokenAsync(new RefreshToken
+        {
+            Token = newRefreshToken,
+            UserId = user.UserId,
+            ExpiryDate = DateTime.UtcNow.AddDays(7), // Set a new expiry for the refresh token
+            IsRevoked = false
+        });
+
+        await _context.SaveChangesAsync();
+
+        // Return the new tokens
+        return Ok(new ApiResponse
+        {
+            Status = true,
+            Message = "Token refreshed successfully",
+            Data = new
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            }
+        });
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO model)
+    {
+        var response = await _authService.ForgotPasswordAsync(model);
+        if (!response.Status)
+        {
+            return BadRequest(response);
+        }
+        return Ok(response);
+    }
+
+    [HttpPost("verify-code")]
+    public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeDTO model)
+    {
+        var response = await _authService.VerifyCodeAsync(model);
+        if (!response.Status)
+        {
+            return BadRequest(response);
+        }
+        return Ok(response);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO model)
+    {
+        var response = await _authService.ResetPasswordAsync(model);
+        if (!response.Status)
+        {
+            return BadRequest(response);
+        }
+        return Ok(response);
     }
 }
