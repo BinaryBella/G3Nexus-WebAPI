@@ -1,12 +1,11 @@
-﻿using G3NexusBackend.Models;
-using G3NexusBackend.Services;
+﻿using G3NexusBackend.DTOs;
+using G3NexusBackend.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
@@ -16,52 +15,54 @@ namespace G3NexusBackend.Controllers
             _projectService = projectService;
         }
 
-        [HttpPost("add")]
-        public async Task<IActionResult> AddProject(Project project)
-        {
-            if (project == null)
-            {
-                return BadRequest("Project data is null.");
-            }
-
-            var createdProject = await _projectService.AddProjectAsync(project);
-            return Ok(createdProject);
-        }
-
-        [HttpPut("edit/{projectId}")]
-        public async Task<IActionResult> EditProject(int projectId, Project project)
-        {
-            if (project == null)
-            {
-                return BadRequest("Project data is null.");
-            }
-
-            var updatedProject = await _projectService.UpdateProjectAsync(projectId, project);
-            if (updatedProject == null)
-            {
-                return NotFound($"Project with ID {projectId} not found.");
-            }
-
-            return Ok(updatedProject);
-        }
-
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllProjects()
+        [HttpGet]
+        public async Task<IActionResult> GetProjects()
         {
             var projects = await _projectService.GetAllProjectsAsync();
-            return Ok(projects);
+            return Ok(new ApiResponse { Status = true, Data = projects });
         }
 
-        [HttpGet("{projectId}")]
-        public async Task<IActionResult> GetProjectById(int projectId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProjectById(int id)
         {
-            var project = await _projectService.GetProjectByIdAsync(projectId);
+            var project = await _projectService.GetProjectByIdAsync(id);
             if (project == null)
             {
-                return NotFound($"Project with ID {projectId} not found.");
+                return NotFound(new ApiResponse { Status = false, Message = "Project not found" });
             }
 
-            return Ok(project);
+            return Ok(new ApiResponse { Status = true, Data = project });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateProject(ProjectDTO projectDto)
+        {
+            var project = await _projectService.CreateProjectAsync(projectDto);
+            return CreatedAtAction(nameof(GetProjectById), new { id = project.ProjectId }, new ApiResponse { Status = true, Data = project });
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProject(int id, ProjectDTO projectDto)
+        {
+            var project = await _projectService.UpdateProjectAsync(id, projectDto);
+            if (project == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Project not found" });
+            }
+
+            return Ok(new ApiResponse { Status = true, Data = project });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeactivateProject(int id)
+        {
+            var response = await _projectService.DeActivateProjectAsync(id);
+            if (!response.Status)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
         }
     }
 }

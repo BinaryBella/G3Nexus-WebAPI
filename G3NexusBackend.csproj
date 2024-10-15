@@ -7,18 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\VerificationsController.cs" />
+    <Compile Remove="Data\DTO\ForgotPasswordDTO.cs" />
+    <Compile Remove="Data\DTO\VerificationDTO.cs" />
+    <Compile Remove="Services\Interfaces\IVerificationService.cs" />
+    <Compile Remove="Services\VerificationService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Swagger for API documentation -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
 
     <!-- Entity Framework Core and SQL Server provider -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>
