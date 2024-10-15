@@ -1,7 +1,7 @@
-﻿namespace G3NexusBackend.Data.DTO
+﻿namespace G3NexusBackend.DTOs
 {
     public class ForgotPasswordRequestDTO
     {
-        public string Email { get; set; }
+        public string EmailAddress { get; set; }
     }
 }

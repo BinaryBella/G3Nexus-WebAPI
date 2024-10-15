@@ -35,11 +35,9 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.Property(p => p.TotalBudget)
             .HasColumnType("decimal(18, 2)");
-
-        // Foreign Key for User (Client)
-        builder.HasOne(p => p.User)
-            .WithMany()
-            .HasForeignKey(p => p.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.Property(b => b.IsActive)
+            .IsRequired()
+            .HasMaxLength(50); 
     }
 }

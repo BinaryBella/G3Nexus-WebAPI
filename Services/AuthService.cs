@@ -1,127 +1,66 @@
-using System.Security.Cryptography;
-using G3NexusBackend.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
-using G3NexusBackend.Data.DTO;
 using G3NexusBackend.DTOs;
 using Microsoft.EntityFrameworkCore;
-using G3NexusBackend.Interfaces;
+using Microsoft.IdentityModel.Tokens;
 
 public class AuthService : IAuthService
 {
-    private readonly IConfiguration _config;
-    private readonly G3NexusDbContext _dbContext;
-    private readonly IEmailService _emailService;
+    private readonly G3NexusDbContext _context;
+    private readonly IConfiguration _configuration;
 
-    public AuthService(IConfiguration config, G3NexusDbContext dbContext, IEmailService emailService)
+    public AuthService(G3NexusDbContext context, IConfiguration configuration)
     {
-        _config = config;
-        _dbContext = dbContext;
-        _emailService = emailService;
+        _context = context;
+        _configuration = configuration;
     }
 
-    // Authenticate by checking the email and hashed password
-    public User? IsAuthenticated(string emailAddress, string password)
+    public async Task<ApiResponse> AuthenticateAsync(UserDTO userDto)
     {
-        // Hash the password entered by the user
-        var hashedPassword = HashPassword(password);
+        var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == userDto.Email);
+        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == userDto.Email);
 
-        // Find the user by email (case-insensitive) and compare hashed passwords
-        var user = _dbContext.Users
-            .FirstOrDefault(u => u.EmailAddress.ToLower() == emailAddress.ToLower() && u.Password == hashedPassword);
-
-        if (user == null)
+        if (client == null && employee == null)
         {
-            return null;
+            return new ApiResponse { Status = false, Message = "User not found" };
         }
 
-        return user;
-    }
-
-    public bool DoesEmailExists(string email)
-    {
-        var user = _dbContext.Users.FirstOrDefault(x => x.EmailAddress == email);
-        return user != null;
-    }
-
-    public async Task<ApiResponse> ForgotPasswordAsync(ForgotPasswordRequestDTO model)
-    {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.EmailAddress == model.Email);
-        if (user == null)
+        // Check if user exists and verify password
+        if (client != null && BCrypt.Net.BCrypt.Verify(userDto.Password, client.Password))
         {
-            return new ApiResponse { Status = false, Message = "User not found." };
+            var token = GenerateJwtToken(client.Email, client.Role);
+            return new ApiResponse { Status = true, Message = "Authentication successful", Data = token };
+        }
+        else if (employee != null && BCrypt.Net.BCrypt.Verify(userDto.Password, employee.Password))
+        {
+            var token = GenerateJwtToken(employee.Email, employee.Role);
+            return new ApiResponse { Status = true, Message = "Authentication successful", Data = token };
         }
 
-        var verificationCode = GenerateVerificationCode();
-        var verification = new Verification
+        return new ApiResponse { Status = false, Message = "Invalid credentials" };
+    }
+
+    private string GenerateJwtToken(string email, string role)
+    {
+        var claims = new[]
         {
-            UserId = user.UserId,
-            VerificationCode = verificationCode,
-            ExpiryDate = DateTime.UtcNow.AddMinutes(10)
+            new Claim(JwtRegisteredClaimNames.Sub, email),
+            new Claim(ClaimTypes.Role, role),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        await _dbContext.Verifications.AddAsync(verification);
-        await _dbContext.SaveChangesAsync();
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiresInMinutes"]));
 
-        // Get the email template
-        var emailTemplate = await _emailService.GetEmailTemplateAsync("VerificationEmailTemplate.html");
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: expires,
+            signingCredentials: creds);
 
-        // Replace the placeholder with the actual verification code
-        var emailBody = emailTemplate.Replace("{{VerificationCode}}", verificationCode);
-
-        // Send verification code via email using the HTML template
-        await _emailService.SendEmailAsync(user.EmailAddress, "Password Reset Verification Code", emailBody, true);
-
-        return new ApiResponse { Status = true, Message = "Verification code sent to email." };
-    }
-
-    public async Task<ApiResponse> VerifyCodeAsync(VerifyCodeDTO model)
-    {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.EmailAddress == model.Email);
-        if (user == null)
-        {
-            return new ApiResponse { Status = false, Message = "User not found." };
-        }
-
-        var verification = await _dbContext.Verifications
-            .FirstOrDefaultAsync(x => x.UserId == user.UserId && x.VerificationCode == model.VerificationCode && x.ExpiryDate > DateTime.UtcNow);
-
-        if (verification == null)
-        {
-            return new ApiResponse { Status = false, Message = "Invalid or expired verification code." };
-        }
-
-        return new ApiResponse { Status = true, Message = "Verification successful." };
-    }
-
-    public async Task<ApiResponse> ResetPasswordAsync(ResetPasswordDTO model)
-    {
-        if (model.NewPassword != model.ConfirmPassword)
-        {
-            return new ApiResponse { Status = false, Message = "Passwords do not match." };
-        }
-
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.EmailAddress == model.Email);
-        if (user == null)
-        {
-            return new ApiResponse { Status = false, Message = "User not found." };
-        }
-
-        user.Password = HashPassword(model.NewPassword); // Using the BCrypt HashPassword method
-        _dbContext.Users.Update(user);
-        await _dbContext.SaveChangesAsync();
-
-        return new ApiResponse { Status = true, Message = "Password reset successfully." };
-    }
-
-    private string GenerateVerificationCode()
-    {
-        var random = new Random();
-        return random.Next(100000, 999999).ToString();
-    }
-
-    private string HashPassword(string password)
-    {
-        // BCrypt for password hashing
-        return BCrypt.Net.BCrypt.HashPassword(password);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

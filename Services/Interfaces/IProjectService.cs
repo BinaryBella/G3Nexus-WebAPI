@@ -4,9 +4,10 @@ namespace G3NexusBackend.Interfaces
 {
     public interface IProjectService
     {
-        Task<ApiResponse> AddProject(ProjectDTO projectDto);
-        Task<ApiResponse> EditProject(ProjectDTO projectDto);
-        Task<ApiResponse> GetAllProjects();
-        Task<ApiResponse> GetProjectById(int projectId);
+        Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
+        Task<ProjectDTO> GetProjectByIdAsync(int projectId);
+        Task<ProjectDTO> CreateProjectAsync(ProjectDTO projectDto);
+        Task<ProjectDTO> UpdateProjectAsync(int projectId, ProjectDTO projectDto);
+        Task<ApiResponse> DeActivateProjectAsync(int projectId); 
     }
 }

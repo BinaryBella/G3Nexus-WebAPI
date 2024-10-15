@@ -2,7 +2,7 @@
 {
     public class VerifyCodeDTO
     {
-        public string Email { get; set; }
-        public string VerificationCode { get; set; }
+        public string EmailAddress { get; set; }
+        public string Code { get; set; }
     }
 }

@@ -4,9 +4,10 @@ namespace G3NexusBackend.Interfaces
 {
     public interface IRequirementService
     {
-        Task<ApiResponse> AddRequirement(RequirementDTO requirementDto);
-        Task<ApiResponse> EditRequirement(RequirementDTO requirementDto);
-        Task<ApiResponse> GetAllRequirements();
-        Task<ApiResponse> GetRequirementById(int requirementId);
+        Task<IEnumerable<RequirementDTO>> GetAllRequirementsAsync();
+        Task<RequirementDTO> GetRequirementByIdAsync(int requirementId);
+        Task<RequirementDTO> CreateRequirementAsync(RequirementDTO requirementDto);
+        Task<RequirementDTO> UpdateRequirementAsync(int requirementId, RequirementDTO requirementDto);
+        Task<ApiResponse> DeActivateRequirementAsync(int requirementId);
     }
-}
+}  
