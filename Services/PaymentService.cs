@@ -17,7 +17,7 @@ namespace G3NexusBackend.Services
         public async Task<IEnumerable<PaymentDTO>> GetAllPaymentsAsync()
         {
             return await _context.Payments
-                .Where(p => p.IsActive) // Only return active payments
+                .Where(p => p.IsActive)
                 .Select(p => new PaymentDTO
                 {
                     PaymentId = p.PaymentId,
@@ -63,7 +63,7 @@ namespace G3NexusBackend.Services
                 PaymentDescription = paymentDto.PaymentDescription,
                 PaymentDate = paymentDto.PaymentDate,
                 Attachment = paymentDto.Attachment,
-                IsActive = true // New payments are active by default
+                IsActive = true
             };
 
             _context.Payments.Add(payment);
