@@ -16,7 +16,7 @@ namespace G3NexusBackend.Services
         public async Task<IEnumerable<BugDTO>> GetAllBugsAsync()
         {
             return await _context.Bugs
-                .Where(b => b.IsActive) // Only return active bugs
+                .Where(b => b.IsActive)
                 .Select(b => new BugDTO
                 {
                     BugId = b.BugId,
@@ -60,7 +60,7 @@ namespace G3NexusBackend.Services
                 Severity = bugDto.Severity,
                 BugDescription = bugDto.BugDescription,
                 Attachment = bugDto.Attachment,
-                IsActive = true, // Newly created bug is active by default
+                IsActive = true,
                 ClientId = bugDto.ClientId,
                 ProjectId = bugDto.ProjectId
             };
