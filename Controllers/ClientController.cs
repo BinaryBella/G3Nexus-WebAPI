@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace G3NexusBackend.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ClientController : ControllerBase
