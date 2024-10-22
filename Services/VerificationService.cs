@@ -1,7 +1,6 @@
 using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
 using G3NexusBackend.Models;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Services
 {
@@ -14,7 +13,7 @@ namespace G3NexusBackend.Services
             _context = context;
         }
 
-        public async Task AddVerificationAsync(VerificationDTO verificationDto)
+        public async Task<ApiResponse> AddVerification(VerificationDTO verificationDto)
         {
             var verification = new Verification
             {
@@ -25,6 +24,8 @@ namespace G3NexusBackend.Services
 
             _context.Verifications.Add(verification);
             await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "Verification added successfully" };
         }
     }
 }

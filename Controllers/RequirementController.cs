@@ -1,50 +1,68 @@
 using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class RequirementsController : ControllerBase
+    [ApiController]
+    public class RequirementController : ControllerBase
     {
         private readonly IRequirementService _requirementService;
 
-        public RequirementsController(IRequirementService requirementService)
+        public RequirementController(IRequirementService requirementService)
         {
             _requirementService = requirementService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RequirementDTO>>> GetAllRequirements()
+        public async Task<IActionResult> GetRequirements()
         {
             var requirements = await _requirementService.GetAllRequirementsAsync();
-            return Ok(requirements);
+            return Ok(new ApiResponse { Status = true, Data = requirements });
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<RequirementDTO>> GetRequirementById(int id)
+        public async Task<IActionResult> GetRequirementById(int id)
         {
             var requirement = await _requirementService.GetRequirementByIdAsync(id);
-            if (requirement == null) return NotFound();
+            if (requirement == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Requirement not found" });
+            }
 
-            return Ok(requirement);
+            return Ok(new ApiResponse { Status = true, Data = requirement });
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddRequirement(RequirementDTO requirementDto)
+        public async Task<IActionResult> CreateRequirement(RequirementDTO requirementDto)
         {
-            await _requirementService.AddRequirementAsync(requirementDto);
-            return CreatedAtAction(nameof(GetRequirementById), new { id = requirementDto.RequirementId }, requirementDto);
+            var requirement = await _requirementService.CreateRequirementAsync(requirementDto);
+            return CreatedAtAction(nameof(GetRequirementById), new { id = requirement.RequirementId }, new ApiResponse { Status = true, Data = requirement });
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateRequirement(int id, RequirementDTO requirementDto)
+        public async Task<IActionResult> UpdateRequirement(int id, RequirementDTO requirementDto)
         {
-            await _requirementService.UpdateRequirementAsync(id, requirementDto);
-            return NoContent();
+            var requirement = await _requirementService.UpdateRequirementAsync(id, requirementDto);
+            if (requirement == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Requirement not found" });
+            }
+
+            return Ok(new ApiResponse { Status = true, Data = requirement });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeactivateRequirement(int id)
+        {
+            var response = await _requirementService.DeActivateRequirementAsync(id);
+            if (!response.Status)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
         }
     }
 }

@@ -1,6 +1,4 @@
 using G3NexusBackend.DTOs;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Interfaces
 {
@@ -8,7 +6,8 @@ namespace G3NexusBackend.Interfaces
     {
         Task<IEnumerable<BugDTO>> GetAllBugsAsync();
         Task<BugDTO> GetBugByIdAsync(int bugId);
-        Task AddBugAsync(BugDTO bugDto);
-        Task UpdateBugAsync(int bugId, BugDTO bugDto);
+        Task<BugDTO> CreateBugAsync(BugDTO bugDto);
+        Task<BugDTO> UpdateBugAsync(int bugId, BugDTO bugDto);
+        Task<ApiResponse> DeActivateBugAsync(int bugId); 
     }
 }

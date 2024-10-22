@@ -1,52 +1,68 @@
 using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class PaymentsController : ControllerBase
+    [ApiController]
+    public class PaymentController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
 
-        public PaymentsController(IPaymentService paymentService)
+        public PaymentController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PaymentDTO>>> GetAllPayments()
+        public async Task<IActionResult> GetPayments()
         {
             var payments = await _paymentService.GetAllPaymentsAsync();
-            return Ok(payments);
+            return Ok(new ApiResponse { Status = true, Data = payments });
         }
 
-        
         [HttpGet("{id}")]
-        public async Task<ActionResult<PaymentDTO>> GetPaymentById(int id)
+        public async Task<IActionResult> GetPaymentById(int id)
         {
             var payment = await _paymentService.GetPaymentByIdAsync(id);
-            if (payment == null) return NotFound();
+            if (payment == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Payment not found" });
+            }
 
-            return Ok(payment);
+            return Ok(new ApiResponse { Status = true, Data = payment });
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddPayment(PaymentDTO paymentDto)
+        public async Task<IActionResult> CreatePayment(PaymentDTO paymentDto)
         {
-            await _paymentService.AddPaymentAsync(paymentDto);
-            return CreatedAtAction(nameof(GetPaymentById), new { id = paymentDto.PaymentId }, paymentDto);
+            var payment = await _paymentService.CreatePaymentAsync(paymentDto);
+            return CreatedAtAction(nameof(GetPaymentById), new { id = payment.PaymentId }, new ApiResponse { Status = true, Data = payment });
         }
 
-        
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdatePayment(int id, PaymentDTO paymentDto)
+        public async Task<IActionResult> UpdatePayment(int id, PaymentDTO paymentDto)
         {
-            await _paymentService.UpdatePaymentAsync(id, paymentDto);
-            return NoContent();
+            var payment = await _paymentService.UpdatePaymentAsync(id, paymentDto);
+            if (payment == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Payment not found" });
+            }
+
+            return Ok(new ApiResponse { Status = true, Data = payment });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeactivatePayment(int id)
+        {
+            var response = await _paymentService.DeActivatePaymentAsync(id);
+            if (!response.Status)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
         }
     }
 }

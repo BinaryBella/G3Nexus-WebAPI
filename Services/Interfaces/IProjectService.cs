@@ -1,6 +1,4 @@
 ﻿using G3NexusBackend.DTOs;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Interfaces
 {
@@ -8,7 +6,8 @@ namespace G3NexusBackend.Interfaces
     {
         Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
         Task<ProjectDTO> GetProjectByIdAsync(int projectId);
-        Task AddProjectAsync(ProjectDTO projectDto);
-        Task UpdateProjectAsync(int projectId, ProjectDTO projectDto);
+        Task<ProjectDTO> CreateProjectAsync(ProjectDTO projectDto);
+        Task<ProjectDTO> UpdateProjectAsync(int projectId, ProjectDTO projectDto);
+        Task<ApiResponse> DeActivateProjectAsync(int projectId); 
     }
 }

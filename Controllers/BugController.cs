@@ -4,45 +4,65 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace G3NexusBackend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class BugsController : ControllerBase
+    [ApiController]
+    public class BugController : ControllerBase
     {
         private readonly IBugService _bugService;
 
-        public BugsController(IBugService bugService)
+        public BugController(IBugService bugService)
         {
             _bugService = bugService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BugDTO>>> GetAllBugs()
+        public async Task<IActionResult> GetBugs()
         {
             var bugs = await _bugService.GetAllBugsAsync();
-            return Ok(bugs);
+            return Ok(new ApiResponse { Status = true, Data = bugs });
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<BugDTO>> GetBugById(int id)
+        public async Task<IActionResult> GetBugById(int id)
         {
             var bug = await _bugService.GetBugByIdAsync(id);
-            if (bug == null) return NotFound();
+            if (bug == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Bug not found" });
+            }
 
-            return Ok(bug);
+            return Ok(new ApiResponse { Status = true, Data = bug });
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddBug(BugDTO bugDto)
+        public async Task<IActionResult> CreateBug(BugDTO bugDto)
         {
-            await _bugService.AddBugAsync(bugDto);
-            return CreatedAtAction(nameof(GetBugById), new { id = bugDto.BugId }, bugDto);
+            var bug = await _bugService.CreateBugAsync(bugDto);
+            return CreatedAtAction(nameof(GetBugById), new { id = bug.BugId }, new ApiResponse { Status = true, Data = bug });
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateBug(int id, BugDTO bugDto)
+        public async Task<IActionResult> UpdateBug(int id, BugDTO bugDto)
         {
-            await _bugService.UpdateBugAsync(id, bugDto);
-            return NoContent();
+            var bug = await _bugService.UpdateBugAsync(id, bugDto);
+            if (bug == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Bug not found" });
+            }
+
+            return Ok(new ApiResponse { Status = true, Data = bug });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeactivateBug(int id)
+        {
+            var response = await _bugService.DeActivateBugAsync(id);
+            if (!response.Status)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
         }
     }
 }

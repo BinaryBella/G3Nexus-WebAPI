@@ -1,7 +1,5 @@
-﻿using G3NexusBackend.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 
 public class BugConfiguration : IEntityTypeConfiguration<Bug>
 {
@@ -10,28 +8,38 @@ public class BugConfiguration : IEntityTypeConfiguration<Bug>
         // Table name
         builder.ToTable("Bugs");
 
-        // Primary key
+        // Primary Key
         builder.HasKey(b => b.BugId);
 
         // Properties
         builder.Property(b => b.BugTitle)
             .IsRequired()
-            .HasMaxLength(200);
+            .HasMaxLength(100);
 
         builder.Property(b => b.Severity)
             .IsRequired()
-            .HasMaxLength(20);
+            .HasMaxLength(50); // Adjust length based on your requirements (e.g., "Critical", "High", etc.)
 
         builder.Property(b => b.BugDescription)
-            .HasMaxLength(1000);
+            .IsRequired()
+            .HasMaxLength(500); // Adjust description length as per your use case
 
         builder.Property(b => b.Attachment)
-            .HasMaxLength(255);
+            .HasMaxLength(200); // Assuming this is a URL or file path
 
-        // Foreign Key for Project
+        builder.Property(b => b.IsActive)
+            .IsRequired()
+            .HasMaxLength(50); // For status like "Active", "Inactive", etc.
+
+        // Foreign Keys and Relationships
+        builder.HasOne(b => b.Client)
+            .WithMany(c => c.Bugs)
+            .HasForeignKey(b => b.ClientId)
+            .OnDelete(DeleteBehavior.Cascade); // Cascade delete if needed
+
         builder.HasOne(b => b.Project)
-            .WithMany()
+            .WithMany(p => p.Bugs)
             .HasForeignKey(b => b.ProjectId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade); // Cascade delete if needed
     }
 }

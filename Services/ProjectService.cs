@@ -1,10 +1,6 @@
 ﻿using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
-using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Services
 {
@@ -19,32 +15,39 @@ namespace G3NexusBackend.Services
 
         public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
         {
-            return await _context.Projects.Select(project => new ProjectDTO
-            {
-                ProjectId = project.ProjectId,
-                UserId = project.UserId,
-                ProjectName = project.ProjectName,
-                ProjectType = project.ProjectType,
-                ProjectSize = project.ProjectSize,
-                CreationDate = project.CreationDate,
-                ProjectDescription = project.ProjectDescription,
-                EstimatedBudget = project.EstimatedBudget,
-                ActualStartDate = project.ActualStartDate,
-                ActualEndDate = project.ActualEndDate,
-                TotalBudget = project.TotalBudget,
-                Status = project.Status
-            }).ToListAsync();
+            return await _context.Projects
+                .Where(p => p.IsActive)
+                .Select(p => new ProjectDTO
+                {
+                    ProjectId = p.ProjectId,
+                    ProjectName = p.ProjectName,
+                    ProjectType = p.ProjectType,
+                    ProjectSize = p.ProjectSize,
+                    CreationDate = p.CreationDate,
+                    ProjectDescription = p.ProjectDescription,
+                    EstimatedBudget = p.EstimatedBudget,
+                    ActualStartDate = p.ActualStartDate,
+                    ActualEndDate = p.ActualEndDate,
+                    TotalBudget = p.TotalBudget,
+                    PaymentType = p.PaymentType,
+                    PaymentStatus = p.PaymentStatus,
+                    Status = p.Status,
+                    IsActive = p.IsActive
+                })
+                .ToListAsync();
         }
 
         public async Task<ProjectDTO> GetProjectByIdAsync(int projectId)
         {
             var project = await _context.Projects.FindAsync(projectId);
-            if (project == null) return null;
+            if (project == null || !project.IsActive)
+            {
+                return null;
+            }
 
             return new ProjectDTO
             {
                 ProjectId = project.ProjectId,
-                UserId = project.UserId,
                 ProjectName = project.ProjectName,
                 ProjectType = project.ProjectType,
                 ProjectSize = project.ProjectSize,
@@ -54,15 +57,17 @@ namespace G3NexusBackend.Services
                 ActualStartDate = project.ActualStartDate,
                 ActualEndDate = project.ActualEndDate,
                 TotalBudget = project.TotalBudget,
-                Status = project.Status
+                PaymentType = project.PaymentType,
+                PaymentStatus = project.PaymentStatus,
+                Status = project.Status,
+                IsActive = project.IsActive
             };
         }
 
-        public async Task AddProjectAsync(ProjectDTO projectDto)
+        public async Task<ProjectDTO> CreateProjectAsync(ProjectDTO projectDto)
         {
             var project = new Project
             {
-                UserId = projectDto.UserId,
                 ProjectName = projectDto.ProjectName,
                 ProjectType = projectDto.ProjectType,
                 ProjectSize = projectDto.ProjectSize,
@@ -72,19 +77,27 @@ namespace G3NexusBackend.Services
                 ActualStartDate = projectDto.ActualStartDate,
                 ActualEndDate = projectDto.ActualEndDate,
                 TotalBudget = projectDto.TotalBudget,
-                Status = projectDto.Status
+                PaymentType = projectDto.PaymentType,
+                PaymentStatus = projectDto.PaymentStatus,
+                Status = projectDto.Status,
+                IsActive = true // New projects are active by default
             };
 
             _context.Projects.Add(project);
             await _context.SaveChangesAsync();
+
+            projectDto.ProjectId = project.ProjectId;
+            return projectDto;
         }
 
-        public async Task UpdateProjectAsync(int projectId, ProjectDTO projectDto)
+        public async Task<ProjectDTO> UpdateProjectAsync(int projectId, ProjectDTO projectDto)
         {
             var project = await _context.Projects.FindAsync(projectId);
-            if (project == null) return;
+            if (project == null || !project.IsActive)
+            {
+                return null;
+            }
 
-            project.UserId = projectDto.UserId;
             project.ProjectName = projectDto.ProjectName;
             project.ProjectType = projectDto.ProjectType;
             project.ProjectSize = projectDto.ProjectSize;
@@ -94,9 +107,29 @@ namespace G3NexusBackend.Services
             project.ActualStartDate = projectDto.ActualStartDate;
             project.ActualEndDate = projectDto.ActualEndDate;
             project.TotalBudget = projectDto.TotalBudget;
+            project.PaymentType = projectDto.PaymentType;
+            project.PaymentStatus = projectDto.PaymentStatus;
             project.Status = projectDto.Status;
 
+            _context.Projects.Update(project);
             await _context.SaveChangesAsync();
+
+            return projectDto;
+        }
+
+        public async Task<ApiResponse> DeActivateProjectAsync(int projectId)
+        {
+            var project = await _context.Projects.FindAsync(projectId);
+            if (project == null || !project.IsActive)
+            {
+                return new ApiResponse { Status = false, Message = "Project not found or already inactive." };
+            }
+
+            project.IsActive = false;
+            _context.Projects.Update(project);
+            await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "Project successfully deactivated." };
         }
     }
 }

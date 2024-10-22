@@ -2,9 +2,6 @@ using G3NexusBackend.DTOs;
 using G3NexusBackend.Interfaces;
 using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace G3NexusBackend.Services
 {
@@ -19,22 +16,29 @@ namespace G3NexusBackend.Services
 
         public async Task<IEnumerable<PaymentDTO>> GetAllPaymentsAsync()
         {
-            return await _context.Payments.Select(payment => new PaymentDTO
-            {
-                PaymentId = payment.PaymentId,
-                ProjectId = payment.ProjectId,
-                PaymentAmount = payment.PaymentAmount,
-                PaymentType = payment.PaymentType,
-                PaymentDescription = payment.PaymentDescription,
-                PaymentDate = payment.PaymentDate,
-                Attachment = payment.Attachment
-            }).ToListAsync();
+            return await _context.Payments
+                .Where(p => p.IsActive)
+                .Select(p => new PaymentDTO
+                {
+                    PaymentId = p.PaymentId,
+                    ProjectId = p.ProjectId,
+                    PaymentAmount = p.PaymentAmount,
+                    PaymentType = p.PaymentType,
+                    PaymentDescription = p.PaymentDescription,
+                    PaymentDate = p.PaymentDate,
+                    Attachment = p.Attachment,
+                    IsActive = p.IsActive
+                })
+                .ToListAsync();
         }
 
         public async Task<PaymentDTO> GetPaymentByIdAsync(int paymentId)
         {
             var payment = await _context.Payments.FindAsync(paymentId);
-            if (payment == null) return null;
+            if (payment == null || !payment.IsActive)
+            {
+                return null;
+            }
 
             return new PaymentDTO
             {
@@ -44,11 +48,12 @@ namespace G3NexusBackend.Services
                 PaymentType = payment.PaymentType,
                 PaymentDescription = payment.PaymentDescription,
                 PaymentDate = payment.PaymentDate,
-                Attachment = payment.Attachment
+                Attachment = payment.Attachment,
+                IsActive = payment.IsActive
             };
         }
 
-        public async Task AddPaymentAsync(PaymentDTO paymentDto)
+        public async Task<PaymentDTO> CreatePaymentAsync(PaymentDTO paymentDto)
         {
             var payment = new Payment
             {
@@ -57,17 +62,24 @@ namespace G3NexusBackend.Services
                 PaymentType = paymentDto.PaymentType,
                 PaymentDescription = paymentDto.PaymentDescription,
                 PaymentDate = paymentDto.PaymentDate,
-                Attachment = paymentDto.Attachment
+                Attachment = paymentDto.Attachment,
+                IsActive = true
             };
 
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
+
+            paymentDto.PaymentId = payment.PaymentId;
+            return paymentDto;
         }
 
-        public async Task UpdatePaymentAsync(int paymentId, PaymentDTO paymentDto)
+        public async Task<PaymentDTO> UpdatePaymentAsync(int paymentId, PaymentDTO paymentDto)
         {
             var payment = await _context.Payments.FindAsync(paymentId);
-            if (payment == null) return;
+            if (payment == null || !payment.IsActive)
+            {
+                return null;
+            }
 
             payment.ProjectId = paymentDto.ProjectId;
             payment.PaymentAmount = paymentDto.PaymentAmount;
@@ -76,7 +88,25 @@ namespace G3NexusBackend.Services
             payment.PaymentDate = paymentDto.PaymentDate;
             payment.Attachment = paymentDto.Attachment;
 
+            _context.Payments.Update(payment);
             await _context.SaveChangesAsync();
+
+            return paymentDto;
+        }
+
+        public async Task<ApiResponse> DeActivatePaymentAsync(int paymentId)
+        {
+            var payment = await _context.Payments.FindAsync(paymentId);
+            if (payment == null || !payment.IsActive)
+            {
+                return new ApiResponse { Status = false, Message = "Payment not found or already inactive." };
+            }
+
+            payment.IsActive = false;
+            _context.Payments.Update(payment);
+            await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "Payment successfully deactivated." };
         }
     }
 }

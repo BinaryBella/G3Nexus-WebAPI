@@ -1,10 +1,11 @@
 using G3NexusBackend.DTOs;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
-namespace G3NexusBackend.Interfaces
+namespace G3NexusBackend.Services.Interfaces;
+
+public interface IVerificationService
 {
-    public interface IVerificationService
-    {
-        Task AddVerificationAsync(VerificationDTO verificationDto);
-    }
+    Task<VerificationDTO> GenerateVerificationCode(string email);
+    Task<bool> ValidateVerificationCode(ValidateVerificationCodeRequest request);
+    Task<bool> ValidateVerificationCode(string email, string code);
 }

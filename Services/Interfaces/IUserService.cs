@@ -1,12 +1,9 @@
 ﻿using G3NexusBackend.DTOs;
 
-namespace G3NexusBackend.Interfaces
+public interface IUserService
 {
-    public interface IUserService
-    {
-        Task<IEnumerable<UserDTO>> GetAllUsersAsync();
-        Task<UserDTO> GetUserByIdAsync(int userId);
-        Task AddUserAsync(UserDTO userDto);
-        Task UpdateUserAsync(int userId, UserDTO userDto);
-    }
+    Task<ApiResponse> AddUser(UserDTO userDto);
+    Task<ApiResponse> EditUser(UserDTO userDto);
+    Task<ApiResponse> GetAllUsers();
+    Task<ApiResponse> GetUserById(int userId);
 }
