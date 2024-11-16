@@ -29,6 +29,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IBugService, BugService>();
 builder.Services.AddScoped<IRequirementService, RequirementService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<ITermsConditionsService, TermsConditionsService>();
 
 
 // Add Swagger with JWT Authentication support
