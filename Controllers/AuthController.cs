@@ -2,6 +2,7 @@ using System.Security.Claims;
 using G3NexusBackend.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,14 +16,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] UserDTO userDto)
+    public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
     {
-        if (userDto == null)
-        {
-            return BadRequest(new ApiResponse { Status = false, Message = "Invalid request" });
-        }
-
-        var response = await _authService.AuthenticateAsync(userDto);
+        var response = await _authService.AuthenticateAsync(loginDto);
         if (response.Status)
         {
             return Ok(response);
@@ -37,15 +33,22 @@ public class AuthController : ControllerBase
         var authResponse = await _authService.RefreshTokenAsync(refreshTokenDTO);
         return Ok(authResponse);
     }
-
+    
+    [HttpPost("logout")]
     [Authorize]
-    [HttpGet("verify-role")]
-    public async Task<IActionResult> VerifyRole([FromQuery] string requiredRole)
+    public async Task<IActionResult> Logout()
     {
-        var email = User.FindFirst(ClaimTypes.Email)?.Value;
-        if (email == null) return Unauthorized();
+        var userEmail = User.FindFirst(ClaimTypes.Name)?.Value ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-        var isAuthorized = await _authService.VerifyRoleAsync(email, requiredRole);
-        return isAuthorized ? Ok("Role verified.") : Forbid();
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized(new { message = "Invalid user" });
+        }
+
+        var result = await _authService.LogoutAsync(userEmail);
+        return result ? Ok(new { message = "Logged out successfully" }) : BadRequest(new { message = "Logout failed" });
     }
+  
+
+    
 }

@@ -17,16 +17,33 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
 
-    public async Task<ApiResponse> AuthenticateAsync(UserDTO userDto)
+    public async Task<ApiResponse> AuthenticateAsync(LoginDTO loginDto)
     {
         try
         {
-            var (isValid, email, role) = await ValidateUserAsync(userDto);
+            var (isValid, email, role) = await ValidateUserAsync(loginDto);
             if (!isValid)
+            {
                 return new ApiResponse { Status = false, Message = "Invalid credentials" };
-
-            var token = GenerateJwtToken(email, role);
-            return new ApiResponse { Status = true, Message = "Authentication successful", Data = token };
+            }
+            
+            var refreshToken = GenerateJwtToken(email, role, TokenType.RefreshToken);
+            var refreshTokenObject = new RefreshToken
+            {
+                Email = email,
+                Token = refreshToken,
+                IsActive = true,
+                ExpiryDate = DateTime.Now.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpirationDays"]))
+                
+            };
+            await _context.RefreshTokens.AddAsync(refreshTokenObject);
+            await _context.SaveChangesAsync();
+            return new ApiResponse { Status = true, Message = "Authentication successful", Data =
+            new {
+                AccessToken = GenerateJwtToken(email, role, TokenType.AccessToken),
+                RefreshToken = refreshToken
+            } };
+            
         }
         catch (Exception ex)
         {
@@ -34,11 +51,11 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<ApiResponse> RefreshTokenAsync(RefreshTokenDTO refreshTokenDTO)
+    public async Task<ApiResponse> RefreshTokenAsync(RefreshTokenDTO refreshTokenDto)
     {
         try
         {
-            var principal = GetPrincipalFromExpiredToken(refreshTokenDTO.AccessToken);
+            var principal = GetPrincipalFromExpiredToken(refreshTokenDto.AccessToken);
             var email = principal.FindFirst(ClaimTypes.Email)?.Value;
 
             if (email == null)
@@ -46,7 +63,7 @@ public class AuthService : IAuthService
 
             // Retrieve the refresh token
             var refreshToken = await _context.RefreshTokens
-                .FirstOrDefaultAsync(rt => rt.Token == refreshTokenDTO.RefreshToken && rt.Email == email);
+                .FirstOrDefaultAsync(rt => rt.Token == refreshTokenDto.RefreshToken && rt.Email == email);
 
             if (refreshToken == null || refreshToken.ExpiryDate < DateTime.UtcNow || refreshToken.IsRevoked ||
                 !refreshToken.IsActive)
@@ -61,38 +78,23 @@ public class AuthService : IAuthService
             if (client == null && employee == null)
                 return new ApiResponse { Status = false, Message = "User not found" };
 
-            var userEmail = client?.Email ?? employee.Email;
-            var userRole = client?.Role ?? employee.Role;
+            var userEmail = client?.Email ?? employee?.Email;
+            var userRole = client?.Role ?? employee?.Role;
+            
+            if (userEmail == null || userRole == null)
+                return new ApiResponse { Status = false, Message = "User not found" };
 
             // Generate new tokens
-            var newAccessToken = GenerateJwtToken(userEmail, userRole);
-            var newRefreshToken = Guid.NewGuid().ToString();
-
-            // Update the current refresh token to inactive
-            refreshToken.IsActive = false;
-            refreshToken.IsRevoked = true;
-
-            // Create a new refresh token
-            var newRefreshTokenEntity = new RefreshToken
-            {
-                Email = email,
-                Token = newRefreshToken,
-                ExpiryDate = DateTime.UtcNow.AddDays(7),
-                IsActive = true,
-                IsRevoked = false
-            };
-
-            await _context.RefreshTokens.AddAsync(newRefreshTokenEntity);
-            await _context.SaveChangesAsync();
+            var newAccessToken = GenerateJwtToken(userEmail, userRole, TokenType.AccessToken);
 
             return new ApiResponse
             {
                 Status = true,
                 Message = "Tokens refreshed successfully",
-                Data = new AuthResponseDTO
+                Data = new
                 {
                     AccessToken = newAccessToken,
-                    RefreshToken = newRefreshToken
+                    RefreshToken = refreshTokenDto.RefreshToken
                 }
             };
         }
@@ -102,51 +104,41 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<bool> VerifyRoleAsync(string email, string requiredRole)
+    private async Task<(bool isValid, string email, string role)> ValidateUserAsync(LoginDTO loginDto)
     {
-        var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email && c.Role == requiredRole);
-        if (client != null)
-            return true;
-
-        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email && e.Role == requiredRole);
-        if (employee != null)
-            return true;
-
-        return false;
-    }
-
-
-    private async Task<(bool isValid, string email, string role)> ValidateUserAsync(UserDTO userDto)
-    {
-        var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == userDto.Email);
-        if (client != null && BCrypt.Net.BCrypt.Verify(userDto.Password, client.Password))
+        var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == loginDto.EmailAddress);
+        if (client != null && BCrypt.Net.BCrypt.Verify(loginDto.Password, client.Password))
             return (true, client.Email, client.Role);
 
-        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == userDto.Email);
-        if (employee != null && BCrypt.Net.BCrypt.Verify(userDto.Password, employee.Password))
+        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == loginDto.EmailAddress);
+        if (employee != null && BCrypt.Net.BCrypt.Verify(loginDto.Password, employee.Password))
             return (true, employee.Email, employee.Role);
 
         return (false, null, null);
     }
 
-    private string GenerateJwtToken(string email, string role)
+    private string GenerateJwtToken(string email, string role, TokenType tokenType)
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, email),
-            new Claim(ClaimTypes.Role, role),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new (ClaimTypes.Email, email),
+            new (ClaimTypes.Role, role),
+            new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
         // Add additional claims (optional)
-        if (role == "ClientAdmin" || role == "CompanyAdmin")
+        if (role is "ClientAdmin" or "CompanyAdmin")
         {
             claims.Add(new Claim("UserType", "Admin"));
         }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiresInMinutes"]));
+        var expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpirationMinutes"]));
+        if (tokenType == TokenType.RefreshToken)
+        {
+            expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpirationDays"]));
+        }
 
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
@@ -180,4 +172,22 @@ public class AuthService : IAuthService
 
         return principal;
     }
+    
+    public async Task<bool> LogoutAsync(string email)
+    {
+        var refreshToken = await _context.RefreshTokens
+            .Where(rt => rt.Email == email)
+            .FirstOrDefaultAsync();
+
+        if (refreshToken == null)
+        {
+            return false; 
+        }
+
+        _context.RefreshTokens.Remove(refreshToken);
+        await _context.SaveChangesAsync();
+
+        return true; // Logout successful
+    }
+
 }

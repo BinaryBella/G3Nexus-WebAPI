@@ -14,7 +14,7 @@ namespace G3NexusBackend.Data.Configurations
             // Configure Token as required and with max length
             builder.Property(rt => rt.Token)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasColumnType("NVARCHAR(MAX)");
 
             // Configure Expires as a required field
             builder.Property(rt => rt.ExpiryDate)

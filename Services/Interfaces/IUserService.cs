@@ -2,8 +2,8 @@
 
 public interface IUserService
 {
-    Task<ApiResponse> AddUser(UserDTO userDto);
-    Task<ApiResponse> EditUser(UserDTO userDto);
+    Task<ApiResponse> AddUser(LoginDTO loginDto);
+    Task<ApiResponse> EditUser(LoginDTO loginDto);
     Task<ApiResponse> GetAllUsers();
     Task<ApiResponse> GetUserById(int userId);
 }
