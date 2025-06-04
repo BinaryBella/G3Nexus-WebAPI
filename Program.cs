@@ -11,6 +11,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+// Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // NextJS default port
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Add DbContext
 builder.Services.AddDbContext<G3NexusDbContext>(options =>
 {
@@ -110,13 +121,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Add authentication and authorization middlewares
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseCors();
-
 app.MapControllers();
-
 app.Run();
