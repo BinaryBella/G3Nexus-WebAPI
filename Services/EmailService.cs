@@ -1,50 +1,46 @@
-﻿using G3NexusBackend.Interfaces;
-using Microsoft.Extensions.Configuration;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
-using System.IO;
+using G3NexusBackend.Services.Interfaces;
 
-namespace G3NexusBackend.Services
+namespace G3NexusBackend.Services;
+
+public class EmailService : IEmailService
 {
-    public class EmailService : IEmailService
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
+
+    public EmailService(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        private readonly IConfiguration _configuration;
-        private readonly IWebHostEnvironment _environment;
+        _configuration = configuration;
+        _environment = environment;
+    }
 
-        public EmailService(IConfiguration configuration, IWebHostEnvironment environment)
+    public async Task SendEmailAsync(string toEmail, string subject, string body, bool isHtml = false)
+    {
+        var emailSettings = _configuration.GetSection("EmailSettings");
+
+        var smtpClient = new SmtpClient(emailSettings["SmtpServer"])
         {
-            _configuration = configuration;
-            _environment = environment;
-        }
+            Port = int.Parse(emailSettings["Port"]),
+            Credentials = new NetworkCredential(emailSettings["Username"], emailSettings["Password"]),
+            EnableSsl = true,
+        };
 
-        public async Task SendEmailAsync(string toEmail, string subject, string body, bool isHtml = false)
+        var mailMessage = new MailMessage
         {
-            var emailSettings = _configuration.GetSection("EmailSettings");
+            From = new MailAddress(emailSettings["SenderEmail"], emailSettings["SenderName"]),
+            Subject = subject,
+            Body = body,
+            IsBodyHtml = isHtml,
+        };
+        mailMessage.To.Add(toEmail);
 
-            var smtpClient = new SmtpClient(emailSettings["SmtpServer"])
-            {
-                Port = int.Parse(emailSettings["Port"]),
-                Credentials = new NetworkCredential(emailSettings["Username"], emailSettings["Password"]),
-                EnableSsl = true,
-            };
+        await smtpClient.SendMailAsync(mailMessage);
+    }
 
-            var mailMessage = new MailMessage
-            {
-                From = new MailAddress(emailSettings["SenderEmail"], emailSettings["SenderName"]),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = isHtml,
-            };
-            mailMessage.To.Add(toEmail);
-
-            await smtpClient.SendMailAsync(mailMessage);
-        }
-
-        public async Task<string> GetEmailTemplateAsync(string templateName)
-        {
-            var templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", templateName);
-            return await File.ReadAllTextAsync(templatePath);
-        }
+    public async Task<string> GetEmailTemplateAsync(string templateName)
+    {
+        var templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", templateName);
+        return await File.ReadAllTextAsync(templatePath);
     }
 }

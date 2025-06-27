@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using G3NexusBackend.DTOs;
+using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;

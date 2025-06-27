@@ -1,5 +1,7 @@
 ﻿using G3NexusBackend.DTOs;
 
+namespace G3NexusBackend.Services.Interfaces;
+
 public interface IUserService
 {
     Task<ApiResponse> AddUser(LoginDTO loginDto);

@@ -1,6 +1,6 @@
 using G3NexusBackend.DTOs;
+using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using G3NexusBackend.Interfaces;
 
 [ApiController]
 [Route("api/[controller]")]

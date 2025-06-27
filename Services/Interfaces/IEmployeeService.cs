@@ -1,13 +1,12 @@
 using G3NexusBackend.DTOs;
 
-namespace G3NexusBackend.Interfaces
+namespace G3NexusBackend.Services.Interfaces;
+
+public interface IEmployeeService
 {
-    public interface IEmployeeService
-    {
-        Task<IEnumerable<EmployeeDTO>> GetAllEmployeesAsync();
-        Task<EmployeeDTO> GetEmployeeByIdAsync(int employeeId);
-        Task<EmployeeDTO> CreateEmployeeAsync(EmployeeDTO employeeDto);
-        Task<EmployeeDTO> UpdateEmployeeAsync(int employeeId, EmployeeDTO employeeDto);
-        Task<ApiResponse> DeActivateEmployeeAsync(int employeeId);
-    }
+    Task<IEnumerable<EmployeeDTO>> GetAllEmployeesAsync();
+    Task<EmployeeDTO?> GetEmployeeByIdAsync(int employeeId);
+    Task<EmployeeDTO> CreateEmployeeAsync(EmployeeDTO employeeDto);
+    Task<EmployeeDTO?> UpdateEmployeeAsync(int employeeId, EmployeeDTO employeeDto);
+    Task<ApiResponse> DeActivateEmployeeAsync(int employeeId);
 }

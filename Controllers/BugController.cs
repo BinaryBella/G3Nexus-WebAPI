@@ -1,5 +1,5 @@
 using G3NexusBackend.DTOs;
-using G3NexusBackend.Interfaces;
+using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace G3NexusBackend.Controllers
@@ -22,7 +22,7 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = bugs });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetBugById(int id)
         {
             var bug = await _bugService.GetBugByIdAsync(id);
@@ -37,23 +37,38 @@ namespace G3NexusBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBug(BugDTO bugDto)
         {
-            var bug = await _bugService.CreateBugAsync(bugDto);
-            return CreatedAtAction(nameof(GetBugById), new { id = bug.BugId }, new ApiResponse { Status = true, Data = bug });
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBug(int id, BugDTO bugDto)
-        {
-            var bug = await _bugService.UpdateBugAsync(id, bugDto);
-            if (bug == null)
+            try
             {
-                return NotFound(new ApiResponse { Status = false, Message = "Bug not found" });
+                var bug = await _bugService.CreateBugAsync(bugDto);
+                return CreatedAtAction(nameof(GetBugById), new { id = bug.BugId }, new ApiResponse { Status = true, Data = bug });
             }
-
-            return Ok(new ApiResponse { Status = true, Data = bug });
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
+            }
         }
 
-        [HttpDelete("{id}")]
+        [HttpPut]
+        public async Task<IActionResult> UpdateBug(BugDTO bugDto)
+        {
+            try
+            {
+                var bugId = bugDto.BugId;
+                var bug = await _bugService.UpdateBugAsync(bugId, bugDto);
+                if (bug == null)
+                {
+                    return NotFound(new ApiResponse { Status = false, Message = "Bug not found" });
+                }
+
+                return Ok(new ApiResponse { Status = true, Data = bug });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeactivateBug(int id)
         {
             var response = await _bugService.DeActivateBugAsync(id);
@@ -66,3 +81,4 @@ namespace G3NexusBackend.Controllers
         }
     }
 }
+

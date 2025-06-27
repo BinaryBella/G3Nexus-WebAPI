@@ -2,13 +2,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using G3NexusBackend.Interfaces;
 using G3NexusBackend.Models;
+using G3NexusBackend.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace G3NexusBackend.Services
-{
+namespace G3NexusBackend.Services;
+
 public class JwtService : IJwtService
 {
     private readonly IConfiguration _configuration;
@@ -99,5 +99,4 @@ public class JwtService : IJwtService
     {
         return await dataContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == token);
     }
-}
 }

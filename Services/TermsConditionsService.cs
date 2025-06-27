@@ -1,19 +1,12 @@
 using G3NexusBackend.DTOs;
-using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using G3NexusBackend.Interfaces;
 using G3NexusBackend.Models;
+using G3NexusBackend.Services.Interfaces;
+
+namespace G3NexusBackend.Services;
 
 public class TermsConditionsService : ITermsConditionsService
 {
-    private readonly List<TermsConditions> _termsConditions;
-
-    public TermsConditionsService()
-    {
-        _termsConditions = new List<TermsConditions>();
-    }
+    private readonly List<TermsConditions> _termsConditions = new();
 
     public async Task<ApiResponse> GetAllAsync()
     {
@@ -27,28 +20,28 @@ public class TermsConditionsService : ITermsConditionsService
 
     public async Task<ApiResponse> CreateAsync(TermsConditionsDTO dto)
     {
-        var newTC = new TermsConditions
+        var newTc = new TermsConditions
         {
             TCId = _termsConditions.Count + 1,
             Content = dto.Content,
             UpdatedDate = DateTime.Now
         };
 
-        _termsConditions.Add(newTC);
+        _termsConditions.Add(newTc);
 
         return new ApiResponse
         {
             Status = true,
             Message = "Terms and Conditions created successfully",
-            Data = newTC
+            Data = newTc
         };
     }
 
     public async Task<ApiResponse> UpdateAsync(TermsConditionsDTO dto)
     {
-        var existingTC = _termsConditions.FirstOrDefault(tc => tc.TCId == dto.TCId);
+        var existingTc = _termsConditions.FirstOrDefault(tc => tc.TCId == dto.TCId);
 
-        if (existingTC == null)
+        if (existingTc == null)
         {
             return new ApiResponse
             {
@@ -58,14 +51,14 @@ public class TermsConditionsService : ITermsConditionsService
             };
         }
 
-        existingTC.Content = dto.Content;
-        existingTC.UpdatedDate = DateTime.Now;
+        existingTc.Content = dto.Content;
+        existingTc.UpdatedDate = DateTime.Now;
 
         return new ApiResponse
         {
             Status = true,
             Message = "Terms and Conditions updated successfully",
-            Data = existingTC
+            Data = existingTc
         };
     }
 }

@@ -1,10 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿namespace G3NexusBackend.Services.Interfaces;
 
-namespace G3NexusBackend.Interfaces
+public interface IEmailService
 {
-    public interface IEmailService
-    {
-        Task SendEmailAsync(string toEmail, string subject, string body, bool isHtml = false);
-        Task<string> GetEmailTemplateAsync(string templateName);
-    }
+    Task SendEmailAsync(string toEmail, string subject, string body, bool isHtml = false);
+    Task<string> GetEmailTemplateAsync(string templateName);
 }

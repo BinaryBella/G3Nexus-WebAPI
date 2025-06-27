@@ -1,6 +1,6 @@
 using G3NexusBackend.DTOs;
 
-namespace G3NexusBackend.Interfaces;
+namespace G3NexusBackend.Services.Interfaces;
 
 public interface ITermsConditionsService
 {

@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using G3NexusBackend.Models;
 
-namespace G3NexusBackend.Interfaces
-{
+namespace G3NexusBackend.Services.Interfaces;
+
 public interface IJwtService
 {
     string GenerateAccessToken(string userName, string[] roles);
@@ -13,6 +13,3 @@ public interface IJwtService
     ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
     
 }
-    
-}
-

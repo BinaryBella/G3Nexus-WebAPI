@@ -1,13 +1,12 @@
 ﻿using G3NexusBackend.DTOs;
 
-namespace G3NexusBackend.Interfaces
+namespace G3NexusBackend.Services.Interfaces;
+
+public interface IProjectService
 {
-    public interface IProjectService
-    {
-        Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
-        Task<ProjectDTO> GetProjectByIdAsync(int projectId);
-        Task<ProjectDTO> CreateProjectAsync(ProjectDTO projectDto);
-        Task<ProjectDTO> UpdateProjectAsync(int projectId, ProjectDTO projectDto);
-        Task<ApiResponse> DeActivateProjectAsync(int projectId); 
-    }
+    Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
+    Task<ProjectDTO?> GetProjectByIdAsync(int projectId);
+    Task<ProjectDTO> CreateProjectAsync(ProjectDTO projectDto);
+    Task<ProjectDTO?> UpdateProjectAsync(int projectId, ProjectDTO projectDto);
+    Task<ApiResponse> DeActivateProjectAsync(int projectId);
 }

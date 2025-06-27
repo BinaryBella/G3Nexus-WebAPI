@@ -3,8 +3,11 @@ using System.Security.Claims;
 using System.Text;
 using G3NexusBackend.DTOs;
 using G3NexusBackend.Models;
+using G3NexusBackend.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+
+namespace G3NexusBackend.Services;
 
 public class AuthService : IAuthService
 {
@@ -26,7 +29,7 @@ public class AuthService : IAuthService
             {
                 return new ApiResponse { Status = false, Message = "Invalid credentials" };
             }
-            
+
             var refreshToken = GenerateJwtToken(email, role, TokenType.RefreshToken);
             var refreshTokenObject = new RefreshToken
             {
@@ -34,15 +37,15 @@ public class AuthService : IAuthService
                 Token = refreshToken,
                 IsActive = true,
                 ExpiryDate = DateTime.Now.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpirationDays"]))
-                
+
             };
             await _context.RefreshTokens.AddAsync(refreshTokenObject);
             await _context.SaveChangesAsync();
             return new ApiResponse { Status = true, Message = "Authentication successful", Data =
-            new {
-                AccessToken = GenerateJwtToken(email, role, TokenType.AccessToken),
-                RefreshToken = refreshToken
-            } };
+                new {
+                    AccessToken = GenerateJwtToken(email, role, TokenType.AccessToken),
+                    RefreshToken = refreshToken
+                } };
             
         }
         catch (Exception ex)
