@@ -1,3 +1,5 @@
+using G3NexusBackend.Models;
+
 public class Employee
 {
     public int EmployeeId { get; set; } // Primary Key
@@ -8,4 +10,6 @@ public class Employee
     public string Password { get; set; } 
     public string Role { get; set; }
     public bool IsActive { get; set; }
+    // Navigation property
+    public ICollection<EmployeeProject> EmployeeProjects { get; set; }
 }

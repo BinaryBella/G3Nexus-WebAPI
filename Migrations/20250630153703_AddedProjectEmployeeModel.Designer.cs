@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace G3NexusBackend.Migrations
 {
     [DbContext(typeof(G3NexusDbContext))]
-    partial class G3NexusDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250630153703_AddedProjectEmployeeModel")]
+    partial class AddedProjectEmployeeModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,21 +162,6 @@ namespace G3NexusBackend.Migrations
                     b.HasKey("EmployeeId");
 
                     b.ToTable("Employees", (string)null);
-                });
-
-            modelBuilder.Entity("G3NexusBackend.Models.ClientProject", b =>
-                {
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ClientId", "ProjectId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("ClientProjects", (string)null);
                 });
 
             modelBuilder.Entity("G3NexusBackend.Models.Company", b =>
@@ -472,25 +459,6 @@ namespace G3NexusBackend.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("G3NexusBackend.Models.ClientProject", b =>
-                {
-                    b.HasOne("Client", "Client")
-                        .WithMany("ClientProjects")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Project", "Project")
-                        .WithMany("ClientProjects")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("G3NexusBackend.Models.EmployeeProject", b =>
                 {
                     b.HasOne("Employee", "Employee")
@@ -555,8 +523,6 @@ namespace G3NexusBackend.Migrations
                 {
                     b.Navigation("Bugs");
 
-                    b.Navigation("ClientProjects");
-
                     b.Navigation("Requirements");
                 });
 
@@ -568,8 +534,6 @@ namespace G3NexusBackend.Migrations
             modelBuilder.Entity("Project", b =>
                 {
                     b.Navigation("Bugs");
-
-                    b.Navigation("ClientProjects");
 
                     b.Navigation("EmployeeProjects");
 

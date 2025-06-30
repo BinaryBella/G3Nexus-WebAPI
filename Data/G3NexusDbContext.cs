@@ -15,6 +15,8 @@ public class G3NexusDbContext : DbContext
     public DbSet<Verification> Verifications { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Company> Company { get; set; }
+    public DbSet<EmployeeProject> EmployeeProjects { get; set; }
+    public DbSet<ClientProject> ClientProjects { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Apply configurations
@@ -28,5 +30,7 @@ public class G3NexusDbContext : DbContext
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         modelBuilder.ApplyConfiguration(new TermsConditionsConfiguration());
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+        modelBuilder.ApplyConfiguration(new EmployeeProjectConfiguration());
+        modelBuilder.ApplyConfiguration(new ClientProjectConfiguration());
     }
 }

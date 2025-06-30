@@ -1,3 +1,5 @@
+using G3NexusBackend.Models;
+
 public class Client
 {
     public int Id { get; set; } // Primary Key
@@ -10,6 +12,6 @@ public class Client
     public bool IsActive { get; set; }
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs
-    // public int CompanyId { get; set; }
-    // public Company Company { get; set; }
+    // Many-to-many navigation
+    public ICollection<ClientProject> ClientProjects { get; set; }
 }
