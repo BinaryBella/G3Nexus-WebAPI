@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace G3NexusBackend.DTOs
+namespace G3NexusBackend.Data.DTO
 {
     public class LoginDTO
     {

@@ -1,5 +1,4 @@
-﻿// Models/Requirement.cs
-public class Requirement
+﻿public class Requirement
 {
     public int RequirementId { get; set; }
     public string RequirementTitle { get; set; }

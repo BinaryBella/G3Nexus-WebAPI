@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace G3NexusBackend.Data.Config;
+
 public class ClientConfiguration : IEntityTypeConfiguration<Client>
 {
     public void Configure(EntityTypeBuilder<Client> builder)
@@ -9,8 +11,8 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.ToTable("Clients");
 
         // Primary Key
-        builder.HasKey(c => c.Id);        
-        
+        builder.HasKey(c => c.Id);
+
         // Properties
         builder.Property(c => c.Name)
             .IsRequired()
@@ -38,7 +40,7 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.Property(b => b.IsActive)
             .IsRequired()
             .HasMaxLength(50); // For status like "Active", "Inactive", etc.
-        
+
         // Relationships
 
         // One-to-many relationship with ProjectEmployeeClient
@@ -58,7 +60,7 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
             .WithOne(b => b.Client)
             .HasForeignKey(b => b.ClientId)
             .OnDelete(DeleteBehavior.Cascade); // Cascade delete
-        
+
         // // Foreign Keys and Relationships
         // builder.HasOne(r => r.Company)
         //     .WithMany(c => c.Clients)

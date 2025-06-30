@@ -1,3 +1,5 @@
+namespace G3NexusBackend.Data.DTO;
+
 public class PaymentDTO
 {
     public int PaymentId { get; set; }

@@ -1,5 +1,3 @@
-using G3NexusBackend.Models;
-
 public class Client
 {
     public int Id { get; set; } // Primary Key

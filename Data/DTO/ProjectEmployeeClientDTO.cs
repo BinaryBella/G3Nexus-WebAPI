@@ -1,4 +1,4 @@
-using G3NexusBackend.DTOs;
+namespace G3NexusBackend.Data.DTO;
 
 public class ProjectEmployeeClientDTO
 {

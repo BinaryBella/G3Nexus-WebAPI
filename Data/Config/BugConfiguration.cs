@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace G3NexusBackend.Data.Config;
+
 public class BugConfiguration : IEntityTypeConfiguration<Bug>
 {
     public void Configure(EntityTypeBuilder<Bug> builder)

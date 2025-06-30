@@ -1,6 +1,5 @@
-using G3NexusBackend.DTOs;
+using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace G3NexusBackend.Controllers

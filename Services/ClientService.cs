@@ -1,4 +1,4 @@
-using G3NexusBackend.DTOs;
+using G3NexusBackend.Data.DTO;
 using Microsoft.EntityFrameworkCore;
 using G3NexusBackend.Services.Interfaces;
 

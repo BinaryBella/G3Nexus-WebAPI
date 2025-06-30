@@ -1,8 +1,8 @@
+using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using G3NexusBackend.Models;
 
-namespace G3NexusBackend.Data.Configurations
+namespace G3NexusBackend.Data.Config
 {
     public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
     {

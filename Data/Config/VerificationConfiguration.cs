@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace G3NexusBackend.Data.Config;
+
 public class VerificationConfiguration : IEntityTypeConfiguration<Verification>
 {
     public void Configure(EntityTypeBuilder<Verification> builder)

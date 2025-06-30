@@ -1,5 +1,4 @@
-﻿// Models/Bug.cs
-public class Bug
+﻿public class Bug
 {
     public int BugId { get; set; }
     public string BugTitle { get; set; }

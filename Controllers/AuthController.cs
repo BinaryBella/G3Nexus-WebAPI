@@ -1,9 +1,11 @@
 using System.Security.Claims;
-using G3NexusBackend.DTOs;
+using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
+
+namespace G3NexusBackend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -29,9 +31,9 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDTO refreshTokenDTO)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDTO refreshTokenDto)
     {
-        var authResponse = await _authService.RefreshTokenAsync(refreshTokenDTO);
+        var authResponse = await _authService.RefreshTokenAsync(refreshTokenDto);
         return Ok(authResponse);
     }
     

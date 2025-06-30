@@ -1,4 +1,4 @@
-﻿using G3NexusBackend.Data.Configurations;
+﻿using G3NexusBackend.Data.Config;
 using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,7 +1,8 @@
-using G3NexusBackend.DTOs;
-using G3NexusBackend.Models;
+using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+
+namespace G3NexusBackend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -17,8 +18,8 @@ public class TermsConditionsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllTermsAsync()
     {
-        var TermsConditions = await _termsConditionsService.GetAllTermsAsync();
-        return Ok(new ApiResponse { Status = true, Data = TermsConditions });
+        var termsConditions = await _termsConditionsService.GetAllTermsAsync();
+        return Ok(new ApiResponse { Status = true, Data = termsConditions });
     }
     
     [HttpGet("{id:int}")]
@@ -34,11 +35,11 @@ public class TermsConditionsController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> CreateTermsAsync(TermsConditionsDTO TermsConditionsdto)
+    public async Task<IActionResult> CreateTermsAsync(TermsConditionsDTO termsConditionsDto)
     {
         try
         {
-            var terms = await _termsConditionsService.CreateTermsAsync(TermsConditionsdto);
+            var terms = await _termsConditionsService.CreateTermsAsync(termsConditionsDto);
             return CreatedAtAction(nameof(GetTermsById), new { id = terms.TCId }, new ApiResponse { Status = true, Data = terms });
         }
         catch (KeyNotFoundException ex)
@@ -48,12 +49,12 @@ public class TermsConditionsController : ControllerBase
     }
     
     [HttpPut]
-    public async Task<IActionResult> UpdateTermsAsync(TermsConditionsDTO TermsConditionsdto)
+    public async Task<IActionResult> UpdateTermsAsync(TermsConditionsDTO termsConditionsDto)
     {
         try
         {
-            var TCId = TermsConditionsdto.TCId;
-            var term = await _termsConditionsService.UpdateTermsAsync(TCId, TermsConditionsdto);
+            var tcId = termsConditionsDto.TCId;
+            var term = await _termsConditionsService.UpdateTermsAsync(tcId, termsConditionsDto);
             if (term == null)
             {
                 return NotFound(new ApiResponse { Status = false, Message = "Term not found" });
@@ -67,10 +68,10 @@ public class TermsConditionsController : ControllerBase
         }
     }
     
-    [HttpDelete("{TCId:int}")]
-    public async Task<IActionResult> DeactivateTerm(int TCId)
+    [HttpDelete("{tcId:int}")]
+    public async Task<IActionResult> DeactivateTerm(int tcId)
     {
-        var response = await _termsConditionsService.DeActivateTermAsync(TCId);
+        var response = await _termsConditionsService.DeActivateTermAsync(tcId);
         if (!response.Status)
         {
             return NotFound(response);
