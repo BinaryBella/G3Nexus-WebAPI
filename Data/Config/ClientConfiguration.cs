@@ -58,5 +58,11 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
             .WithOne(b => b.Client)
             .HasForeignKey(b => b.ClientId)
             .OnDelete(DeleteBehavior.Cascade); // Cascade delete
+        
+        // // Foreign Keys and Relationships
+        // builder.HasOne(r => r.Company)
+        //     .WithMany(c => c.Clients)
+        //     .HasForeignKey(r => r.CompanyId)
+        //     .OnDelete(DeleteBehavior.Cascade); // Adjust delete behavior as per your needs
     }
 }
