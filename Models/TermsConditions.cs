@@ -6,4 +6,6 @@ public class TermsConditions
     public string Content { get; set; }
     public DateTime UpdatedDate { get; set; }
     public bool IsActive { get; set; }
+    public int ProjectId { get; set; }
+    public Project Project { get; set; } // navigation
 }

@@ -20,5 +20,9 @@ public class TermsConditionsConfiguration : IEntityTypeConfiguration<TermsCondit
         
         builder.Property(tc => tc.IsActive)
             .IsRequired(); 
+        
+        builder.HasOne(tc => tc.Project)
+            .WithOne(p => p.TermsConditions)
+            .HasForeignKey<TermsConditions>(tc => tc.ProjectId);
     }
 }

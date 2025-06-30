@@ -16,7 +16,8 @@ public class Project
     public string PaymentStatus { get; set; } 
     public string Status { get; set; }
     public bool IsActive { get; set; }
-
+   
+    public TermsConditions TermsConditions { get; set; } // navigation
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs
     public ICollection<Payment> Payments { get; set; } // Navigation property for related payments
