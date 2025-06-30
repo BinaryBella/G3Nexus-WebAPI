@@ -54,13 +54,25 @@ public class RequirementService : IRequirementService
 
     public async Task<RequirementDTO> CreateRequirementAsync(RequirementDTO requirementDto)
     {
+        var clientExists = await _context.Clients.AnyAsync(c => c.Id == requirementDto.ClientId);
+        if (!clientExists)
+        {
+            throw new KeyNotFoundException($"Client with ID {requirementDto.ClientId} not found.");
+        }
+
+        var projectExists = await _context.Projects.AnyAsync(p => p.ProjectId == requirementDto.ProjectId);
+        if (!projectExists)
+        {
+            throw new KeyNotFoundException($"Project with ID {requirementDto.ProjectId} not found.");
+        }
+
         var requirement = new Requirement
         {
             RequirementTitle = requirementDto.RequirementTitle,
             Priority = requirementDto.Priority,
             RequirementDescription = requirementDto.RequirementDescription,
             Attachment = requirementDto.Attachment,
-            IsActive = true, // New requirement is active by default
+            IsActive = true,
             ClientId = requirementDto.ClientId,
             ProjectId = requirementDto.ProjectId
         };

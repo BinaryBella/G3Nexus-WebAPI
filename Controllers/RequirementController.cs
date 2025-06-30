@@ -33,13 +33,21 @@ namespace G3NexusBackend.Controllers
 
             return Ok(new ApiResponse { Status = true, Data = requirement });
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> CreateRequirement(RequirementDTO requirementDto)
         {
-            var requirement = await _requirementService.CreateRequirementAsync(requirementDto);
-            return CreatedAtAction(nameof(GetRequirementById), new { id = requirement.RequirementId }, new ApiResponse { Status = true, Data = requirement });
+            try
+            {
+                var requirement = await _requirementService.CreateRequirementAsync(requirementDto);
+                return CreatedAtAction(nameof(GetRequirementById), new { id = requirement.RequirementId }, new ApiResponse { Status = true, Data = requirement });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
+            }
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRequirement(int id, RequirementDTO requirementDto)
