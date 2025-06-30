@@ -8,7 +8,6 @@ public class Client
     public string Password { get; set; } 
     public string Role { get; set; }
     public bool IsActive { get; set; }
-    public ICollection<ProjectEmployeeClient> ProjectEmployeeClients { get; set; } // Navigation property
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs
     // public int CompanyId { get; set; }

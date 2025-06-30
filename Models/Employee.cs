@@ -8,5 +8,4 @@ public class Employee
     public string Password { get; set; } 
     public string Role { get; set; }
     public bool IsActive { get; set; }
-    public ICollection<ProjectEmployeeClient> ProjectEmployeeClients { get; set; } // Navigation property
 }

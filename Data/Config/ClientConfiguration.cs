@@ -43,12 +43,6 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
 
         // Relationships
 
-        // One-to-many relationship with ProjectEmployeeClient
-        builder.HasMany(c => c.ProjectEmployeeClients)
-            .WithOne(pec => pec.Client)
-            .HasForeignKey(pec => pec.ClientId)
-            .OnDelete(DeleteBehavior.Cascade); // Cascade delete
-
         // One-to-many relationship with Requirement
         builder.HasMany(c => c.Requirements)
             .WithOne(r => r.Client)

@@ -14,7 +14,6 @@ public class G3NexusDbContext : DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Verification> Verifications { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
-    public DbSet<ProjectEmployeeClient> ProjectEmployeeClients { get; set; }
     public DbSet<Company> Company { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,7 +26,6 @@ public class G3NexusDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
         modelBuilder.ApplyConfiguration(new VerificationConfiguration());
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
-        modelBuilder.ApplyConfiguration(new ProjectEmployeeClientConfiguration());
         modelBuilder.ApplyConfiguration(new TermsConditionsConfiguration());
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
     }

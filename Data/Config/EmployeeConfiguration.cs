@@ -40,13 +40,5 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(b => b.IsActive)
             .IsRequired()
             .HasMaxLength(50); // For status like "Active", "Inactive", etc.
-
-        // Relationships
-
-        // One-to-many relationship with ProjectEmployeeClient
-        builder.HasMany(e => e.ProjectEmployeeClients)
-            .WithOne(pec => pec.Employee)
-            .HasForeignKey(pec => pec.EmployeeId)
-            .OnDelete(DeleteBehavior.Cascade); // Cascade delete if employee is deleted
     }
 }
