@@ -4,7 +4,7 @@ namespace G3NexusBackend.Services.Interfaces;
 
 public interface ITermsConditionsService
 {
-    Task<ApiResponse> GetAllAsync();
-    Task<ApiResponse> CreateAsync(TermsConditionsDTO dto);
-    Task<ApiResponse> UpdateAsync(TermsConditionsDTO dto);
+    Task<IEnumerable<TermsConditionsDTO>> GetAllTermsAsync();
+    Task<TermsConditionsDTO?> GetTermsByIdAsync(int TCId);
+    Task<TermsConditionsDTO> CreateTermsAsync(TermsConditionsDTO bugDto);
 }

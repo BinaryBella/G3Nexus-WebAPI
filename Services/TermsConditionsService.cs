@@ -1,64 +1,57 @@
 using G3NexusBackend.DTOs;
 using G3NexusBackend.Models;
 using G3NexusBackend.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace G3NexusBackend.Services;
 
 public class TermsConditionsService : ITermsConditionsService
 {
-    private readonly List<TermsConditions> _termsConditions = new();
+    private readonly G3NexusDbContext _context;
 
-    public async Task<ApiResponse> GetAllAsync()
+    public TermsConditionsService(G3NexusDbContext context)
     {
-        return new ApiResponse
-        {
-            Status = true,
-            Message = "Fetched all terms and conditions successfully",
-            Data = _termsConditions
-        };
+        _context = context;
     }
 
-    public async Task<ApiResponse> CreateAsync(TermsConditionsDTO dto)
+    public async Task<IEnumerable<TermsConditionsDTO>> GetAllTermsAsync()
     {
-        var newTc = new TermsConditions
-        {
-            TCId = _termsConditions.Count + 1,
-            Content = dto.Content,
-            UpdatedDate = DateTime.Now
-        };
-
-        _termsConditions.Add(newTc);
-
-        return new ApiResponse
-        {
-            Status = true,
-            Message = "Terms and Conditions created successfully",
-            Data = newTc
-        };
-    }
-
-    public async Task<ApiResponse> UpdateAsync(TermsConditionsDTO dto)
-    {
-        var existingTc = _termsConditions.FirstOrDefault(tc => tc.TCId == dto.TCId);
-
-        if (existingTc == null)
-        {
-            return new ApiResponse
+        return await _context.TermsConditions
+            .Select(t => new TermsConditionsDTO
             {
-                Status = false,
-                Message = "Terms and Conditions not found",
-                Error = "Invalid TCId"
-            };
-        }
+                TCId = t.TCId,
+                Content = t.Content,
+                UpdatedDate = t.UpdatedDate
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<TermsConditionsDTO?> GetTermsByIdAsync(int TCId)
+    {
+        var term = await _context.TermsConditions.FindAsync(TCId);
 
-        existingTc.Content = dto.Content;
-        existingTc.UpdatedDate = DateTime.Now;
-
-        return new ApiResponse
+        return new TermsConditionsDTO
         {
-            Status = true,
-            Message = "Terms and Conditions updated successfully",
-            Data = existingTc
+            TCId = term.TCId,
+            Content = term.Content,
+            UpdatedDate = term.UpdatedDate
         };
+    }
+
+    
+    public async Task<TermsConditionsDTO> CreateTermsAsync(TermsConditionsDTO TermsConditionsdto)
+    {
+        var term = new TermsConditions
+        {
+            TCId = TermsConditionsdto.TCId,
+            Content = TermsConditionsdto.Content,
+            UpdatedDate = TermsConditionsdto.UpdatedDate
+        };
+
+        _context.TermsConditions.Add(term);
+        await _context.SaveChangesAsync();
+
+        TermsConditionsdto.TCId = term.TCId;
+        return TermsConditionsdto;
     }
 }

@@ -1,4 +1,5 @@
 using G3NexusBackend.DTOs;
+using G3NexusBackend.Models;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,23 +15,36 @@ public class TermsConditionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllTermsAsync()
     {
-        var response = await _termsConditionsService.GetAllAsync();
-        return Ok(response);
+        var TermsConditions = await _termsConditionsService.GetAllTermsAsync();
+        return Ok(new ApiResponse { Status = true, Data = TermsConditions });
     }
+    
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetTermsById(int id)
+    {
+        var terms = await _termsConditionsService.GetTermsByIdAsync(id);
+        if (terms == null)
+        {
+            return NotFound(new ApiResponse { Status = false, Message = "Terms not found" });
+        }
 
+        return Ok(new ApiResponse { Status = true, Data = terms });
+    }
+    
     [HttpPost]
-    public async Task<IActionResult> Create(TermsConditionsDTO dto)
+    public async Task<IActionResult> CreateTermsAsync(TermsConditionsDTO TermsConditionsdto)
     {
-        var response = await _termsConditionsService.CreateAsync(dto);
-        return Ok(response);
+        try
+        {
+            var terms = await _termsConditionsService.CreateTermsAsync(TermsConditionsdto);
+            return CreatedAtAction(nameof(GetTermsById), new { id = terms.TCId }, new ApiResponse { Status = true, Data = terms });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
+        }
     }
-
-    [HttpPut]
-    public async Task<IActionResult> Update(TermsConditionsDTO dto)
-    {
-        var response = await _termsConditionsService.UpdateAsync(dto);
-        return Ok(response);
-    }
+    
 }

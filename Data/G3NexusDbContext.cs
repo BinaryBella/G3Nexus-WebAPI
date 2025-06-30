@@ -11,6 +11,8 @@ public class G3NexusDbContext : DbContext
     public DbSet<Project> Projects { get; set; }
     public DbSet<Requirement> Requirements { get; set; }
     public DbSet<Bug> Bugs { get; set; }
+    
+    public DbSet<TermsConditions> TermsConditions { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Verification> Verifications { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -29,6 +31,6 @@ public class G3NexusDbContext : DbContext
         modelBuilder.ApplyConfiguration(new VerificationConfiguration());
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         modelBuilder.ApplyConfiguration(new ProjectEmployeeClientConfiguration());
-        
+        modelBuilder.ApplyConfiguration(new TermsConditionsConfiguration());
     }
 }
