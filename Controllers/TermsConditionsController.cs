@@ -47,4 +47,34 @@ public class TermsConditionsController : ControllerBase
         }
     }
     
+    [HttpPut]
+    public async Task<IActionResult> UpdateTermsAsync(TermsConditionsDTO TermsConditionsdto)
+    {
+        try
+        {
+            var TCId = TermsConditionsdto.TCId;
+            var term = await _termsConditionsService.UpdateTermsAsync(TCId, TermsConditionsdto);
+            if (term == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Term not found" });
+            }
+
+            return Ok(new ApiResponse { Status = true, Data = term });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
+        }
+    }
+    
+    [HttpDelete("{TCId:int}")]
+    public async Task<IActionResult> DeactivateTerm(int TCId)
+    {
+        var response = await _termsConditionsService.DeActivateTermAsync(TCId);
+        if (!response.Status)
+        {
+            return NotFound(response);
+        }
+        return Ok(response);
+    }
 }

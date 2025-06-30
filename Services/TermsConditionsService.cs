@@ -21,7 +21,8 @@ public class TermsConditionsService : ITermsConditionsService
             {
                 TCId = t.TCId,
                 Content = t.Content,
-                UpdatedDate = t.UpdatedDate
+                UpdatedDate = t.UpdatedDate,
+                IsActive = t.IsActive
             })
             .ToListAsync();
     }
@@ -34,7 +35,8 @@ public class TermsConditionsService : ITermsConditionsService
         {
             TCId = term.TCId,
             Content = term.Content,
-            UpdatedDate = term.UpdatedDate
+            UpdatedDate = term.UpdatedDate,
+            IsActive = term.IsActive
         };
     }
 
@@ -45,7 +47,8 @@ public class TermsConditionsService : ITermsConditionsService
         {
             TCId = TermsConditionsdto.TCId,
             Content = TermsConditionsdto.Content,
-            UpdatedDate = TermsConditionsdto.UpdatedDate
+            UpdatedDate = TermsConditionsdto.UpdatedDate,
+            IsActive = TermsConditionsdto.IsActive
         };
 
         _context.TermsConditions.Add(term);
@@ -53,5 +56,35 @@ public class TermsConditionsService : ITermsConditionsService
 
         TermsConditionsdto.TCId = term.TCId;
         return TermsConditionsdto;
+    }
+    
+    public async Task<TermsConditionsDTO?> UpdateTermsAsync(int TCId, TermsConditionsDTO TermsConditionsdto)
+    {
+        var term = await _context.TermsConditions.FindAsync(TCId);
+
+        term.TCId = TermsConditionsdto.TCId;
+        term.Content = TermsConditionsdto.Content;
+        term.UpdatedDate = TermsConditionsdto.UpdatedDate;
+        term.IsActive = TermsConditionsdto.IsActive;
+        
+        _context.TermsConditions.Update(term);
+        await _context.SaveChangesAsync();
+
+        return TermsConditionsdto;
+    }
+    
+    public async Task<ApiResponse> DeActivateTermAsync(int id)
+    {
+        var term = await _context.TermsConditions.FindAsync(id);
+        if (term is not {IsActive: true})
+        {
+            return new ApiResponse { Status = false, Message = "Term not found or already inactive." };
+        }
+
+        term.IsActive = false;
+        _context.TermsConditions.Update(term);
+        await _context.SaveChangesAsync();
+
+        return new ApiResponse { Status = true, Message = "Term successfully deactivated." };
     }
 }

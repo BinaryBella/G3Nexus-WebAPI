@@ -17,5 +17,8 @@ public class TermsConditionsConfiguration : IEntityTypeConfiguration<TermsCondit
 
         builder.Property(tc => tc.UpdatedDate)
             .IsRequired();
+        
+        builder.Property(tc => tc.IsActive)
+            .IsRequired(); 
     }
 }
