@@ -20,7 +20,6 @@ public class ClientService : IClientService
             .Select(c => new ClientDTO
             {
                 Id = c.Id,
-                OrganizationName = c.OrganizationName,
                 Name = c.Name,
                 ContactNo = c.ContactNo,
                 Email = c.Email,
@@ -42,7 +41,6 @@ public class ClientService : IClientService
         return new ClientDTO
         {
             Id = client.Id,
-            OrganizationName = client.OrganizationName,
             Name = client.Name,
             ContactNo = client.ContactNo,
             Email = client.Email,
@@ -56,7 +54,6 @@ public class ClientService : IClientService
     {
         var client = new Client
         {
-            OrganizationName = clientDto.OrganizationName,
             Name = clientDto.Name,
             ContactNo = clientDto.ContactNo,
             Email = clientDto.Email,

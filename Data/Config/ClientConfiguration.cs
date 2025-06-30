@@ -10,11 +10,6 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
 
         // Primary Key
         builder.HasKey(c => c.Id);        
-
-        // Properties
-        builder.Property(c => c.OrganizationName)
-            .IsRequired()
-            .HasMaxLength(100); // Adjust based on name length requirements
         
         // Properties
         builder.Property(c => c.Name)
