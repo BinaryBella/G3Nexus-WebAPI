@@ -37,10 +37,18 @@ namespace G3NexusBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePayment(PaymentDTO paymentDto)
         {
-            var payment = await _paymentService.CreatePaymentAsync(paymentDto);
-            return CreatedAtAction(nameof(GetPaymentById), new { id = payment.PaymentId }, new ApiResponse { Status = true, Data = payment });
+            try
+            {
+                var payment = await _paymentService.CreatePaymentAsync(paymentDto);
+                return CreatedAtAction(nameof(GetPaymentById), new { id = payment.PaymentId }, new ApiResponse { Status = true, Data = payment });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
+            }
         }
 
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePayment(int id, PaymentDTO paymentDto)
         {

@@ -55,6 +55,12 @@ public class PaymentService : IPaymentService
 
     public async Task<PaymentDTO> CreatePaymentAsync(PaymentDTO paymentDto)
     {
+        var projectExists = await _context.Projects.AnyAsync(p => p.ProjectId == paymentDto.ProjectId);
+        if (!projectExists)
+        {
+            throw new KeyNotFoundException($"Project with ID {paymentDto.ProjectId} not found.");
+        }
+
         var payment = new Payment
         {
             ProjectId = paymentDto.ProjectId,
@@ -72,6 +78,27 @@ public class PaymentService : IPaymentService
         paymentDto.PaymentId = payment.PaymentId;
         return paymentDto;
     }
+
+    
+    // public async Task<PaymentDTO> CreatePaymentAsync(PaymentDTO paymentDto)
+    // {
+    //     var payment = new Payment
+    //     {
+    //         ProjectId = paymentDto.ProjectId,
+    //         PaymentAmount = paymentDto.PaymentAmount,
+    //         PaymentType = paymentDto.PaymentType,
+    //         PaymentDescription = paymentDto.PaymentDescription,
+    //         PaymentDate = paymentDto.PaymentDate,
+    //         Attachment = paymentDto.Attachment,
+    //         IsActive = true
+    //     };
+    //
+    //     _context.Payments.Add(payment);
+    //     await _context.SaveChangesAsync();
+    //
+    //     paymentDto.PaymentId = payment.PaymentId;
+    //     return paymentDto;
+    // }
 
     public async Task<PaymentDTO?> UpdatePaymentAsync(int paymentId, PaymentDTO paymentDto)
     {
