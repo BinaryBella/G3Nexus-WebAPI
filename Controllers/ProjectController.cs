@@ -22,7 +22,7 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = projects });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetProjectById(int id)
         {
             var project = await _projectService.GetProjectByIdAsync(id);
@@ -41,9 +41,10 @@ namespace G3NexusBackend.Controllers
             return CreatedAtAction(nameof(GetProjectById), new { id = project.ProjectId }, new ApiResponse { Status = true, Data = project });
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProject(int id, ProjectDTO projectDto)
+        [HttpPut]
+        public async Task<IActionResult> UpdateProject(ProjectDTO projectDto)
         {
+            var id = projectDto.ProjectId;
             var project = await _projectService.UpdateProjectAsync(id, projectDto);
             if (project == null)
             {
@@ -53,7 +54,7 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = project });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeactivateProject(int id)
         {
             var response = await _projectService.DeActivateProjectAsync(id);

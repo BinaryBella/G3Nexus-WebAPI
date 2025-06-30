@@ -22,7 +22,7 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = requirements });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetRequirementById(int id)
         {
             var requirement = await _requirementService.GetRequirementByIdAsync(id);
@@ -49,19 +49,28 @@ namespace G3NexusBackend.Controllers
         }
 
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRequirement(int id, RequirementDTO requirementDto)
+        [HttpPut]
+        public async Task<IActionResult> UpdateRequirement(RequirementDTO requirementDto)
         {
-            var requirement = await _requirementService.UpdateRequirementAsync(id, requirementDto);
-            if (requirement == null)
+            try
             {
-                return NotFound(new ApiResponse { Status = false, Message = "Requirement not found" });
+                var id = requirementDto.RequirementId;
+                var requirement = await _requirementService.UpdateRequirementAsync(id, requirementDto);
+                if (requirement == null)
+                {
+                    return NotFound(new ApiResponse { Status = false, Message = "Requirement not found" });
+                }
+
+                return Ok(new ApiResponse { Status = true, Data = requirement });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
             }
 
-            return Ok(new ApiResponse { Status = true, Data = requirement });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeactivateRequirement(int id)
         {
             var response = await _requirementService.DeActivateRequirementAsync(id);

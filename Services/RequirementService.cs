@@ -92,6 +92,18 @@ public class RequirementService : IRequirementService
             return null;
         }
 
+        var clientExists = await _context.Clients.AnyAsync(c => c.Id == requirementDto.ClientId);
+        if (!clientExists)
+        {
+            throw new KeyNotFoundException($"Client with ID {requirementDto.ClientId} not found.");
+        }
+
+        var projectExists = await _context.Projects.AnyAsync(p => p.ProjectId == requirementDto.ProjectId);
+        if (!projectExists)
+        {
+            throw new KeyNotFoundException($"Project with ID {requirementDto.ProjectId} not found.");
+        }
+
         requirement.RequirementTitle = requirementDto.RequirementTitle;
         requirement.Priority = requirementDto.Priority;
         requirement.RequirementDescription = requirementDto.RequirementDescription;

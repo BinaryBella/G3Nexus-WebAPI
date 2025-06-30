@@ -22,7 +22,7 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = employees });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetEmployeeById(int id)
         {
             var employee = await _employeeService.GetEmployeeByIdAsync(id);
@@ -41,9 +41,10 @@ namespace G3NexusBackend.Controllers
             return CreatedAtAction(nameof(GetEmployeeById), new { id = employee.EmployeeId }, new ApiResponse { Status = true, Data = employee });
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(int id, EmployeeDTO employeeDto)
+        [HttpPut]
+        public async Task<IActionResult> UpdateEmployee(EmployeeDTO employeeDto)
         {
+            var id = employeeDto.EmployeeId;
             var employee = await _employeeService.UpdateEmployeeAsync(id, employeeDto);
             if (employee == null)
             {
@@ -53,7 +54,7 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = employee });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeactivateEmployee(int id)
         {
             var response = await _employeeService.DeActivateEmployeeAsync(id);

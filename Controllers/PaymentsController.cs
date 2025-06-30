@@ -22,7 +22,7 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = payments });
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetPaymentById(int id)
         {
             var payment = await _paymentService.GetPaymentByIdAsync(id);
@@ -49,19 +49,28 @@ namespace G3NexusBackend.Controllers
         }
 
         
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePayment(int id, PaymentDTO paymentDto)
+        [HttpPut]
+        public async Task<IActionResult> UpdatePayment(PaymentDTO paymentDto)
         {
-            var payment = await _paymentService.UpdatePaymentAsync(id, paymentDto);
-            if (payment == null)
+            try
             {
-                return NotFound(new ApiResponse { Status = false, Message = "Payment not found" });
+                var id = paymentDto.PaymentId;
+                var payment = await _paymentService.UpdatePaymentAsync(id, paymentDto);
+                if (payment == null)
+                {
+                    return NotFound(new ApiResponse { Status = false, Message = "Payment not found" });
+                }
+
+                return Ok(new ApiResponse { Status = true, Data = payment });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
             }
 
-            return Ok(new ApiResponse { Status = true, Data = payment });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeactivatePayment(int id)
         {
             var response = await _paymentService.DeActivatePaymentAsync(id);

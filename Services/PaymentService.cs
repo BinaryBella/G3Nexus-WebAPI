@@ -108,6 +108,12 @@ public class PaymentService : IPaymentService
             return null;
         }
 
+        var projectExists = await _context.Projects.AnyAsync(p => p.ProjectId == paymentDto.ProjectId);
+        if (!projectExists)
+        {
+            throw new KeyNotFoundException($"Project with ID {paymentDto.ProjectId} not found.");
+        }
+
         payment.ProjectId = paymentDto.ProjectId;
         payment.PaymentAmount = paymentDto.PaymentAmount;
         payment.PaymentType = paymentDto.PaymentType;
