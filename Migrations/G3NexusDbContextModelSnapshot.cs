@@ -162,21 +162,6 @@ namespace G3NexusBackend.Migrations
                     b.ToTable("Employees", (string)null);
                 });
 
-            modelBuilder.Entity("G3NexusBackend.Models.ClientProject", b =>
-                {
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ClientId", "ProjectId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("ClientProjects", (string)null);
-                });
-
             modelBuilder.Entity("G3NexusBackend.Models.Company", b =>
                 {
                     b.Property<int>("CompanyId")
@@ -257,7 +242,7 @@ namespace G3NexusBackend.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("G3NexusBackend.Models.RefreshToken", b =>
@@ -472,25 +457,6 @@ namespace G3NexusBackend.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("G3NexusBackend.Models.ClientProject", b =>
-                {
-                    b.HasOne("Client", "Client")
-                        .WithMany("ClientProjects")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Project", "Project")
-                        .WithMany("ClientProjects")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("G3NexusBackend.Models.EmployeeProject", b =>
                 {
                     b.HasOne("Employee", "Employee")
@@ -555,8 +521,6 @@ namespace G3NexusBackend.Migrations
                 {
                     b.Navigation("Bugs");
 
-                    b.Navigation("ClientProjects");
-
                     b.Navigation("Requirements");
                 });
 
@@ -568,8 +532,6 @@ namespace G3NexusBackend.Migrations
             modelBuilder.Entity("Project", b =>
                 {
                     b.Navigation("Bugs");
-
-                    b.Navigation("ClientProjects");
 
                     b.Navigation("EmployeeProjects");
 

@@ -23,5 +23,4 @@ public class Project
     
     // Many-to-many navigation
     public ICollection<EmployeeProject> EmployeeProjects { get; set; }
-    public ICollection<ClientProject> ClientProjects { get; set; }
 }

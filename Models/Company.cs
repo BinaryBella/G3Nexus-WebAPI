@@ -7,5 +7,4 @@ public class Company
     public string Address { get; set; }
     public bool IsActive { get; set; }
     
-    // public ICollection<Client> Clients { get; set; } // Navigation property for related clients
 }

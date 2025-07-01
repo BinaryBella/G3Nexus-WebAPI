@@ -12,6 +12,4 @@ public class Client
     public bool IsActive { get; set; }
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs
-    // Many-to-many navigation
-    public ICollection<ClientProject> ClientProjects { get; set; }
 }
