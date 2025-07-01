@@ -1,4 +1,4 @@
-﻿using G3NexusBackend.Models;
+﻿namespace G3NexusBackend.Models;
 
 public class Project
 {
@@ -16,6 +16,10 @@ public class Project
     public string PaymentStatus { get; set; } 
     public string Status { get; set; }
     public bool IsActive { get; set; }
+    public int CompanyId { get; set; } // Foreign Key
+
+    public Company Company { get; set; } // Navigation property for related company
+
     public TermsConditions TermsConditions { get; set; } // navigation
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs

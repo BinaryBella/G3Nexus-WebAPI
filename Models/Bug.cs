@@ -1,4 +1,6 @@
-﻿public class Bug
+﻿using G3NexusBackend.Models;
+
+public class Bug
 {
     public int BugId { get; set; }
     public string BugTitle { get; set; }

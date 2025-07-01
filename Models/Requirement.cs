@@ -1,4 +1,6 @@
-﻿public class Requirement
+﻿using G3NexusBackend.Models;
+
+public class Requirement
 {
     public int RequirementId { get; set; }
     public string RequirementTitle { get; set; }
