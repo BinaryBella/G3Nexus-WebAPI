@@ -8,4 +8,5 @@ public class Company
     public bool IsActive { get; set; }
 
     public virtual ICollection<Project> Projects { get; set; }
+    public virtual ICollection<Client> Clients { get; set; }
 }

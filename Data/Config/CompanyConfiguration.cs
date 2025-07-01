@@ -21,12 +21,11 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 
             builder.Property(c => c.IsActive)
                 .IsRequired(); 
-            
-            
-            // // One-to-many relationship with Clients
-            // builder.HasMany(c => c.Clients)
-            //     .WithOne(r => r.Company)
-            //     .HasForeignKey(r => r.CompanyId)
-            //     .OnDelete(DeleteBehavior.Cascade); // Cascade delete
+
+            // One-to-many relationship with Clients
+            builder.HasMany(c => c.Clients)
+                .WithOne(r => r.Company)
+                .HasForeignKey(r => r.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
     }
 }

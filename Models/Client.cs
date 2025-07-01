@@ -10,6 +10,8 @@ public class Client
     public string Password { get; set; } 
     public string Role { get; set; }
     public bool IsActive { get; set; }
+    public int CompanyId { get; set; } // Foreign Key to Company
+    public Company Company { get; set; } // Navigation property for related company
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs
 }
