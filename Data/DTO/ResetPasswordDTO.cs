@@ -4,6 +4,6 @@
     {
         public string EmailAddress { get; set; }
         public string NewPassword { get; set; }
-        public string Code { get; set; }
+        public string VerificationCode { get; set; }
     }
 }

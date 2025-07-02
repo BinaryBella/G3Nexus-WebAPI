@@ -24,13 +24,31 @@ public class AuthService : IAuthService
     {
         try
         {
-            var (isValid, email, role) = await ValidateUserAsync(loginDto);
-            if (!isValid)
+            // Validate the email and password
+            var email = loginDto.EmailAddress;
+            var password = loginDto.Password;
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                return new ApiResponse { Status = false, Message = "Invalid credentials" };
+                return new ApiResponse { Status = false, Message = "Email and password are required" };
             }
 
-            var refreshToken = GenerateJwtToken(email, role, TokenType.RefreshToken);
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email);
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email);
+            if (client == null && employee == null)
+            {
+                return new ApiResponse { Status = false, Message = "Invalid email or password" };
+            }
+
+            var userRole = client?.Role ?? employee?.Role;
+
+            // Check the password. Hashed password is saved in the database
+            var hashedPassword = client?.Password ?? employee?.Password;
+            if (!BCrypt.Net.BCrypt.Verify(password, hashedPassword))
+            {
+                return new ApiResponse { Status = false, Message = "Invalid email or password" };
+            }
+
+            var refreshToken = GenerateJwtToken(email, userRole!, TokenType.RefreshToken);
             var refreshTokenObject = new RefreshToken
             {
                 Email = email,
@@ -43,7 +61,7 @@ public class AuthService : IAuthService
             await _context.SaveChangesAsync();
             return new ApiResponse { Status = true, Message = "Authentication successful", Data =
                 new {
-                    AccessToken = GenerateJwtToken(email, role, TokenType.AccessToken),
+                    AccessToken = GenerateJwtToken(email, userRole!, TokenType.AccessToken),
                     RefreshToken = refreshToken
                 } };
             
@@ -107,17 +125,11 @@ public class AuthService : IAuthService
         }
     }
 
-    private async Task<(bool isValid, string email, string role)> ValidateUserAsync(LoginDTO loginDto)
+    public async Task<bool> IsValidEmail(string email)
     {
-        var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == loginDto.EmailAddress);
-        if (client != null && BCrypt.Net.BCrypt.Verify(loginDto.Password, client.Password))
-            return (true, client.Email, client.Role);
-
-        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == loginDto.EmailAddress);
-        if (employee != null && BCrypt.Net.BCrypt.Verify(loginDto.Password, employee.Password))
-            return (true, employee.Email, employee.Role);
-
-        return (false, null, null);
+        var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email);
+        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email);
+        return client != null || employee != null;
     }
 
     private string GenerateJwtToken(string email, string role, TokenType tokenType)
@@ -191,6 +203,55 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
 
         return true; // Logout successful
+    }
+
+    public async Task CreateVerificationTokenAsync(string email)
+    {
+        var verificationToken = new Verification
+        {
+            VerificationCode = Guid.NewGuid().ToString(),
+            Email = email,
+            ExpiryDate = DateTime.UtcNow.AddMinutes(5)
+        };
+
+        var result = await _context.Verifications.AddAsync(verificationToken);
+        if (result.State == EntityState.Added)
+        {
+            await _context.SaveChangesAsync();
+        }
+        throw new Exception("Failed to create verification token");
+    }
+
+    public async Task<bool> IsValidVerificationToken(string email, string verificationCode)
+    {
+        var verification = await _context.Verifications
+            .FirstOrDefaultAsync(v => v.Email == email && v.VerificationCode == verificationCode);
+
+        return verification != null && verification.ExpiryDate >= DateTime.UtcNow;
+    }
+
+    public async Task<bool> ChangePasswordAsync(string email, string newPassword)
+    {
+        var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email);
+        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email);
+
+        if (client != null)
+        {
+            client.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            _context.Clients.Update(client);
+        }
+        else if (employee != null)
+        {
+            employee.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            _context.Employees.Update(employee);
+        }
+        else
+        {
+            return false;
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
 }

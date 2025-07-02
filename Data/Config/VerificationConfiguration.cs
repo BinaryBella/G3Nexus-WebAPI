@@ -18,6 +18,9 @@ public class VerificationConfiguration : IEntityTypeConfiguration<Verification>
             .IsRequired()
             .HasMaxLength(6);
 
+        builder.Property(v => v.Email)
+            .IsRequired();
+
         builder.Property(v => v.ExpiryDate)
             .IsRequired();
     }
