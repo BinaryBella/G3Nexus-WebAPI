@@ -60,7 +60,8 @@ public class ClientService : IClientService
             Address = clientDto.Address,
             Password = BCrypt.Net.BCrypt.HashPassword(clientDto.Password),
             Role = clientDto.Role,
-            IsActive = true
+            IsActive = true,
+            CompanyId = clientDto.CompanyId
         };
 
         _context.Clients.Add(client);

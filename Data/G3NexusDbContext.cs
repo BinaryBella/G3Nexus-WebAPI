@@ -14,7 +14,7 @@ public class G3NexusDbContext : DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Verification> Verifications { get; set; }
-    public DbSet<Company> Company { get; set; }
+    public DbSet<Company> Companies { get; set; }
     public DbSet<EmployeeProject> EmployeeProjects { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
