@@ -78,7 +78,7 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "Verification code and email are required" });
         }
 
-        var isValid = await _authService.IsValidVerificationToken(verificationCode, email);
+        var isValid = await _authService.IsValidVerificationToken(email, verificationCode);
         if (isValid)
         {
             return Ok(new { message = "Email verified successfully" });

@@ -13,11 +13,13 @@ public class AuthService : IAuthService
 {
     private readonly G3NexusDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IEmailService _emailService;
 
-    public AuthService(G3NexusDbContext context, IConfiguration configuration)
+    public AuthService(G3NexusDbContext context, IConfiguration configuration, IEmailService emailService)
     {
         _context = context;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     public async Task<ApiResponse> AuthenticateAsync(LoginDTO loginDto)
@@ -209,7 +211,7 @@ public class AuthService : IAuthService
     {
         var verificationToken = new Verification
         {
-            VerificationCode = Guid.NewGuid().ToString(),
+            VerificationCode = new Random().Next(100000, 999999).ToString(),
             Email = email,
             ExpiryDate = DateTime.UtcNow.AddMinutes(5)
         };
@@ -218,8 +220,17 @@ public class AuthService : IAuthService
         if (result.State == EntityState.Added)
         {
             await _context.SaveChangesAsync();
+            await _emailService.GetEmailTemplateAsync("VerificationEmailTemplate.html")
+                .ContinueWith(async template =>
+                {
+                    var body = template.Result.Replace("{{VerificationCode}}", verificationToken.VerificationCode);
+                    await _emailService.SendEmailAsync(email, "Email Verification", body, true);
+                });
         }
-        throw new Exception("Failed to create verification token");
+        else
+        {
+            throw new Exception("Failed to create verification token");
+        }
     }
 
     public async Task<bool> IsValidVerificationToken(string email, string verificationCode)
