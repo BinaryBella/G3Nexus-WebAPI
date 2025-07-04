@@ -14,9 +14,9 @@ public class CompanyService : ICompanyService
         _context = context;
     }
 
-    public async Task<ApiResponse> GetAllAsync()
+    public async Task<IEnumerable<CompanyDTO>> GetAllCompaniesAsync()
     {
-        var companies = await _context.Companies
+        return await _context.Companies
             .Where(c => c.IsActive)
             .Select(c => new CompanyDTO
             {
@@ -25,68 +25,68 @@ public class CompanyService : ICompanyService
                 Address = c.Address,
                 IsActive = c.IsActive
             }).ToListAsync();
-
-        return new ApiResponse { Status = true, Data = companies };
     }
 
-    public async Task<ApiResponse> GetByIdAsync(int companyId)
+public async Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId)
     {
-        var company = await _context.Companies.FindAsync(companyId);
-        if (company == null || !company.IsActive)
-            return new ApiResponse { Status = false, Message = "Not Found" };
-
-        var dto = new CompanyDTO
+        var company = await _context.Companies.FindAsync(CompanyId);
+        if (company is not {IsActive: true})
+        {
+            return null;
+        }
+        
+        return new CompanyDTO
         {
             CompanyId = company.CompanyId,
             CompanyName = company.CompanyName,
             Address = company.Address,
             IsActive = company.IsActive
         };
-
-        return new ApiResponse { Status = true, Data = dto };
     }
 
-    public async Task<ApiResponse> CreateAsync(CompanyDTO dto)
+    public async Task<CompanyDTO> CreateCompaniesAsync(CompanyDTO companyDto)
     {
         var company = new Company
         {
-            CompanyName = dto.CompanyName,
-            Address = dto.Address,
+            CompanyName = companyDto.CompanyName,
+            Address = companyDto.Address,
             IsActive = true
         };
 
         _context.Companies.Add(company);
         await _context.SaveChangesAsync();
 
-        dto.CompanyId = company.CompanyId;
-        dto.IsActive = true;
-
-        return new ApiResponse { Status = true, Message = "Created", Data = dto };
+        companyDto.CompanyId = companyDto.CompanyId;
+        return companyDto;
     }
 
-    public async Task<ApiResponse> UpdateAsync(CompanyDTO dto)
+    public async Task<CompanyDTO?> UpdateCompaniesAsync(int CompanyId, CompanyDTO companyDto)
     {
-        var company = await _context.Companies.FindAsync(dto.CompanyId);
-        if (company == null)
-            return new ApiResponse { Status = false, Message = "Not Found" };
+        var company = await _context.Companies.FindAsync(companyDto.CompanyId);
+        if (company is not { IsActive: true })
+        {
+            return null;
+        }
 
-        company.CompanyName = dto.CompanyName;
-        company.Address = dto.Address;
+        company.CompanyName = companyDto.CompanyName;
+        company.Address = companyDto.Address;
 
+        _context.Companies.Update(company);
         await _context.SaveChangesAsync();
 
-        return new ApiResponse { Status = true, Message = "Updated", Data = dto };
+        return companyDto;
     }
 
-    public async Task<ApiResponse> SoftDeleteAsync(int companyId)
+    public async Task<ApiResponse> DeActivateCompanyAsync(int CompanyId)
     {
-        var company = await _context.Companies.FindAsync(companyId);
-        if (company == null)
+        var company = await _context.Companies.FindAsync(CompanyId);
+        if (company is not {IsActive: true})
             return new ApiResponse { Status = false, Message = "Not Found" };
 
         company.IsActive = false;
+        _context.Companies.Update(company);
         await _context.SaveChangesAsync();
 
-        return new ApiResponse { Status = true, Message = "Deleted" };
+        return new ApiResponse { Status = true, Message = "Company successfully deactivated." };
     }
 }
