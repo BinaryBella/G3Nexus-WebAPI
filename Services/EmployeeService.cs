@@ -80,15 +80,9 @@ public class EmployeeService : IEmployeeService
 
         employee.Name = employeeDto.Name;
         employee.ContactNo = employeeDto.ContactNo;
-        employee.Email = employeeDto.Email;
         employee.Address = employeeDto.Address;
-
-        if (!string.IsNullOrEmpty(employeeDto.Password))
-        {
-            employee.Password = BCrypt.Net.BCrypt.HashPassword(employeeDto.Password);
-        }
-
         employee.Role = employeeDto.Role;
+        employee.IsActive = employeeDto.IsActive;
 
         _context.Employees.Update(employee);
         await _context.SaveChangesAsync();

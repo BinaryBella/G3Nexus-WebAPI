@@ -71,14 +71,14 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("verify-email")]
-    public async Task<IActionResult> VerifyEmail([FromBody] string verificationCode, [FromQuery] string email)
+    public async Task<IActionResult> VerifyEmail([FromBody] ResetPasswordVerificationDTO data)
     {
-        if (string.IsNullOrEmpty(verificationCode) || string.IsNullOrEmpty(email))
+        if (string.IsNullOrEmpty(data.VerificationCode) || string.IsNullOrEmpty(data.Email))
         {
             return BadRequest(new { message = "Verification code and email are required" });
         }
 
-        var isValid = await _authService.IsValidVerificationToken(email, verificationCode);
+        var isValid = await _authService.IsValidVerificationToken(data.Email, data.VerificationCode);
         if (isValid)
         {
             return Ok(new { message = "Email verified successfully" });
