@@ -52,6 +52,12 @@ public class ClientService : IClientService
 
     public async Task<ClientDTO> CreateClientAsync(ClientDTO clientDto)
     {
+        var companyExists = await _context.Companies.AnyAsync(c => c.CompanyId == clientDto.CompanyId && c.IsActive);
+        if (!companyExists)
+        {
+            throw new KeyNotFoundException($"Company with ID {clientDto.CompanyId} not found.");
+        }
+
         var client = new Client
         {
             Name = clientDto.Name,
@@ -71,9 +77,9 @@ public class ClientService : IClientService
         return clientDto;
     }
 
-    public async Task<ClientDTO?> UpdateClientAsync(int id, ClientDTO clientDto)
+    public async Task<ClientDTO?> UpdateClientAsync(ClientDTO clientDto)
     {
-        var client = await _context.Clients.FindAsync(id);
+        var client = await _context.Clients.FindAsync(clientDto.Id);
         if (client is not {IsActive: true})
         {
             return null;

@@ -41,10 +41,10 @@ public class CompanyController : ControllerBase
         return CreatedAtAction(nameof(GetCompanyById), new { CompanyId = company.CompanyId }, new ApiResponse { Status = true, Data = company });
     }
 
-    [HttpPut("{CompanyId:int}")]
-    public async Task<IActionResult> UpdateCompaniesAsync(int CompanyId, CompanyDTO companyDto)
+    [HttpPut("{CompanyId}")]
+    public async Task<IActionResult> UpdateCompaniesAsync(CompanyDTO companyDto)
     {
-        var company = await _companyService.UpdateCompaniesAsync(CompanyId, companyDto);
+        var company = await _companyService.UpdateCompaniesAsync(companyDto);
         if (company == null)
         {
             return NotFound(new ApiResponse { Status = false, Message = "Company not found" });

@@ -60,7 +60,7 @@ public async Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId)
         return companyDto;
     }
 
-    public async Task<CompanyDTO?> UpdateCompaniesAsync(int CompanyId, CompanyDTO companyDto)
+    public async Task<CompanyDTO?> UpdateCompaniesAsync(CompanyDTO companyDto)
     {
         var company = await _context.Companies.FindAsync(companyDto.CompanyId);
         if (company is not { IsActive: true })
