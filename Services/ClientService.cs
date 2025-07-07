@@ -25,7 +25,8 @@ public class ClientService : IClientService
                 Email = c.Email,
                 Address = c.Address,
                 Role = c.Role,
-                IsActive = c.IsActive
+                IsActive = c.IsActive,
+                CompanyId = c.CompanyId // Include CompanyId in the mapping
             })
             .ToListAsync();
     }
