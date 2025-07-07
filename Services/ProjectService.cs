@@ -39,6 +39,37 @@ public class ProjectService : IProjectService
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<ProjectDTO>> GetProjectsByClientIdAsync(string email)
+    {
+        var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email && c.IsActive);
+        if (client == null)
+        {
+            return Enumerable.Empty<ProjectDTO>();
+        }
+
+        return await _context.Projects
+            .Where(p => p.IsActive && p.CompanyId == client.CompanyId)
+            .Select(p => new ProjectDTO
+            {
+                ProjectId = p.ProjectId,
+                ProjectName = p.ProjectName,
+                ProjectType = p.ProjectType,
+                ProjectSize = p.ProjectSize,
+                CreationDate = p.CreationDate,
+                ProjectDescription = p.ProjectDescription,
+                EstimatedBudget = p.EstimatedBudget,
+                ActualStartDate = p.ActualStartDate,
+                ActualEndDate = p.ActualEndDate,
+                TotalBudget = p.TotalBudget,
+                PaymentType = p.PaymentType,
+                PaymentStatus = p.PaymentStatus,
+                Status = p.Status,
+                IsActive = p.IsActive,
+                CompanyId = p.CompanyId
+            })
+            .ToListAsync();
+    }
+
     public async Task<ProjectDTO?> GetProjectByIdAsync(int projectId)
     {
         var project = await _context.Projects.FindAsync(projectId);

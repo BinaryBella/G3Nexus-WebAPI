@@ -32,7 +32,6 @@ builder.Services.AddDbContext<G3NexusDbContext>(options =>
 // Register services
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();

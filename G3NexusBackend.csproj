@@ -12,6 +12,8 @@
     <Compile Remove="Data\DTO\VerificationDTO.cs" />
     <Compile Remove="Services\Interfaces\IVerificationService.cs" />
     <Compile Remove="Services\VerificationService.cs" />
+    <Compile Remove="Services\Interfaces\IJwtService.cs" />
+    <Compile Remove="Services\JwtService.cs" />
   </ItemGroup>
 
   <ItemGroup>
