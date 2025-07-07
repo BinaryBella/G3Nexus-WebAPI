@@ -41,7 +41,7 @@ public class CompanyController : ControllerBase
         return CreatedAtAction(nameof(GetCompanyById), new { CompanyId = company.CompanyId }, new ApiResponse { Status = true, Data = company });
     }
 
-    [HttpPut("{CompanyId}")]
+    [HttpPut]
     public async Task<IActionResult> UpdateCompaniesAsync(CompanyDTO companyDto)
     {
         var company = await _companyService.UpdateCompaniesAsync(companyDto);

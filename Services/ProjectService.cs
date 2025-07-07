@@ -33,7 +33,8 @@ public class ProjectService : IProjectService
                 PaymentType = p.PaymentType,
                 PaymentStatus = p.PaymentStatus,
                 Status = p.Status,
-                IsActive = p.IsActive
+                IsActive = p.IsActive,
+                CompanyId = p.CompanyId 
             })
             .ToListAsync();
     }
@@ -41,7 +42,7 @@ public class ProjectService : IProjectService
     public async Task<ProjectDTO?> GetProjectByIdAsync(int projectId)
     {
         var project = await _context.Projects.FindAsync(projectId);
-        if (project is not {IsActive: true})
+        if (project is not { IsActive: true })
         {
             return null;
         }
@@ -61,7 +62,8 @@ public class ProjectService : IProjectService
             PaymentType = project.PaymentType,
             PaymentStatus = project.PaymentStatus,
             Status = project.Status,
-            IsActive = project.IsActive
+            IsActive = project.IsActive,
+            CompanyId = project.CompanyId
         };
     }
 
@@ -81,7 +83,8 @@ public class ProjectService : IProjectService
             PaymentType = projectDto.PaymentType,
             PaymentStatus = projectDto.PaymentStatus,
             Status = projectDto.Status,
-            IsActive = true // New projects are active by default
+            IsActive = true,
+            CompanyId = projectDto.CompanyId
         };
 
         _context.Projects.Add(project);
@@ -94,7 +97,7 @@ public class ProjectService : IProjectService
     public async Task<ProjectDTO?> UpdateProjectAsync(int projectId, ProjectDTO projectDto)
     {
         var project = await _context.Projects.FindAsync(projectId);
-        if (project is not {IsActive: true})
+        if (project is not { IsActive: true })
         {
             return null;
         }
@@ -111,6 +114,7 @@ public class ProjectService : IProjectService
         project.PaymentType = projectDto.PaymentType;
         project.PaymentStatus = projectDto.PaymentStatus;
         project.Status = projectDto.Status;
+        project.CompanyId = projectDto.CompanyId;
 
         _context.Projects.Update(project);
         await _context.SaveChangesAsync();

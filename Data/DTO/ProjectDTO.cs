@@ -16,5 +16,6 @@ namespace G3NexusBackend.Data.DTO
         public string PaymentStatus { get; set; }
         public string Status { get; set; }
         public bool IsActive { get; set; }
+        public int CompanyId { get; set; }
     }
 }
