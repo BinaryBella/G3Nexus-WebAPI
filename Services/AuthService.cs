@@ -34,8 +34,8 @@ public class AuthService : IAuthService
                 return new ApiResponse { Status = false, Message = "Email and password are required" };
             }
 
-            var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email);
-            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email);
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email && c.IsActive);
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email && e.IsActive);
             if (client == null && employee == null)
             {
                 return new ApiResponse { Status = false, Message = "Invalid email or password" };

@@ -9,4 +9,5 @@ public interface IProjectService
     Task<ProjectDTO> CreateProjectAsync(ProjectDTO projectDto);
     Task<ProjectDTO?> UpdateProjectAsync(int projectId, ProjectDTO projectDto);
     Task<ApiResponse> DeActivateProjectAsync(int projectId);
+    Task<IEnumerable<ProjectDTO>> GetProjectsByClientIdAsync(string email);
 }

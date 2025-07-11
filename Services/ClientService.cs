@@ -77,7 +77,7 @@ public class ClientService : IClientService
         return clientDto;
     }
 
-    public async Task<ClientDTO?> UpdateClientAsync(ClientDTO clientDto)
+    public async Task<ClientEditDTO?> UpdateClientAsync(ClientEditDTO clientDto)
     {
         var client = await _context.Clients.FindAsync(clientDto.Id);
         if (client is not {IsActive: true})
@@ -89,12 +89,6 @@ public class ClientService : IClientService
         client.ContactNo = clientDto.ContactNo;
         client.Email = clientDto.Email;
         client.Address = clientDto.Address;
-
-        if (!string.IsNullOrEmpty(clientDto.Password))
-        {
-            client.Password = BCrypt.Net.BCrypt.HashPassword(clientDto.Password);
-        }
-
         _context.Clients.Update(client);
         await _context.SaveChangesAsync();
 

@@ -49,7 +49,7 @@ namespace G3NexusBackend.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateClient(ClientDTO clientDto)
+        public async Task<IActionResult> UpdateClient(ClientEditDTO clientDto)
         {
             var client = await _clientService.UpdateClientAsync(clientDto);
             if (client == null)

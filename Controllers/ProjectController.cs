@@ -22,6 +22,13 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = projects });
         }
 
+        [HttpGet("client/{email}")]
+        public async Task<IActionResult> GetProjectsByClientId(string email)
+        {
+            var projects = await _projectService.GetProjectsByClientIdAsync(email);
+            return Ok(new ApiResponse { Status = true, Data = projects });
+        }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetProjectById(int id)
         {
