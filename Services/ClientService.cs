@@ -25,7 +25,8 @@ public class ClientService : IClientService
                 Email = c.Email,
                 Address = c.Address,
                 Role = c.Role,
-                IsActive = c.IsActive
+                IsActive = c.IsActive,
+                CompanyId = c.CompanyId
             })
             .ToListAsync();
     }
@@ -46,7 +47,8 @@ public class ClientService : IClientService
             Email = client.Email,
             Address = client.Address,
             Role = client.Role,
-            IsActive = client.IsActive
+            IsActive = client.IsActive,
+            CompanyId = client.CompanyId
         };
     }
 
