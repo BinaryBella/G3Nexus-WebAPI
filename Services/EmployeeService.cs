@@ -82,6 +82,7 @@ public class EmployeeService : IEmployeeService
         employee.ContactNo = employeeDto.ContactNo;
         employee.Address = employeeDto.Address;
         employee.Role = employeeDto.Role;
+        employee.ProfileImageUrl = employeeDto.ProfileImageUrl;
         employee.IsActive = employeeDto.IsActive;
 
         _context.Employees.Update(employee);

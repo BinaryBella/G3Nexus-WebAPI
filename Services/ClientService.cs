@@ -91,6 +91,7 @@ public class ClientService : IClientService
         client.ContactNo = clientDto.ContactNo;
         client.Email = clientDto.Email;
         client.Address = clientDto.Address;
+        client.ProfileImageUrl = clientDto.ProfileImageUrl;
         _context.Clients.Update(client);
         await _context.SaveChangesAsync();
 
