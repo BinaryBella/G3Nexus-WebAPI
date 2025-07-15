@@ -44,8 +44,19 @@ public async Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId)
         };
     }
 
-    public async Task<CompanyDTO> CreateCompaniesAsync(CompanyDTO companyDto)
+    public async Task<ApiResponse> CreateCompaniesAsync(CompanyDTO companyDto)
     {
+        // Check if a company with the same name already exists
+        var companyExists = await _context.Companies.AnyAsync(c => c.CompanyName == companyDto.CompanyName && c.IsActive);
+        if (companyExists)
+        {
+            return new ApiResponse
+            {
+                Status = false,
+                Message = $"A company with the name '{companyDto.CompanyName}' already exists."
+            };
+        }
+
         var company = new Company
         {
             CompanyName = companyDto.CompanyName,
@@ -56,8 +67,13 @@ public async Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId)
         _context.Companies.Add(company);
         await _context.SaveChangesAsync();
 
-        companyDto.CompanyId = companyDto.CompanyId;
-        return companyDto;
+        companyDto.CompanyId = company.CompanyId;
+        return new ApiResponse
+        {
+            Status = true,
+            Data = companyDto,
+            Message = "Company created successfully."
+        };
     }
 
     public async Task<CompanyDTO?> UpdateCompaniesAsync(CompanyDTO companyDto)

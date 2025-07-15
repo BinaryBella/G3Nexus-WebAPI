@@ -37,8 +37,13 @@ public class CompanyController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateCompaniesAsync(CompanyDTO companyDto)
     {
-        var company = await _companyService.CreateCompaniesAsync(companyDto);
-        return CreatedAtAction(nameof(GetCompanyById), new { CompanyId = company.CompanyId }, new ApiResponse { Status = true, Data = company });
+        var response = await _companyService.CreateCompaniesAsync(companyDto);
+        if (!response.Status)
+        {
+            return BadRequest(response);
+        }
+
+        return CreatedAtAction(nameof(GetCompanyById), new { CompanyId = companyDto.CompanyId }, response);
     }
 
     [HttpPut]

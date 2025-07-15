@@ -6,7 +6,7 @@ public interface ICompanyService
 {
     Task<IEnumerable<CompanyDTO>> GetAllCompaniesAsync();
     Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId);
-    Task<CompanyDTO> CreateCompaniesAsync(CompanyDTO companyDto);
+    Task<ApiResponse> CreateCompaniesAsync(CompanyDTO companyDto);
     Task<CompanyDTO?> UpdateCompaniesAsync(CompanyDTO companyDto);
     Task<ApiResponse> DeActivateCompanyAsync(int CompanyId);
 }
