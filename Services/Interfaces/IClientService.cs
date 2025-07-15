@@ -6,7 +6,7 @@ public interface IClientService
 {
     Task<IEnumerable<ClientDTO>> GetAllClientsAsync();
     Task<ClientDTO?> GetClientByIdAsync(int id);
-    Task<ClientDTO> CreateClientAsync(ClientDTO clientDto);
+    Task<ApiResponse> CreateClientAsync(ClientDTO clientDto);
     Task<ClientEditDTO?> UpdateClientAsync(ClientEditDTO clientDto);
     Task<ApiResponse> DeActivateClientAsync(int id);
 }

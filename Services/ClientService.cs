@@ -1,4 +1,5 @@
 using G3NexusBackend.Data.DTO;
+using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
 using G3NexusBackend.Services.Interfaces;
 
@@ -52,12 +53,28 @@ public class ClientService : IClientService
         };
     }
 
-    public async Task<ClientDTO> CreateClientAsync(ClientDTO clientDto)
+    public async Task<ApiResponse> CreateClientAsync(ClientDTO clientDto)
     {
+        // Check if a client with the same email already exists
+        var emailExists = await _context.Clients.AnyAsync(c => c.Email == clientDto.Email && c.IsActive);
+        if (emailExists)
+        {
+            return new ApiResponse
+            {
+                Status = false,
+                Message = $"A client with the email '{clientDto.Email}' already exists."
+            };
+        }
+
+        // Check if the associated company exists
         var companyExists = await _context.Companies.AnyAsync(c => c.CompanyId == clientDto.CompanyId && c.IsActive);
         if (!companyExists)
         {
-            throw new KeyNotFoundException($"Company with ID {clientDto.CompanyId} not found.");
+            return new ApiResponse
+            {
+                Status = false,
+                Message = $"Company with ID {clientDto.CompanyId} not found."
+            };
         }
 
         var client = new Client
@@ -76,9 +93,13 @@ public class ClientService : IClientService
         await _context.SaveChangesAsync();
 
         clientDto.Id = client.Id;
-        return clientDto;
+        return new ApiResponse
+        {
+            Status = true,
+            Message = "Client created successfully.",
+            Data = clientDto
+        };
     }
-
     public async Task<ClientEditDTO?> UpdateClientAsync(ClientEditDTO clientDto)
     {
         var client = await _context.Clients.FindAsync(clientDto.Id);

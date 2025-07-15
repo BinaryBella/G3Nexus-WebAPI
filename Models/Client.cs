@@ -9,7 +9,7 @@ public class Client
     public string Address { get; set; }
     public string Password { get; set; } 
     public string Role { get; set; }
-    public string ProfileImageUrl { get; set; }
+    public string? ProfileImageUrl { get; set; }
     public bool IsActive { get; set; }
     public int CompanyId { get; set; } // Foreign Key to Company
     public Company Company { get; set; } // Navigation property for related company

@@ -37,15 +37,13 @@ namespace G3NexusBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateClient(ClientDTO clientDto)
         {
-            try
+            var response = await _clientService.CreateClientAsync(clientDto);
+            if (!response.Status)
             {
-                var client = await _clientService.CreateClientAsync(clientDto);
-                return CreatedAtAction(nameof(GetClientById), new { id = client.Id }, new ApiResponse { Status = true, Data = client });                
+                return BadRequest(response);
             }
-            catch (KeyNotFoundException ex)
-            {
-                return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
-            }
+
+            return CreatedAtAction(nameof(GetClientById), new { id = ((ClientDTO)response.Data).Id }, response);
         }
 
         [HttpPut]
