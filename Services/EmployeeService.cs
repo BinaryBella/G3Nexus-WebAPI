@@ -50,8 +50,19 @@ public class EmployeeService : IEmployeeService
         };
     }
 
-    public async Task<EmployeeDTO> CreateEmployeeAsync(EmployeeDTO employeeDto)
+    public async Task<ApiResponse> CreateEmployeeAsync(EmployeeDTO employeeDto)
     {
+        // Check if an employee with the same email already exists
+        var emailExists = await _context.Employees.AnyAsync(e => e.Email == employeeDto.Email && e.IsActive);
+        if (emailExists)
+        {
+            return new ApiResponse
+            {
+                Status = false,
+                Message = $"An employee with the email '{employeeDto.Email}' already exists."
+            };
+        }
+
         var employee = new Employee
         {
             Name = employeeDto.Name,
@@ -60,6 +71,7 @@ public class EmployeeService : IEmployeeService
             Address = employeeDto.Address,
             Password = BCrypt.Net.BCrypt.HashPassword(employeeDto.Password),
             Role = employeeDto.Role,
+            ProfileImageUrl = employeeDto.ProfileImageUrl,
             IsActive = true
         };
 
@@ -67,7 +79,12 @@ public class EmployeeService : IEmployeeService
         await _context.SaveChangesAsync();
 
         employeeDto.EmployeeId = employee.EmployeeId;
-        return employeeDto;
+        return new ApiResponse
+        {
+            Status = true,
+            Message = "Employee created successfully.",
+            Data = employeeDto
+        };
     }
 
     public async Task<EmployeeDTO?> UpdateEmployeeAsync(int employeeId, EmployeeDTO employeeDto)

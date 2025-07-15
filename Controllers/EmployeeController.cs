@@ -37,8 +37,13 @@ namespace G3NexusBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEmployee(EmployeeDTO employeeDto)
         {
-            var employee = await _employeeService.CreateEmployeeAsync(employeeDto);
-            return CreatedAtAction(nameof(GetEmployeeById), new { id = employee.EmployeeId }, new ApiResponse { Status = true, Data = employee });
+            var response = await _employeeService.CreateEmployeeAsync(employeeDto);
+            if (!response.Status)
+            {
+                return BadRequest(response);
+            }
+
+            return CreatedAtAction(nameof(GetEmployeeById), new { id = ((EmployeeDTO)response.Data).EmployeeId }, response);
         }
 
         [HttpPut]

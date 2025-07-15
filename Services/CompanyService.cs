@@ -95,9 +95,19 @@ public async Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId)
 
     public async Task<ApiResponse> DeActivateCompanyAsync(int CompanyId)
     {
-        var company = await _context.Companies.FindAsync(CompanyId);
-        if (company is not {IsActive: true})
-            return new ApiResponse { Status = false, Message = "Not Found" };
+        var company = await _context.Companies
+            .Include(c => c.Clients) // Include clients in the query
+            .FirstOrDefaultAsync(c => c.CompanyId == CompanyId);
+
+        if (company is not { IsActive: true })
+        {
+            return new ApiResponse { Status = false, Message = "Company not found or already inactive." };
+        }
+
+        if (company.Clients != null && company.Clients.Any())
+        {
+            return new ApiResponse { Status = false, Message = "Cannot deactivate company with associated clients." };
+        }
 
         company.IsActive = false;
         _context.Companies.Update(company);
