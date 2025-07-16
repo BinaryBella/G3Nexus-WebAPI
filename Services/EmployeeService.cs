@@ -7,10 +7,12 @@ namespace G3NexusBackend.Services;
 public class EmployeeService : IEmployeeService
 {
     private readonly G3NexusDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public EmployeeService(G3NexusDbContext context)
+    public EmployeeService(G3NexusDbContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
 
     public async Task<IEnumerable<EmployeeDTO>> GetAllEmployeesAsync()
@@ -49,10 +51,9 @@ public class EmployeeService : IEmployeeService
             IsActive = employee.IsActive
         };
     }
-
+    
     public async Task<ApiResponse> CreateEmployeeAsync(EmployeeDTO employeeDto)
     {
-        // Check if an employee with the same email already exists
         var emailExists = await _context.Employees.AnyAsync(e => e.Email == employeeDto.Email && e.IsActive);
         if (emailExists)
         {
@@ -79,6 +80,13 @@ public class EmployeeService : IEmployeeService
         await _context.SaveChangesAsync();
 
         employeeDto.EmployeeId = employee.EmployeeId;
+
+        var emailTemplate = await _emailService.GetEmailTemplateAsync("PasswordEmailTemplate.html");
+        emailTemplate = emailTemplate.Replace("{{Name}}", employeeDto.Name)
+            .Replace("{{Password}}", employeeDto.Password);
+
+        await _emailService.SendEmailAsync(employeeDto.Email, "Welcome to G3Nexus", emailTemplate, isHtml: true);
+
         return new ApiResponse
         {
             Status = true,
@@ -86,7 +94,7 @@ public class EmployeeService : IEmployeeService
             Data = employeeDto
         };
     }
-
+    
     public async Task<EmployeeDTO?> UpdateEmployeeAsync(int employeeId, EmployeeDTO employeeDto)
     {
         var employee = await _context.Employees.FindAsync(employeeId);

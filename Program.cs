@@ -30,7 +30,6 @@ builder.Services.AddDbContext<G3NexusDbContext>(options =>
 });
 
 // Register services
-
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IClientService, ClientService>();
@@ -41,7 +40,6 @@ builder.Services.AddScoped<IRequirementService, RequirementService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ITermsConditionsService, TermsConditionsService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
-
 
 // Add Swagger with JWT Authentication support
 builder.Services.AddAuthentication(options =>
