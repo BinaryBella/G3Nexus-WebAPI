@@ -8,10 +8,12 @@ namespace G3NexusBackend.Services;
 public class ClientService : IClientService
 {
     private readonly G3NexusDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public ClientService(G3NexusDbContext context)
+    public ClientService(G3NexusDbContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
 
     public async Task<IEnumerable<ClientDTO>> GetAllClientsAsync()
@@ -93,6 +95,13 @@ public class ClientService : IClientService
         await _context.SaveChangesAsync();
 
         clientDto.Id = client.Id;
+        
+        var emailTemplate = await _emailService.GetEmailTemplateAsync("PasswordEmailTemplate.html");
+        emailTemplate = emailTemplate.Replace("{{Name}}", clientDto.Name)
+            .Replace("{{Password}}", clientDto.Password);
+
+        await _emailService.SendEmailAsync(clientDto.Email, "Welcome to G3Nexus", emailTemplate, isHtml: true);
+
         return new ApiResponse
         {
             Status = true,
