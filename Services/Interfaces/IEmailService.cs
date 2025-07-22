@@ -4,4 +4,5 @@ public interface IEmailService
 {
     Task SendEmailAsync(string toEmail, string subject, string body, bool isHtml = false);
     Task<string> GetEmailTemplateAsync(string templateName);
+    Task SendEmailWithAttachmentAsync(string toEmail, string subject, string body, byte[] attachmentBytes, string attachmentName, bool isHtml = true);
 }

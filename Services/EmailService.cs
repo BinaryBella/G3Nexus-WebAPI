@@ -38,6 +38,32 @@ public class EmailService : IEmailService
         await smtpClient.SendMailAsync(mailMessage);
     }
 
+    public async Task SendEmailWithAttachmentAsync(string toEmail, string subject, string body, byte[] attachmentBytes, string attachmentName, bool isHtml = true)
+    {
+        var emailSettings = _configuration.GetSection("EmailSettings");
+
+        var smtpClient = new SmtpClient(emailSettings["SmtpServer"])
+        {
+            Port = int.Parse(emailSettings["Port"]),
+            Credentials = new NetworkCredential(emailSettings["Username"], emailSettings["Password"]),
+            EnableSsl = true,
+        };
+
+        var mailMessage = new MailMessage
+        {
+            From = new MailAddress(emailSettings["SenderEmail"], emailSettings["SenderName"]),
+            Subject = subject,
+            Body = body,
+            IsBodyHtml = isHtml,
+        };
+        mailMessage.To.Add(toEmail);
+
+        using var ms = new MemoryStream(attachmentBytes);
+        mailMessage.Attachments.Add(new Attachment(ms, attachmentName));
+
+        await smtpClient.SendMailAsync(mailMessage);
+    }
+
     public async Task<string> GetEmailTemplateAsync(string templateName)
     {
         var templatePath = Path.Combine(_environment.WebRootPath, "EmailTemplates", templateName);

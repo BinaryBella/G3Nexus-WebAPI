@@ -9,4 +9,5 @@ public interface IClientService
     Task<ApiResponse> CreateClientAsync(ClientDTO clientDto);
     Task<ClientEditDTO?> UpdateClientAsync(ClientEditDTO clientDto);
     Task<ApiResponse> DeActivateClientAsync(int id);
+    Task<ClientDTO?> GetClientAdminByCompanyIdAsync(int companyId);
 }

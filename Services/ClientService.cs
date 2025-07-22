@@ -142,4 +142,25 @@ public class ClientService : IClientService
 
         return new ApiResponse { Status = true, Message = "Client successfully deactivated." };
     }
+    
+    public async Task<ClientDTO?> GetClientAdminByCompanyIdAsync(int companyId)
+    {
+        return await _context.Clients
+            .Where(c => c.CompanyId == companyId &&
+                        c.Role == "CLIENT_ADMIN" &&
+                        c.IsActive)
+            .Select(c => new ClientDTO
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Email = c.Email,
+                ContactNo = c.ContactNo,
+                Address = c.Address,
+                Role = c.Role,
+                CompanyId = c.CompanyId,
+                IsActive = c.IsActive
+            })
+            .FirstOrDefaultAsync();
+    }
+
 }

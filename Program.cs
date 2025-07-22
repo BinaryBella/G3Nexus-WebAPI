@@ -5,8 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using G3NexusBackend.Services.Interfaces;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+QuestPDF.Settings.License = LicenseType.Community;
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -40,6 +42,9 @@ builder.Services.AddScoped<IRequirementService, RequirementService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ITermsConditionsService, TermsConditionsService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
+builder.Services.AddScoped<IQuotationCostService, QuotationCostService>();
+
 
 // Add Swagger with JWT Authentication support
 builder.Services.AddAuthentication(options =>

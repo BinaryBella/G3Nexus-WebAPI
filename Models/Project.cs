@@ -27,4 +27,6 @@ public class Project
     
     // Many-to-many navigation
     public ICollection<EmployeeProject> EmployeeProjects { get; set; }
+    public QuotationCost QuotationCost { get; set; }
+
 }

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Project Quotation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 40px auto;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 30px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h2 {
+            color: #00b894;
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #00b894;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        .content p {
+            margin: 12px 0;
+            font-size: 15px;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 13px;
+            color: #777;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>G3 Technologies (Pvt) Ltd - Project Quotation</h2>
+    </div>
+
+    <div class="content">
+        <p>Dear <span class="highlight">{{ClientName}}</span>,</p>
+
+        <p>We are pleased to submit the quotation for the project titled <span class="highlight">{{ProjectTitle}}</span>.</p>
+
+        <div class="section-title">Project Details</div>
+        <p><strong>Quotation ID:</strong> {{QuotationId}}<br />
+            <strong>Date:</strong> {{QuotationDate}}<br />
+            <strong>Client Contact:</strong> {{ClientContact}}<br />
+            <strong>Email:</strong> {{ClientEmail}}</p>
+
+        <p><strong>Project Description:</strong><br /> {{ProjectDescription}}</p>
+        <p><strong>Estimated Duration:</strong> {{StartDate}} – {{EndDate}}</p>
+
+        <div class="section-title">Cost & Payment Summary</div>
+        <p>The full cost breakdown and payment schedule are detailed in the attached PDF document.</p>
+        <p><strong>Total Project Cost:</strong> Rs. <span class="highlight">{{TotalCost}}</span></p>
+
+        <p>If you have any questions or would like to make adjustments, please don’t hesitate to get in touch.</p>
+
+        <p>Thank you for choosing G3 Technologies.<br />
+            We look forward to working with you!</p>
+    </div>
+
+    <div class="footer">
+        This is an automated message from G3NEXUS. Please do not reply to this email.
+    </div>
+</div>
+</body>
+</html>

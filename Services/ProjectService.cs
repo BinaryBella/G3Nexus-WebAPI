@@ -8,10 +8,17 @@ namespace G3NexusBackend.Services;
 public class ProjectService : IProjectService
 {
     private readonly G3NexusDbContext _context;
+    private readonly IPdfGeneratorService _pdfService;
+    private readonly IEmailService _emailService;
+    private readonly IClientService _clientService;
 
-    public ProjectService(G3NexusDbContext context)
+
+    public ProjectService(G3NexusDbContext context, IPdfGeneratorService pdfService, IEmailService emailService, IClientService clientService)
     {
         _context = context;
+        _pdfService = pdfService;
+        _emailService = emailService;
+        _clientService = clientService;
     }
 
     public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
@@ -98,33 +105,69 @@ public class ProjectService : IProjectService
         };
     }
 
-    public async Task<ProjectDTO> CreateProjectAsync(ProjectDTO projectDto)
+public async Task<ProjectDTO> CreateProjectAsync(ProjectDTO projectDto)
+{
+    // Validate Client Admin for the Company
+    var client = await _clientService.GetClientAdminByCompanyIdAsync(projectDto.CompanyId);
+    if (client == null)
+        throw new Exception("No active Client Admin found for the company.");
+
+    projectDto.ClientName = client.Name;
+    projectDto.ClientEmail = client.Email;
+
+    // Create Project Entity
+    var project = new Project
     {
-        var project = new Project
-        {
-            ProjectName = projectDto.ProjectName,
-            ProjectType = projectDto.ProjectType,
-            ProjectSize = projectDto.ProjectSize,
-            CreationDate = projectDto.CreationDate,
-            ProjectDescription = projectDto.ProjectDescription,
-            EstimatedBudget = projectDto.EstimatedBudget,
-            ActualStartDate = projectDto.ActualStartDate,
-            ActualEndDate = projectDto.ActualEndDate,
-            TotalBudget = projectDto.TotalBudget,
-            PaymentType = projectDto.PaymentType,
-            PaymentStatus = projectDto.PaymentStatus,
-            Status = projectDto.Status,
-            IsActive = true,
-            CompanyId = projectDto.CompanyId
-        };
+        ProjectName = projectDto.ProjectName,
+        ProjectType = projectDto.ProjectType,
+        ProjectSize = projectDto.ProjectSize,
+        CreationDate = projectDto.CreationDate,
+        ProjectDescription = projectDto.ProjectDescription,
+        EstimatedBudget = projectDto.EstimatedBudget,
+        ActualStartDate = projectDto.ActualStartDate,
+        ActualEndDate = projectDto.ActualEndDate,
+        TotalBudget = projectDto.TotalBudget,
+        PaymentType = projectDto.PaymentType,
+        PaymentStatus = projectDto.PaymentStatus,
+        Status = projectDto.Status,
+        IsActive = true,
+        CompanyId = projectDto.CompanyId
+    };
 
-        _context.Projects.Add(project);
-        await _context.SaveChangesAsync();
+    _context.Projects.Add(project);
+    await _context.SaveChangesAsync();
 
-        projectDto.ProjectId = project.ProjectId;
-        return projectDto;
-    }
+    projectDto.ProjectId = project.ProjectId;
 
+    // Generate PDF Quotation
+    var pdfBytes = _pdfService.GenerateProjectQuotation(projectDto);
+
+    // Prepare Email Template
+    var emailBody = await _emailService.GetEmailTemplateAsync("ProjectQuotation.html");
+    emailBody = emailBody.Replace("{{ClientName}}", projectDto.ClientName)
+        .Replace("{{ProjectTitle}}", projectDto.ProjectName)
+        .Replace("{{QuotationId}}", projectDto.ProjectId.ToString())
+        .Replace("{{QuotationDate}}", DateTime.Now.ToString("dd/MM/yyyy"))
+        .Replace("{{ClientContact}}", client.ContactNo)
+        .Replace("{{ClientEmail}}", client.Email)
+        .Replace("{{ProjectDescription}}", projectDto.ProjectDescription)
+        .Replace("{{StartDate}}", projectDto.ActualStartDate?.ToShortDateString() ?? "N/A")
+        .Replace("{{EndDate}}", projectDto.ActualEndDate?.ToShortDateString() ?? "N/A")
+        .Replace("{{TotalCost}}", projectDto.TotalBudget.ToString("N2"));
+
+    // Send Email with PDF Attachment
+    await _emailService.SendEmailWithAttachmentAsync(
+        projectDto.ClientEmail,
+        $"[Quotation] {projectDto.ProjectName} - G3NEXUS",
+        emailBody,
+        pdfBytes,
+        "Project_Quotation.pdf",
+        isHtml: true
+    );
+
+    return projectDto;
+}
+    
     public async Task<ProjectDTO?> UpdateProjectAsync(int projectId, ProjectDTO projectDto)
     {
         var project = await _context.Projects.FindAsync(projectId);
