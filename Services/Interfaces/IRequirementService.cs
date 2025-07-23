@@ -9,4 +9,5 @@ public interface IRequirementService
     Task<RequirementDTO> CreateRequirementAsync(RequirementDTO requirementDto);
     Task<RequirementDTO?> UpdateRequirementAsync(int requirementId, RequirementDTO requirementDto);
     Task<ApiResponse> DeActivateRequirementAsync(int requirementId);
+    Task<RequirementDTO?> MarkAsViewedAsync(int requirementId);
 }

@@ -80,5 +80,17 @@ namespace G3NexusBackend.Controllers
 
             return Ok(response);
         }
+        
+        [HttpPut("MarkAsViewed/{id:int}")]
+        public async Task<IActionResult> MarkRequirementAsViewed(int id)
+        {
+            var requirement = await _requirementService.MarkAsViewedAsync(id);
+            if (requirement == null)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = "Requirement not found" });
+            }
+
+            return Ok(new ApiResponse { Status = true, Data = requirement });
+        }
     }
 }

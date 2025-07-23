@@ -136,4 +136,30 @@ public class RequirementService : IRequirementService
 
         return new ApiResponse { Status = true, Message = "Requirement successfully deactivated." };
     }
+    
+    public async Task<RequirementDTO?> MarkAsViewedAsync(int requirementId)
+    {
+        var requirement = await _context.Requirements.FindAsync(requirementId);
+        if (requirement == null || !requirement.IsActive)
+        {
+            return null;
+        }
+
+        requirement.CreatedAt = DateTime.MinValue; // Reset the "new" indicator
+        _context.Requirements.Update(requirement);
+        await _context.SaveChangesAsync();
+
+        return new RequirementDTO
+        {
+            RequirementId = requirement.RequirementId,
+            RequirementTitle = requirement.RequirementTitle,
+            Priority = requirement.Priority,
+            RequirementDescription = requirement.RequirementDescription,
+            Attachment = requirement.Attachment,
+            IsActive = requirement.IsActive,
+            ClientId = requirement.ClientId,
+            ProjectId = requirement.ProjectId,
+            IsNew = false
+        };
+    }
 }
