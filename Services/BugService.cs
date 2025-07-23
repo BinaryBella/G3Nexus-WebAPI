@@ -12,25 +12,27 @@ public class BugService : IBugService
     {
         _context = context;
     }
-
-    public async Task<IEnumerable<BugDTO>> GetAllBugsAsync()
+   
+    public async Task<IEnumerable<BugDTO>> GetAllBugsAsync(int userId, DateTime userLastLogin)
     {
-        return await _context.Bugs
+        var bugs = await _context.Bugs
             .Where(b => b.IsActive)
-            .Select(b => new BugDTO
-            {
-                BugId = b.BugId,
-                BugTitle = b.BugTitle,
-                Severity = b.Severity,
-                BugDescription = b.BugDescription,
-                Attachment = b.Attachment,
-                IsActive = b.IsActive,
-                ClientId = b.ClientId,
-                ProjectId = b.ProjectId
-            })
             .ToListAsync();
-    }
 
+        return bugs.Select(b => new BugDTO
+        {
+            BugId = b.BugId,
+            BugTitle =  b.BugTitle,
+            Severity = b.Severity,
+            BugDescription = b.BugDescription,
+            Attachment = b.Attachment,
+            IsActive = b.IsActive,
+            ClientId = b.ClientId,
+            ProjectId = b.ProjectId,
+            IsNew = b.CreatedAt > userLastLogin
+        });
+    }
+    
     public async Task<BugDTO?> GetBugByIdAsync(int bugId)
     {
         var bug = await _context.Bugs.FindAsync(bugId);
@@ -68,6 +70,8 @@ public class BugService : IBugService
             throw new KeyNotFoundException($"Project with ID {bugDto.ProjectId} not found.");
         }
 
+        var sriLankaTime = DateTime.UtcNow.AddHours(5.5);
+
         var bug = new Bug
         {
             BugTitle = bugDto.BugTitle,
@@ -76,7 +80,8 @@ public class BugService : IBugService
             Attachment = bugDto.Attachment,
             IsActive = true,
             ClientId = bugDto.ClientId,
-            ProjectId = bugDto.ProjectId
+            ProjectId = bugDto.ProjectId,
+            CreatedAt = sriLankaTime
         };
 
         _context.Bugs.Add(bug);
@@ -132,5 +137,31 @@ public class BugService : IBugService
         await _context.SaveChangesAsync();
 
         return new ApiResponse { Status = true, Message = "Bug successfully deactivated." };
+    }
+    
+    public async Task<BugDTO?> MarkAsViewedAsync(int BugId)
+    {
+        var Bug = await _context.Bugs.FindAsync(BugId);
+        if (Bug == null || !Bug.IsActive)
+        {
+            return null;
+        }
+
+        Bug.CreatedAt = DateTime.MinValue; // Reset the "new" indicator
+        _context.Bugs.Update(Bug);
+        await _context.SaveChangesAsync();
+
+        return new BugDTO
+        {
+            BugId = Bug.BugId,
+            BugTitle = Bug.BugTitle,
+            Severity = Bug.Severity,
+            BugDescription = Bug.BugDescription,
+            Attachment = Bug.Attachment,
+            IsActive = Bug.IsActive,
+            ClientId = Bug.ClientId,
+            ProjectId = Bug.ProjectId,
+            IsNew = false
+        };
     }
 }

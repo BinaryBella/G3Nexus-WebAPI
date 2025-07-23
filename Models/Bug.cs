@@ -8,8 +8,8 @@ public class Bug
     public string BugDescription { get; set; }
     public string Attachment { get; set; }
     public bool IsActive { get; set; }
-    
-    // Foreign Keys
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+   // Foreign Keys
     public int ClientId { get; set; }
     public int ProjectId { get; set; }
 
