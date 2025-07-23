@@ -8,6 +8,7 @@ namespace G3NexusBackend.Data.DTO
         public string RequirementDescription { get; set; }
         public string Attachment { get; set; }
         public bool IsActive { get; set; }
+        public bool IsNew { get; set; }
         public int ClientId { get; set; }
         public int ProjectId { get; set; }
     }

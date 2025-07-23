@@ -13,22 +13,24 @@ public class RequirementService : IRequirementService
         _context = context;
     }
 
-    public async Task<IEnumerable<RequirementDTO>> GetAllRequirementsAsync()
+    public async Task<IEnumerable<RequirementDTO>> GetAllRequirementsAsync(int userId, DateTime userLastLogin)
     {
-        return await _context.Requirements
-            .Where(r => r.IsActive) 
-            .Select(r => new RequirementDTO
-            {
-                RequirementId = r.RequirementId,
-                RequirementTitle = r.RequirementTitle,
-                Priority = r.Priority,
-                RequirementDescription = r.RequirementDescription,
-                Attachment = r.Attachment,
-                IsActive = r.IsActive,
-                ClientId = r.ClientId,
-                ProjectId = r.ProjectId
-            })
+        var requirements = await _context.Requirements
+            .Where(r => r.IsActive)
             .ToListAsync();
+
+        return requirements.Select(r => new RequirementDTO
+        {
+            RequirementId = r.RequirementId,
+            RequirementTitle = r.RequirementTitle,
+            Priority = r.Priority,
+            RequirementDescription = r.RequirementDescription,
+            Attachment = r.Attachment,
+            IsActive = r.IsActive,
+            ClientId = r.ClientId,
+            ProjectId = r.ProjectId,
+            IsNew = r.CreatedAt > userLastLogin
+        });
     }
 
     public async Task<RequirementDTO?> GetRequirementByIdAsync(int requirementId)
@@ -66,6 +68,8 @@ public class RequirementService : IRequirementService
             throw new KeyNotFoundException($"Project with ID {requirementDto.ProjectId} not found.");
         }
 
+        var sriLankaTime = DateTime.UtcNow.AddHours(5.5);
+
         var requirement = new Requirement
         {
             RequirementTitle = requirementDto.RequirementTitle,
@@ -74,7 +78,8 @@ public class RequirementService : IRequirementService
             Attachment = requirementDto.Attachment,
             IsActive = true,
             ClientId = requirementDto.ClientId,
-            ProjectId = requirementDto.ProjectId
+            ProjectId = requirementDto.ProjectId,
+            CreatedAt = sriLankaTime
         };
 
         _context.Requirements.Add(requirement);

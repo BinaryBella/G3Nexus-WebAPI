@@ -15,10 +15,11 @@ namespace G3NexusBackend.Controllers
             _requirementService = requirementService;
         }
 
+        // GET: api/Requirement?userId=12&lastLogin=2025-07-23T06:00:00Z
         [HttpGet]
-        public async Task<IActionResult> GetRequirements()
+        public async Task<IActionResult> GetRequirements([FromQuery] int userId, [FromQuery] DateTime lastLogin)
         {
-            var requirements = await _requirementService.GetAllRequirementsAsync();
+            var requirements = await _requirementService.GetAllRequirementsAsync(userId, lastLogin);
             return Ok(new ApiResponse { Status = true, Data = requirements });
         }
 
@@ -33,7 +34,7 @@ namespace G3NexusBackend.Controllers
 
             return Ok(new ApiResponse { Status = true, Data = requirement });
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> CreateRequirement(RequirementDTO requirementDto)
         {
@@ -47,7 +48,6 @@ namespace G3NexusBackend.Controllers
                 return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
             }
         }
-
 
         [HttpPut]
         public async Task<IActionResult> UpdateRequirement(RequirementDTO requirementDto)
@@ -67,7 +67,6 @@ namespace G3NexusBackend.Controllers
             {
                 return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
             }
-
         }
 
         [HttpDelete("{id:int}")]
