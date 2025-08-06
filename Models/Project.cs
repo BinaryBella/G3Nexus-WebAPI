@@ -19,8 +19,6 @@ public class Project
     public int CompanyId { get; set; } // Foreign Key
 
     public Company Company { get; set; } // Navigation property for related company
-
-    public TermsConditions TermsConditions { get; set; } // navigation
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs
     public ICollection<Payment> Payments { get; set; } // Navigation property for related payments
