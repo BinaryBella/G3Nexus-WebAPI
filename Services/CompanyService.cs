@@ -106,7 +106,7 @@ public async Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId)
 
         if (company.Clients != null && company.Clients.Any())
         {
-            return new ApiResponse { Status = false, Message = "Cannot deactivate company with associated clients." };
+            return new ApiResponse { Status = false, Message = "This company has associated clients and cannot be deleted. Please remove all clients before deleting the company." };
         }
 
         company.IsActive = false;

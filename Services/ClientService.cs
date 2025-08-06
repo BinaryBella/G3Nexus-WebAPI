@@ -122,6 +122,7 @@ public class ClientService : IClientService
         client.Email = clientDto.Email;
         client.Address = clientDto.Address;
         client.ProfileImageUrl = clientDto.ProfileImageUrl;
+        client.Role = clientDto.Role;
         _context.Clients.Update(client);
         await _context.SaveChangesAsync();
 
