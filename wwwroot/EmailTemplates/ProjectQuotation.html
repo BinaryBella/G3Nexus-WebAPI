@@ -64,38 +64,123 @@
     </style>
 </head>
 <body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Quotation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .details, .cost-breakdown, .terms {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
 <div class="container">
     <div class="header">
-        <h2>G3 Technologies (Pvt) Ltd - Project Quotation</h2>
+        <h1>Project Quotation</h1>
+        <p>Quotation ID: {{QuotationId}}</p>
+        <p>Date: {{QuotationDate}}</p>
     </div>
 
-    <div class="content">
-        <p>Dear <span class="highlight">{{ClientName}}</span>,</p>
-
-        <p>We are pleased to submit the quotation for the project titled <span class="highlight">{{ProjectTitle}}</span>.</p>
-
-        <div class="section-title">Project Details</div>
-        <p><strong>Quotation ID:</strong> {{QuotationId}}<br />
-            <strong>Date:</strong> {{QuotationDate}}<br />
-            <strong>Client Contact:</strong> {{ClientContact}}<br />
-            <strong>Email:</strong> {{ClientEmail}}</p>
-
-        <p><strong>Project Description:</strong><br /> {{ProjectDescription}}</p>
-        <p><strong>Estimated Duration:</strong> {{StartDate}} – {{EndDate}}</p>
-
-        <div class="section-title">Cost & Payment Summary</div>
-        <p>The full cost breakdown and payment schedule are detailed in the attached PDF document.</p>
-        <p><strong>Total Project Cost:</strong> Rs. <span class="highlight">{{TotalCost}}</span></p>
-
-        <p>If you have any questions or would like to make adjustments, please don’t hesitate to get in touch.</p>
-
-        <p>Thank you for choosing G3 Technologies.<br />
-            We look forward to working with you!</p>
+    <div class="details">
+        <h2>Client Details</h2>
+        <p><strong>Name:</strong> {{ClientName}}</p>
+        <p><strong>Contact:</strong> {{ClientContact}}</p>
+        <p><strong>Email:</strong> {{ClientEmail}}</p>
     </div>
 
-    <div class="footer">
-        This is an automated message from G3NEXUS. Please do not reply to this email.
+    <div class="details">
+        <h2>Project Details</h2>
+        <p><strong>Title:</strong> {{ProjectTitle}}</p>
+        <p><strong>Description:</strong> {{ProjectDescription}}</p>
+        <p><strong>Start Date:</strong> {{StartDate}}</p>
+        <p><strong>End Date:</strong> {{EndDate}}</p>
     </div>
+
+    <div class="cost-breakdown">
+        <h2>Cost Breakdown</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Item</th>
+                <th>Cost (Rs.)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Advance Payment</td>
+                <td>{{AdvancePayment}}</td>
+            </tr>
+            <tr>
+                <td>Development Cost</td>
+                <td>{{DevelopmentCost}}</td>
+            </tr>
+            <tr>
+                <td>Hosting and Domain</td>
+                <td>{{HostingAndDomain}}</td>
+            </tr>
+            <tr>
+                <td>SSL Certificate</td>
+                <td>{{SSLCertificate}}</td>
+            </tr>
+            <tr>
+                <td>Server Cost</td>
+                <td>{{ServerCost}}</td>
+            </tr>
+            <tr>
+                <td>Deployment Cost</td>
+                <td>{{DeploymentCost}}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>Total</th>
+                <th>{{TotalCost}}</th>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="terms">
+        <h2>Terms and Conditions</h2>
+        <ul>
+            {{#each TermsConditions}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+    </div>
+
+    <p>Thank you for choosing G3 Technologies. We look forward to working with you!</p>
 </div>
 </body>
 </html>

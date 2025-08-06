@@ -19,6 +19,6 @@ namespace G3NexusBackend.Data.DTO
         public int CompanyId { get; set; }
         public string ClientName { get; set; }
         public string ClientEmail { get; set; }
-
+        public QuotationCostDTO QuotationCost { get; set; }
     }
 }

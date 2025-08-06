@@ -5,6 +5,6 @@ namespace G3NexusBackend.Services.Interfaces;
 
 public interface IQuotationCostService
 {
-    Task<QuotationCost> SaveQuotationCostAsync(QuotationCostDTO dto);
+    // Task<QuotationCost> SaveQuotationCostAsync(QuotationCostDTO dto);
     Task<QuotationCost?> GetByProjectIdAsync(int projectId);
 }

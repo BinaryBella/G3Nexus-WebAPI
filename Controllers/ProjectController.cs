@@ -42,9 +42,9 @@ namespace G3NexusBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProject(ProjectDTO projectDto)
+        public async Task<IActionResult> CreateProject(AddProjectRequestDto projectRequestDto)
         {
-            var project = await _projectService.CreateProjectAsync(projectDto);
+            var project = await _projectService.CreateProjectAsync(projectRequestDto);
             return CreatedAtAction(nameof(GetProjectById), new { id = project.ProjectId }, new ApiResponse { Status = true, Data = project });
         }
 

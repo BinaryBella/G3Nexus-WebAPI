@@ -21,6 +21,13 @@ public class G3NexusDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Configure the one-to-one relationship between Project and QuotationCost
+        modelBuilder.Entity<Project>()
+            .HasOne(p => p.QuotationCost)
+            .WithOne(q => q.Project)
+            .HasForeignKey<QuotationCost>(q => q.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         // Apply configurations
         modelBuilder.ApplyConfiguration(new ClientConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
