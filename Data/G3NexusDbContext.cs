@@ -17,6 +17,7 @@ public class G3NexusDbContext : DbContext
     public DbSet<Company> Companies { get; set; }
     public DbSet<EmployeeProject> EmployeeProjects { get; set; }
     public DbSet<QuotationCost> QuotationCosts { get; set; }
+    public DbSet<ProjectTermsConditions> ProjectTermsConditions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,5 +34,6 @@ public class G3NexusDbContext : DbContext
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeProjectConfiguration());
         modelBuilder.ApplyConfiguration(new QuotationCostsConfiguration());
+        modelBuilder.ApplyConfiguration(new ProjectTermsConditionsConfiguration());
     }
 }

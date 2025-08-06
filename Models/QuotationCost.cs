@@ -9,6 +9,8 @@ public class QuotationCost
     public decimal DevelopmentCost { get; set; }
     public decimal HostingAndDomain { get; set; }
     public decimal SSLCertificate { get; set; }
+    public decimal ServerCost { get; set; }
+
     public decimal DeploymentCost { get; set; }
 
     public Project Project { get; set; }
