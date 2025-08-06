@@ -104,7 +104,11 @@ public async Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId)
             return new ApiResponse { Status = false, Message = "Company not found or already inactive." };
         }
 
-        if (company.Clients != null && company.Clients.Any())
+        var activeCompanyClients = await _context.Clients
+            .Where(c => c.CompanyId == CompanyId && c.IsActive)
+            .ToListAsync();
+
+        if (activeCompanyClients.Any())
         {
             return new ApiResponse { Status = false, Message = "This company has associated clients and cannot be deleted. Please remove all clients before deleting the company." };
         }
