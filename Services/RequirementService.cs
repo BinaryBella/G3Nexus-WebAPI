@@ -13,7 +13,7 @@ public class RequirementService : IRequirementService
         _context = context;
     }
 
-    public async Task<IEnumerable<RequirementDTO>> GetAllRequirementsAsync(int userId, DateTime userLastLogin)
+    public async Task<IEnumerable<RequirementDTO>> GetAllRequirementsAsync()
     {
         var requirements = await _context.Requirements
             .Where(r => r.IsActive)
@@ -29,17 +29,21 @@ public class RequirementService : IRequirementService
             IsActive = r.IsActive,
             ClientId = r.ClientId,
             ProjectId = r.ProjectId,
-            IsNew = r.CreatedAt > userLastLogin
+            IsNew = r.IsNew
         });
     }
 
     public async Task<RequirementDTO?> GetRequirementByIdAsync(int requirementId)
-    {
-        var requirement = await _context.Requirements.FindAsync(requirementId);
-        if (requirement is not {IsActive: true})
+    {    
+        var requirement = await _context.Requirements.FirstOrDefaultAsync(r => r.RequirementId == requirementId);
+        if (requirement == null || !requirement.IsActive)
         {
             return null;
         }
+
+        requirement.IsNew = false;
+        _context.Requirements.Update(requirement);
+        await _context.SaveChangesAsync();
 
         return new RequirementDTO
         {
@@ -50,22 +54,42 @@ public class RequirementService : IRequirementService
             Attachment = requirement.Attachment,
             IsActive = requirement.IsActive,
             ClientId = requirement.ClientId,
-            ProjectId = requirement.ProjectId
+            ProjectId = requirement.ProjectId,
+            IsNew = false
         };
     }
 
     public async Task<RequirementDTO> CreateRequirementAsync(RequirementDTO requirementDto)
     {
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == requirementDto.ClientId);
+        var clientId = await _context.Clients
+            .Where(c => c.Id == requirementDto.ClientId && c.IsActive)
+            .Select(c => c.Id)
+            .FirstOrDefaultAsync();
+
+        // Validate the client exists and is active
+        var clientExists = await _context.Clients.AnyAsync(c => c.Id == clientId && c.IsActive);
         if (!clientExists)
         {
-            throw new KeyNotFoundException($"Client with ID {requirementDto.ClientId} not found.");
+            throw new KeyNotFoundException($"Client with ID {clientId} not found.");
         }
 
-        var projectExists = await _context.Projects.AnyAsync(p => p.ProjectId == requirementDto.ProjectId);
+        // Ensure the client has an active company
+        var clientCompany = await _context.Clients
+            .Where(c => c.Id == clientId)
+            .Include(c => c.Company)
+            .Where(c => c.Company.IsActive)
+            .Select(c => c.Company)
+            .FirstOrDefaultAsync();
+        if (clientCompany == null)
+        {
+            throw new KeyNotFoundException($"Company for client with ID {clientId} not found or inactive.");
+        }
+
+        // Validate the project exists and belongs to the client's company
+        var projectExists = await _context.Projects.AnyAsync(p => p.ProjectId == requirementDto.ProjectId && p.CompanyId == clientCompany.CompanyId && p.IsActive);
         if (!projectExists)
         {
-            throw new KeyNotFoundException($"Project with ID {requirementDto.ProjectId} not found.");
+            throw new KeyNotFoundException($"There is no such a project belongs to your company.");
         }
 
         var sriLankaTime = DateTime.UtcNow.AddHours(5.5);
@@ -77,9 +101,10 @@ public class RequirementService : IRequirementService
             RequirementDescription = requirementDto.RequirementDescription,
             Attachment = requirementDto.Attachment,
             IsActive = true,
-            ClientId = requirementDto.ClientId,
+            ClientId = clientId,
             ProjectId = requirementDto.ProjectId,
-            CreatedAt = sriLankaTime
+            CreatedAt = sriLankaTime,
+            IsNew = true
         };
 
         _context.Requirements.Add(requirement);
@@ -135,31 +160,5 @@ public class RequirementService : IRequirementService
         await _context.SaveChangesAsync();
 
         return new ApiResponse { Status = true, Message = "Requirement successfully deactivated." };
-    }
-    
-    public async Task<RequirementDTO?> MarkAsViewedAsync(int requirementId)
-    {
-        var requirement = await _context.Requirements.FindAsync(requirementId);
-        if (requirement == null || !requirement.IsActive)
-        {
-            return null;
-        }
-
-        requirement.CreatedAt = DateTime.MinValue; // Reset the "new" indicator
-        _context.Requirements.Update(requirement);
-        await _context.SaveChangesAsync();
-
-        return new RequirementDTO
-        {
-            RequirementId = requirement.RequirementId,
-            RequirementTitle = requirement.RequirementTitle,
-            Priority = requirement.Priority,
-            RequirementDescription = requirement.RequirementDescription,
-            Attachment = requirement.Attachment,
-            IsActive = requirement.IsActive,
-            ClientId = requirement.ClientId,
-            ProjectId = requirement.ProjectId,
-            IsNew = false
-        };
     }
 }

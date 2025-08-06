@@ -33,6 +33,10 @@ public class RequirementConfiguration : IEntityTypeConfiguration<Requirement>
             .IsRequired()
             .HasMaxLength(50); // Status such as "Active", "Inactive", etc.
 
+        builder.Property(r => r.IsNew)
+            .IsRequired()
+            .HasDefaultValue(true); // Assuming new requirements are active by default
+
         // Foreign Keys and Relationships
         builder.HasOne(r => r.Client)
             .WithMany(c => c.Requirements)

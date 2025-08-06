@@ -17,9 +17,9 @@ namespace G3NexusBackend.Controllers
 
         // GET: api/Requirement?userId=12&lastLogin=2025-07-23T06:00:00Z
         [HttpGet]
-        public async Task<IActionResult> GetRequirements([FromQuery] int userId, [FromQuery] DateTime lastLogin)
+        public async Task<IActionResult> GetRequirements()
         {
-            var requirements = await _requirementService.GetAllRequirementsAsync(userId, lastLogin);
+            var requirements = await _requirementService.GetAllRequirementsAsync();
             return Ok(new ApiResponse { Status = true, Data = requirements });
         }
 
@@ -79,18 +79,6 @@ namespace G3NexusBackend.Controllers
             }
 
             return Ok(response);
-        }
-        
-        [HttpPut("MarkAsViewed/{id:int}")]
-        public async Task<IActionResult> MarkRequirementAsViewed(int id)
-        {
-            var requirement = await _requirementService.MarkAsViewedAsync(id);
-            if (requirement == null)
-            {
-                return NotFound(new ApiResponse { Status = false, Message = "Requirement not found" });
-            }
-
-            return Ok(new ApiResponse { Status = true, Data = requirement });
         }
     }
 }

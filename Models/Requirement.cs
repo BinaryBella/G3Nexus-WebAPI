@@ -8,6 +8,7 @@ public class Requirement
     public string RequirementDescription { get; set; }
     public string Attachment { get; set; }
     public bool IsActive { get; set; }
+    public bool IsNew { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     // Foreign Keys
     public int ClientId { get; set; }
