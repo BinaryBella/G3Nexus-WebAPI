@@ -42,6 +42,7 @@ public class AuthService : IAuthService
             }
 
             var userRole = client?.Role ?? employee?.Role;
+            var userId = client?.Id ?? employee?.EmployeeId;
 
             // Check the password. Hashed password is saved in the database
             var hashedPassword = client?.Password ?? employee?.Password;
@@ -50,7 +51,7 @@ public class AuthService : IAuthService
                 return new ApiResponse { Status = false, Message = "Invalid email or password" };
             }
 
-            var refreshToken = GenerateJwtToken(email, userRole!, TokenType.RefreshToken);
+            var refreshToken = GenerateJwtToken(email, userRole!, userId!.Value.ToString(), TokenType.RefreshToken);
             var refreshTokenObject = new RefreshToken
             {
                 Email = email,
@@ -63,7 +64,7 @@ public class AuthService : IAuthService
             await _context.SaveChangesAsync();
             return new ApiResponse { Status = true, Message = "Authentication successful", Data =
                 new {
-                    AccessToken = GenerateJwtToken(email, userRole!, TokenType.AccessToken),
+                    AccessToken = GenerateJwtToken(email, userRole!, userId!.Value.ToString(), TokenType.AccessToken),
                     RefreshToken = refreshToken
                 } };
             
@@ -80,6 +81,7 @@ public class AuthService : IAuthService
         {
             var principal = GetPrincipalFromExpiredToken(refreshTokenDto.AccessToken);
             var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (email == null)
                 return new ApiResponse { Status = false, Message = "Invalid access token" };
@@ -108,7 +110,7 @@ public class AuthService : IAuthService
                 return new ApiResponse { Status = false, Message = "User not found" };
 
             // Generate new tokens
-            var newAccessToken = GenerateJwtToken(userEmail, userRole, TokenType.AccessToken);
+            var newAccessToken = GenerateJwtToken(userEmail, userRole, userId, TokenType.AccessToken);
 
             return new ApiResponse
             {
@@ -134,11 +136,12 @@ public class AuthService : IAuthService
         return client != null || employee != null;
     }
 
-    private string GenerateJwtToken(string email, string role, TokenType tokenType)
+    private string GenerateJwtToken(string email, string role, string userId, TokenType tokenType)
     {
         var claims = new List<Claim>
         {
             new (ClaimTypes.Email, email),
+            new (ClaimTypes.NameIdentifier, userId.ToString()),
             new (ClaimTypes.Role, role),
             new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

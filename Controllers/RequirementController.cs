@@ -65,7 +65,7 @@ namespace G3NexusBackend.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return BadRequest(new ApiResponse { Status = false, Message = ex.Message });
+                return NotFound(new ApiResponse { Status = false, Message = ex.Message });
             }
         }
 

@@ -13,23 +13,24 @@ public class RequirementService : IRequirementService
         _context = context;
     }
 
-    public async Task<IEnumerable<RequirementDTO>> GetAllRequirementsAsync()
+    public async Task<IEnumerable<RequirementListItemDTO>> GetAllRequirementsAsync()
     {
         var requirements = await _context.Requirements
             .Where(r => r.IsActive)
+            .Include(r => r.Client)
+            .Include(r => r.Project)
             .ToListAsync();
 
-        return requirements.Select(r => new RequirementDTO
+        return requirements.Select(r => new RequirementListItemDTO
         {
             RequirementId = r.RequirementId,
             RequirementTitle = r.RequirementTitle,
             Priority = r.Priority,
-            RequirementDescription = r.RequirementDescription,
-            Attachment = r.Attachment,
-            IsActive = r.IsActive,
             ClientId = r.ClientId,
             ProjectId = r.ProjectId,
-            IsNew = r.IsNew
+            IsNew = r.IsNew,
+            ClientName = r.Client.Name,
+            ProjectName = r.Project.ProjectName
         });
     }
 
@@ -119,7 +120,7 @@ public class RequirementService : IRequirementService
         var requirement = await _context.Requirements.FindAsync(requirementId);
         if (requirement is not {IsActive: true})
         {
-            return null;
+            throw new KeyNotFoundException($"Requirement with ID {requirementId} not found or already inactive.");
         }
 
         var clientExists = await _context.Clients.AnyAsync(c => c.Id == requirementDto.ClientId);
