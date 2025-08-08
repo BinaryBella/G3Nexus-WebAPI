@@ -1,4 +1,3 @@
-using System.IO;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -7,12 +6,23 @@ using G3NexusBackend.Services.Interfaces;
 
 public class PdfGeneratorService : IPdfGeneratorService
 {
-    private readonly string G3NexusBlue = "#4a90e2";
+    private readonly string G3NexusBlue = "#2b4b93";
     private readonly string LightGray = "#f8f9fa";
     private readonly string BorderGray = "#dee2e6";
     private readonly string TextGray = "#666";
+    private readonly ICompanyService CompanyService;
+    
+    public PdfGeneratorService(ICompanyService companyService)
+    {
+        CompanyService = companyService;
+    }
 
     public byte[] GenerateProjectQuotation(ProjectResponseDTO project)
+    {
+        throw new NotImplementedException();
+    }
+
+    public byte[] GenerateProjectQuotation(ProjectResponseDTO project, string clientName, string clientContact, string clientEmail)
     {
         QuestPDF.Settings.License = LicenseType.Community;
 
@@ -25,7 +35,7 @@ public class PdfGeneratorService : IPdfGeneratorService
                 page.Margin(20, Unit.Millimetre);
                 page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Segoe UI"));
 
-                page.Header().Height(80).Element(container => CreateHeader(container, project));
+                page.Header().Height(80).Element(container => CreateHeader(container, project, clientContact, clientEmail));
 
                 page.Content().Column(col =>
                 {
@@ -53,7 +63,7 @@ public class PdfGeneratorService : IPdfGeneratorService
                 page.Margin(20, Unit.Millimetre);
                 page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Segoe UI"));
 
-                page.Header().Height(80).Element(container => CreateHeader(container, project));
+                page.Header().Height(80).Element(container => CreateHeader(container, project, clientContact, clientEmail));
 
                 page.Content().Column(col =>
                 {
@@ -78,8 +88,9 @@ public class PdfGeneratorService : IPdfGeneratorService
         return stream.ToArray();
     }
 
-    private void CreateHeader(IContainer container, ProjectResponseDTO project)
+    private void CreateHeader(IContainer container, ProjectResponseDTO project, string clientContact, string clientEmail)
     {
+        var company = CompanyService.GetCompanyByIdAsync(project.CompanyId).Result;
         container.Row(row =>
         {
             // Left side - Logo and Title
@@ -112,20 +123,20 @@ public class PdfGeneratorService : IPdfGeneratorService
 
                 col.Item().AlignRight().Text(txt =>
                 {
-                    txt.Span("Client Name: ").Bold().FontSize(9).FontColor(TextGray);
-                    txt.Span($"{project.ProjectName}").FontSize(9).FontColor(TextGray);
+                    txt.Span("Company Name: ").Bold().FontSize(9).FontColor(TextGray);
+                    txt.Span($"{company!.CompanyName}").FontSize(9).FontColor(TextGray);
                 });
 
                 col.Item().AlignRight().Text(txt =>
                 {
                     txt.Span("Client Contact: ").Bold().FontSize(9).FontColor(TextGray);
-                    txt.Span($"{project.ProjectDescription}").FontSize(9).FontColor(TextGray);
+                    txt.Span($"{clientContact}").FontSize(9).FontColor(TextGray);
                 });
 
                 col.Item().AlignRight().Text(txt =>
                 {
                     txt.Span("Client Email: ").Bold().FontSize(9).FontColor(TextGray);
-                    txt.Span($"{project.ProjectType}").FontSize(9).FontColor(TextGray);
+                    txt.Span($"{clientEmail}").FontSize(9).FontColor(TextGray);
                 });
             });
         });

@@ -134,7 +134,29 @@ public class ClientService : IClientService
         var client = await _context.Clients.FindAsync(id);
         if (client is not {IsActive: true})
         {
-            return new ApiResponse { Status = false, Message = "Client not found or already inactive." };
+            throw new KeyNotFoundException("Client not found or already inactive.");
+        }
+
+        var clientRequirements = await _context.Requirements.Where(r => r.ClientId == client.Id).Select(r => r.RequirementTitle).ToListAsync();
+        if (clientRequirements.Any())
+        {
+            return new ApiResponse
+            {
+                Status = false,
+                Message = "Cannot deactivate client with active requirements. Please delete the following requirements first.",
+                Data = clientRequirements
+            };
+        }
+
+        var clientBugs = await _context.Bugs.Where(r => r.ClientId == client.Id).Select(r => r.BugTitle).ToListAsync();
+        if (clientBugs.Any())
+        {
+            return new ApiResponse
+            {
+                Status = false,
+                Message = "Cannot deactivate client with active bugs. Please delete the following bugs first.",
+                Data = clientBugs
+            };
         }
 
         client.IsActive = false;

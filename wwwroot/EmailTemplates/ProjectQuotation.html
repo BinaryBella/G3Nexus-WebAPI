@@ -79,7 +79,7 @@
 
         /* Section Headers */
         .section-header {
-            background: #4a90e2;
+            background: #2b4b93;
             color: white;
             padding: 8px 15px;
             font-size: 14px;
@@ -263,11 +263,13 @@
 
 <!-- Email Content -->
 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #333; background: #f5f5f5; padding: 30px;">
-    <h2 style="color: #4a90e2;">Project Initiation Quotation – Web Portal Development</h2>
-    <p>Dear Mr. De Silva,</p>
-    <p>Please find attached the detailed quotation for the Web Portal Development project as discussed.</p>
+    <h2 style="color: #2b4b93;">Project Initiation Quotation – {{ProjectName}}</h2>
+    <p>Dear {{ClientAdminName}},</p>
+    <p>Please find attached the detailed quotation for the {{ProjectName}} project as discussed.</p>
     <ul>
         <li>Project details and estimated duration</li>
+        <li>Client Contact No: <strong>{{ClientContact}}</strong></li>
+        <li>Client Email: <strong>{{ClientEmail}}</strong></li>
         <li>Cost breakdown and payment schedule</li>
         <li>Terms &amp; conditions</li>
     </ul>
@@ -275,7 +277,6 @@
     <p>If you have any questions or require clarifications, please feel free to reach out.</p>
     <br>
     <p>Best regards,<br>
-    [Your Name]<br>
     G3 Technologies (Pvt) Ltd<br>
     📞 +123-456-7890<br>
     📧 info@g3tech.com</p>

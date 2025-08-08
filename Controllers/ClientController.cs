@@ -61,13 +61,23 @@ namespace G3NexusBackend.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeactivateClient(int id)
         {
-            var response = await _clientService.DeActivateClientAsync(id);
-            if (!response.Status)
+            try
             {
-                return NotFound(response);
+                var response = await _clientService.DeActivateClientAsync(id);
+                if (!response.Status)
+                {
+                    return Conflict(response);
+                }
+                return Ok(response);
             }
-
-            return Ok(response);
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new ApiResponse { Status = false, Message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new ApiResponse { Status = false, Message = "An unexpected error occurred." });
+            }
         }
     }
 }

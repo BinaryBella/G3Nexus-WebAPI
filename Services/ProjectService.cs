@@ -251,12 +251,17 @@ public class ProjectService : IProjectService
         };
 
         // 7. Generate PDF
-        var pdfBytes = _pdfService.GenerateProjectQuotation(projectResponseDto);
+        var pdfBytes = _pdfService.GenerateProjectQuotation(
+            projectResponseDto,
+            client.Name,
+            client.ContactNo,
+            client.Email
+        );
 
         // 8. Prepare Email Body
         var emailBody = await _emailService.GetEmailTemplateAsync("ProjectQuotation.html");
-        emailBody = emailBody.Replace("{{ClientName}}", client.Name)
-                             .Replace("{{ProjectTitle}}", project.ProjectName)
+        emailBody = emailBody.Replace("{{ClientAdminName}}", client.Name)
+                             .Replace("{{ProjectName}}", project.ProjectName)
                              .Replace("{{QuotationId}}", project.ProjectId.ToString())
                              .Replace("{{QuotationDate}}", DateTime.Now.ToString("dd/MM/yyyy"))
                              .Replace("{{ClientContact}}", client.ContactNo)
