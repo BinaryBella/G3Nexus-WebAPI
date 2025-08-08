@@ -101,7 +101,7 @@ public class PdfGeneratorService : IPdfGeneratorService
                 col.Item().AlignRight().Text(txt =>
                 {
                     txt.Span("Quotation Id: ").Bold().FontSize(9).FontColor(TextGray);
-                    txt.Span($"{project.ProjectId.ToString() ?? "3110-01"}").FontSize(9).FontColor(TextGray);
+                    txt.Span($"{project.ProjectId}").FontSize(9).FontColor(TextGray);
                 });
 
                 col.Item().AlignRight().Text(txt =>
@@ -113,19 +113,19 @@ public class PdfGeneratorService : IPdfGeneratorService
                 col.Item().AlignRight().Text(txt =>
                 {
                     txt.Span("Client Name: ").Bold().FontSize(9).FontColor(TextGray);
-                    txt.Span("ABC Pvt Ltd").FontSize(9).FontColor(TextGray); // Default client name
+                    txt.Span($"{project.ProjectName}").FontSize(9).FontColor(TextGray);
                 });
 
                 col.Item().AlignRight().Text(txt =>
                 {
                     txt.Span("Client Contact: ").Bold().FontSize(9).FontColor(TextGray);
-                    txt.Span("Mr. De Silva").FontSize(9).FontColor(TextGray); // Default contact
+                    txt.Span($"{project.ProjectDescription}").FontSize(9).FontColor(TextGray);
                 });
 
                 col.Item().AlignRight().Text(txt =>
                 {
                     txt.Span("Client Email: ").Bold().FontSize(9).FontColor(TextGray);
-                    txt.Span("silva@abcpvt.com").FontSize(9).FontColor(TextGray); // Default email
+                    txt.Span($"{project.ProjectType}").FontSize(9).FontColor(TextGray);
                 });
             });
         });

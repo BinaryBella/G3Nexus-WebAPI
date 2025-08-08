@@ -260,178 +260,23 @@
     </style>
 </head>
 <body>
-<!-- Page 1: Project Details and Cost Breakdown -->
-<div class="page">
-    <!-- Header -->
-    <div class="header">
-        <div class="logo-section">
-            <h1>G3NEXUS</h1>
-            <div class="subtitle">QUOTATION</div>
-        </div>
-        <div class="quotation-info">
-            <div><strong>Quotation Id:</strong> {{QuotationId}}</div>
-            <div><strong>Date:</strong> {{QuotationDate}}</div>
-            <div><strong>Client Name:</strong> {{ClientName}}</div>
-            <div><strong>Client Contact:</strong> {{ClientContact}}</div>
-            <div><strong>Client Email:</strong> {{ClientEmail}}</div>
-        </div>
-    </div>
 
-    <!-- Company Details -->
-    <div class="company-details">
-        <div class="company-left">
-            <div><strong>Prepared By:</strong> G3 Technologies (Pvt) Ltd</div>
-            <div><strong>Phone:</strong> +123-456-7890</div>
-            <div><strong>Email:</strong> info@g3tech.com</div>
-        </div>
-        <div class="company-right">
-            <!-- Right side can be used for additional company info if needed -->
-        </div>
-    </div>
-
-    <!-- Project Details Section -->
-    <div class="section-header">PROJECT DETAILS</div>
-
-    <table class="details-table">
-        <tr>
-            <td class="label">Project Title:</td>
-            <td class="value">{{ProjectTitle}}</td>
-        </tr>
-        <tr>
-            <td class="label">Project Description:</td>
-            <td class="value">{{ProjectDescription}}</td>
-        </tr>
-        <tr>
-            <td class="label">Estimated Duration:</td>
-            <td class="value">{{EstimatedDuration}}</td>
-        </tr>
-    </table>
-
-    <!-- Cost Breakdown Section -->
-    <div class="section-header">COST BREAKDOWN</div>
-
-    <table class="cost-table">
-        <thead>
-        <tr>
-            <th>ITEM</th>
-            <th>DESCRIPTION</th>
-            <th>AMOUNT RS</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Advance Payment</td>
-            <td>Required before project kickoff</td>
-            <td class="amount">{{AdvancePayment}}</td>
-        </tr>
-        <tr>
-            <td>Development Cost</td>
-            <td>UI/UX Design, Frontend & Backend Dev</td>
-            <td class="amount">{{DevelopmentCost}}</td>
-        </tr>
-        <tr>
-            <td>Hosting & Domain (1 Year)</td>
-            <td>.com domain + 10GB SSD Hosting</td>
-            <td class="amount">{{HostingAndDomain}}</td>
-        </tr>
-        <tr>
-            <td>SSL Certificate</td>
-            <td>Standard 256-bit SSL (1 Year)</td>
-            <td class="amount">{{SSLCertificate}}</td>
-        </tr>
-        <tr>
-            <td>Deployment & Handover</td>
-            <td>Server setup & final delivery</td>
-            <td class="amount">{{ServerCost}}</td>
-        </tr>
-        <tr class="total-row">
-            <td colspan="2"><strong>TOTAL PROJECT COST</strong></td>
-            <td class="amount"><strong>{{TotalCost}}</strong></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- Payment Schedule Section -->
-    <div class="section-header">PAYMENT SCHEDULE</div>
-
-    <table class="payment-table">
-        <thead>
-        <tr>
-            <th>PAYMENT TYPE</th>
-            <th>DESCRIPTION</th>
-            <th>AMOUNT RS</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Advance Payment</td>
-            <td>Required to start the project</td>
-            <td class="amount">{{AdvancePayment}}</td>
-        </tr>
-        <tr>
-            <td>Final Payment</td>
-            <td>Upon project completion</td>
-            <td class="amount">{{FinalPayment}}</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<!-- Page 2: Terms & Conditions -->
-<div class="page page-break">
-    <!-- Header -->
-    <div class="header">
-        <div class="logo-section">
-            <h1>G3NEXUS</h1>
-            <div class="subtitle">QUOTATION</div>
-        </div>
-        <div class="quotation-info">
-            <div><strong>Quotation Id:</strong> {{QuotationId}}</div>
-            <div><strong>Date:</strong> {{QuotationDate}}</div>
-            <div><strong>Client Name:</strong> {{ClientName}}</div>
-            <div><strong>Client Contact:</strong> {{ClientContact}}</div>
-            <div><strong>Client Email:</strong> {{ClientEmail}}</div>
-        </div>
-    </div>
-
-    <!-- Company Details -->
-    <div class="company-details">
-        <div class="company-left">
-            <div><strong>Prepared By:</strong> G3 Technologies (Pvt) Ltd</div>
-            <div><strong>Phone:</strong> +123-456-7890</div>
-            <div><strong>Email:</strong> info@g3tech.com</div>
-        </div>
-    </div>
-
-    <!-- Terms & Conditions Section -->
-    <div class="section-header">TERMS & CONDITIONS</div>
-
-    <ul class="terms-list">
-        {{#each TermsConditions}}
-        <li>{{this}}</li>
-        {{/each}}
+<!-- Email Content -->
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #333; background: #f5f5f5; padding: 30px;">
+    <h2 style="color: #4a90e2;">Project Initiation Quotation – Web Portal Development</h2>
+    <p>Dear Mr. De Silva,</p>
+    <p>Please find attached the detailed quotation for the Web Portal Development project as discussed.</p>
+    <ul>
+        <li>Project details and estimated duration</li>
+        <li>Cost breakdown and payment schedule</li>
+        <li>Terms &amp; conditions</li>
     </ul>
-
-    <!-- Signature Section -->
-    <div class="signature-section">
-        <div class="signature-box">
-            <div class="signature-line"></div>
-            <div class="signature-label">Authorized Signature: ...........................</div>
-            <br>
-            <div class="signature-label">Date: ......................................................</div>
-        </div>
-        <div class="signature-box">
-            <div class="signature-line"></div>
-            <div class="signature-label">Client Signature: .............................</div>
-            <br>
-            <div class="signature-label">Date: ......................................................</div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-        Thank you for choosing G3 Technologies (Pvt) Ltd.
-    </div>
+    <p>We look forward to your confirmation to proceed. The project will commence upon receipt of the advance payment as per the attached quotation.</p>
+    <p>If you have any questions or require clarifications, please feel free to reach out.</p>
+    <br>
+    <p>Best regards,<br>
+    [Your Name]<br>
+    G3 Technologies (Pvt) Ltd<br>
+    📞 +123-456-7890<br>
+    📧 info@g3tech.com</p>
 </div>
-</body>
-</html>

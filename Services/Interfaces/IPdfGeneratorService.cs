@@ -4,5 +4,5 @@ namespace G3NexusBackend.Services.Interfaces;
 
 public interface IPdfGeneratorService
 {
-    byte[] GenerateProjectQuotation(ProjectDTO project);
+    byte[] GenerateProjectQuotation(ProjectResponseDTO project);
 }
