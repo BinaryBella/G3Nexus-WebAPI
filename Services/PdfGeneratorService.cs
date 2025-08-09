@@ -22,7 +22,7 @@ public class PdfGeneratorService : IPdfGeneratorService
         throw new NotImplementedException();
     }
 
-    public byte[] GenerateProjectQuotation(ProjectResponseDTO project, string clientName, string clientContact, string clientEmail)
+    public byte[] GenerateProjectQuotation(ProjectResponseDTO project, string clientName, string clientContact, string clientEmail, List<string> selectedTerms)
     {
         QuestPDF.Settings.License = LicenseType.Community;
 
@@ -72,8 +72,8 @@ public class PdfGeneratorService : IPdfGeneratorService
 
                     // TERMS & CONDITIONS Section
                     col.Item().Element(container => CreateSectionHeader(container, "TERMS & CONDITIONS"));
-                    col.Item().Element(container => CreateTermsAndConditions(container));
-
+                    col.Item().Element(container => CreateTermsAndConditions(container, selectedTerms));
+                    
                     // Signature Section
                     col.Item().PaddingTop(40).Element(CreateSignatureSection);
 
@@ -302,27 +302,25 @@ public class PdfGeneratorService : IPdfGeneratorService
         });
     }
 
-    private void CreateTermsAndConditions(IContainer container)
+    private void CreateTermsAndConditions(IContainer container, List<string> selectedTerms)
     {
         container.PaddingTop(10).Column(col =>
         {
-            col.Item().PaddingBottom(6).Text(txt =>
+            if (selectedTerms != null && selectedTerms.Count > 0)
             {
-                txt.Span("• ").FontColor(G3NexusBlue).Bold();
-                txt.Span("Hosting, Domain, and SSL are valid for 1 year from the date of deployment.").FontSize(9).FontColor("#555");
-            });
-
-            col.Item().PaddingBottom(6).Text(txt =>
+                foreach (var term in selectedTerms)
+                {
+                    col.Item().PaddingBottom(6).Text(txt =>
+                    {
+                        txt.Span("• ").FontColor(G3NexusBlue).Bold();
+                        txt.Span(term).FontSize(9).FontColor("#555");
+                    });
+                }
+            }
+            else
             {
-                txt.Span("• ").FontColor(G3NexusBlue).Bold();
-                txt.Span("After full payment, the source code and all deliverables will be handed over.").FontSize(9).FontColor("#555");
-            });
-
-            col.Item().PaddingBottom(6).Text(txt =>
-            {
-                txt.Span("• ").FontColor(G3NexusBlue).Bold();
-                txt.Span("Support & maintenance available for 1 month post-deployment.").FontSize(9).FontColor("#555");
-            });
+                col.Item().Text("No terms & conditions selected.").FontSize(9).FontColor("#999");
+            }
         });
     }
 

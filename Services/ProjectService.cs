@@ -156,6 +156,7 @@ public class ProjectService : IProjectService
     {
         // 1. Validate Client Admin for the Company
         var client = await _clientService.GetClientAdminByCompanyIdAsync(projectRequestDto.CompanyId);
+
         if (client == null)
             throw new Exception("No active Client Admin found for the company.");
 
@@ -250,12 +251,18 @@ public class ProjectService : IProjectService
             TermsConditions = projectRequestDto.TermsConditions.Where(tc => tc.IsChecked).ToList()
         };
 
+        
         // 7. Generate PDF
+        var selectedTermsContent = selectedTerms
+            .Select(tc => _context.TermsConditions.FirstOrDefault(t => t.TCId == tc.TCId)?.Content)
+            .Where(content => content != null)
+            .ToList();
         var pdfBytes = _pdfService.GenerateProjectQuotation(
             projectResponseDto,
             client.Name,
             client.ContactNo,
-            client.Email
+            client.Email,
+            selectedTermsContent
         );
 
         // 8. Prepare Email Body
