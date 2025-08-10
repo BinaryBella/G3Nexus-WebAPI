@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace G3NexusBackend.Migrations
 {
     [DbContext(typeof(G3NexusDbContext))]
-    [Migration("20250723052621_addnewattributeRequirement")]
-    partial class addnewattributeRequirement
+    [Migration("20250810123530_intialMigration")]
+    partial class intialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -48,6 +48,9 @@ namespace G3NexusBackend.Migrations
 
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
                         .HasMaxLength(50)
@@ -327,6 +330,58 @@ namespace G3NexusBackend.Migrations
                     b.ToTable("Projects", (string)null);
                 });
 
+            modelBuilder.Entity("G3NexusBackend.Models.ProjectTermsConditions", b =>
+                {
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TCId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsChecked")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("TermsConditionsTCId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectId", "TCId");
+
+                    b.HasIndex("TCId");
+
+                    b.HasIndex("TermsConditionsTCId");
+
+                    b.ToTable("ProjectTermsConditions");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.Quotation", b =>
+                {
+                    b.Property<int>("QuotationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuotationId"), 1L, 1);
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("QuotationId");
+
+                    b.ToTable("Quotations");
+                });
+
             modelBuilder.Entity("G3NexusBackend.Models.QuotationCost", b =>
                 {
                     b.Property<int>("Id")
@@ -353,12 +408,41 @@ namespace G3NexusBackend.Migrations
                     b.Property<decimal>("SSLCertificate")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal>("ServerCost")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId")
                         .IsUnique();
 
                     b.ToTable("QuotationCosts", (string)null);
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.QuotationRequirement", b =>
+                {
+                    b.Property<int>("QuotationRequirementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuotationRequirementId"), 1L, 1);
+
+                    b.Property<int>("QuotationId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RequirementCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RequirementId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QuotationRequirementId");
+
+                    b.HasIndex("QuotationId");
+
+                    b.HasIndex("RequirementId");
+
+                    b.ToTable("QuotationRequirements");
                 });
 
             modelBuilder.Entity("G3NexusBackend.Models.RefreshToken", b =>
@@ -408,16 +492,10 @@ namespace G3NexusBackend.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("TCId");
-
-                    b.HasIndex("ProjectId")
-                        .IsUnique();
 
                     b.ToTable("TermsConditions", (string)null);
                 });
@@ -456,7 +534,6 @@ namespace G3NexusBackend.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequirementId"), 1L, 1);
 
                     b.Property<string>("Attachment")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -470,12 +547,23 @@ namespace G3NexusBackend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsNew")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsQuoted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Priority")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuotationId")
                         .HasColumnType("int");
 
                     b.Property<string>("RequirementDescription")
@@ -493,6 +581,8 @@ namespace G3NexusBackend.Migrations
                     b.HasIndex("ClientId");
 
                     b.HasIndex("ProjectId");
+
+                    b.HasIndex("QuotationId");
 
                     b.ToTable("Requirements", (string)null);
                 });
@@ -568,6 +658,29 @@ namespace G3NexusBackend.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("G3NexusBackend.Models.ProjectTermsConditions", b =>
+                {
+                    b.HasOne("G3NexusBackend.Models.Project", "Project")
+                        .WithMany("ProjectTermsConditions")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.TermsConditions", "TermsConditions")
+                        .WithMany()
+                        .HasForeignKey("TCId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.TermsConditions", null)
+                        .WithMany("ProjectTermsConditions")
+                        .HasForeignKey("TermsConditionsTCId");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("TermsConditions");
+                });
+
             modelBuilder.Entity("G3NexusBackend.Models.QuotationCost", b =>
                 {
                     b.HasOne("G3NexusBackend.Models.Project", "Project")
@@ -579,15 +692,23 @@ namespace G3NexusBackend.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("G3NexusBackend.Models.TermsConditions", b =>
+            modelBuilder.Entity("G3NexusBackend.Models.QuotationRequirement", b =>
                 {
-                    b.HasOne("G3NexusBackend.Models.Project", "Project")
-                        .WithOne("TermsConditions")
-                        .HasForeignKey("G3NexusBackend.Models.TermsConditions", "ProjectId")
+                    b.HasOne("G3NexusBackend.Models.Quotation", "Quotation")
+                        .WithMany("QuotationRequirements")
+                        .HasForeignKey("QuotationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Project");
+                    b.HasOne("Requirement", "Requirement")
+                        .WithMany()
+                        .HasForeignKey("RequirementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quotation");
+
+                    b.Navigation("Requirement");
                 });
 
             modelBuilder.Entity("Requirement", b =>
@@ -604,9 +725,15 @@ namespace G3NexusBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("G3NexusBackend.Models.Quotation", "Quotation")
+                        .WithMany()
+                        .HasForeignKey("QuotationId");
+
                     b.Navigation("Client");
 
                     b.Navigation("Project");
+
+                    b.Navigation("Quotation");
                 });
 
             modelBuilder.Entity("Client", b =>
@@ -636,13 +763,22 @@ namespace G3NexusBackend.Migrations
 
                     b.Navigation("Payments");
 
+                    b.Navigation("ProjectTermsConditions");
+
                     b.Navigation("QuotationCost")
                         .IsRequired();
 
                     b.Navigation("Requirements");
+                });
 
-                    b.Navigation("TermsConditions")
-                        .IsRequired();
+            modelBuilder.Entity("G3NexusBackend.Models.Quotation", b =>
+                {
+                    b.Navigation("QuotationRequirements");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.TermsConditions", b =>
+                {
+                    b.Navigation("ProjectTermsConditions");
                 });
 #pragma warning restore 612, 618
         }
