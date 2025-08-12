@@ -6,6 +6,8 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using G3NexusBackend.Services.Interfaces;
 using QuestPDF.Infrastructure;
+using G3NexusBackend.Extensions;
+using G3NexusBackend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 QuestPDF.Settings.License = LicenseType.Community;
@@ -116,7 +118,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Ensure the database is created/migrated on startup
+// Ensure the database is created/migrated and seeded on startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -124,11 +126,14 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<G3NexusDbContext>();
         context.Database.EnsureCreated();
+        
+        // Seed the database with initial data
+        await DatabaseSeeder.SeedDataAsync(context);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while creating/migrating the database.");
+        logger.LogError(ex, "An error occurred while creating/migrating or seeding the database.");
     }
 }
 
