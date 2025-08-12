@@ -86,6 +86,52 @@ namespace G3NexusBackend.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("send-quotation")]
+        public async Task<IActionResult> SendBugQuotation(BugQuotationRequestDTO quotationRequest)
+        {
+            try
+            {
+                var response = await _bugService.SendBugQuotationAsync(quotationRequest);
+                if (!response.Status)
+                {
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse 
+                { 
+                    Status = false, 
+                    Message = $"Internal server error: {ex.Message}" 
+                });
+            }
+        }
+
+        [HttpPost("send-bulk-quotation")]
+        public async Task<IActionResult> SendBulkBugQuotation(BulkBugQuotationRequestDTO bulkQuotationRequest)
+        {
+            try
+            {
+                var response = await _bugService.SendBulkBugQuotationAsync(bulkQuotationRequest);
+                if (!response.Status)
+                {
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse 
+                { 
+                    Status = false, 
+                    Message = $"Internal server error: {ex.Message}" 
+                });
+            }
+        }
     }
 }
 

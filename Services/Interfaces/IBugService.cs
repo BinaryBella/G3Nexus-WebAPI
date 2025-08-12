@@ -10,4 +10,6 @@ public interface IBugService
     Task<BugDTO> CreateBugAsync(BugDTO bugDto);
     Task<BugDTO?> UpdateBugAsync(int bugId, BugDTO bugDto);
     Task<ApiResponse> DeActivateBugAsync(int bugId);
+    Task<ApiResponse> SendBugQuotationAsync(BugQuotationRequestDTO quotationRequest);
+    Task<ApiResponse> SendBulkBugQuotationAsync(BulkBugQuotationRequestDTO bulkQuotationRequest);
 }
