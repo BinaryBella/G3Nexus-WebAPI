@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Quotation - G3NEXUS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #3450A3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .footer {
+            background-color: #6c757d;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 0 0 5px 5px;
+        }
+        .highlight {
+            background-color: white;
+            padding: 10px;
+            border-left: 4px solid #d4d4d4;
+            margin: 15px 0;
+        }
+        .details {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .cost-highlight {
+            background-color: #fafafa;
+            color: #3450A3;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Requirement Quotation - G3NEXUS</h1>
+    </div>
+    
+    <div class="content">
+        <h2>Dear {{ClientAdminName}},</h2>
+        
+        <p>We are pleased to provide you with a comprehensive quotation for your selected requirements in the <strong>{{ProjectName}}</strong> project.</p>
+        
+        <div class="highlight">
+            <strong>Quotation Summary:</strong><br>
+            • Total Requirements: {{RequirementCount}}<br>
+            • Requirements: {{RequirementTitle}}<br>
+            • Project: {{ProjectName}}
+        </div>
+        
+        <div class="cost-highlight">
+            Total Quotation Cost: {{TotalCost}}
+        </div>
+        
+        <div class="details">
+            <h3>Contact Information:</h3>
+            <p><strong>Client:</strong> {{ClientAdminName}}</p>
+            <p><strong>Phone:</strong> {{ClientContact}}</p>
+            <p><strong>Email:</strong> {{ClientEmail}}</p>
+        </div>
+        
+        <div class="details">
+            <h3>What's Next?</h3>
+            <ul>
+                <li>Review the attached detailed quotation PDF</li>
+                <li>Contact us if you have any questions or need clarifications</li>
+                <li>We look forward to your approval to proceed with the requirements</li>
+            </ul>
+        </div>
+        
+        <p>Please find the detailed quotation attached as a PDF document. If you have any questions or need further clarification, please don't hesitate to contact us.</p>
+        
+        <p>Thank you for choosing G3NEXUS for your software development needs!</p>
+        
+        <p>Best regards,<br>
+        <strong>G3NEXUS Development Team</strong></p>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2025 G3NEXUS. All rights reserved.</p>
+        <p>Delivering Excellence in Software Solutions</p>
+    </div>
+</body>
+</html>

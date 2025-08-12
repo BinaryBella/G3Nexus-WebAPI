@@ -1,5 +1,6 @@
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
+using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace G3NexusBackend.Services;
@@ -33,8 +34,9 @@ public class RequirementService : IRequirementService
             ClientId = r.ClientId,
             ProjectId = r.ProjectId,
             IsNew = r.IsNew,
-            ClientName = r.Client.Name,
-            ProjectName = r.Project.ProjectName
+            ClientName = r.Client?.Name,
+            ProjectName = r.Project?.ProjectName,
+            IsQuoted = r.IsQuoted
         });
     }
 
@@ -238,6 +240,142 @@ public class RequirementService : IRequirementService
             { 
                 Status = false, 
                 Message = $"Failed to send requirement quotation: {ex.Message}" 
+            };
+        }
+    }
+
+    public async Task<ApiResponse> SendBulkQuotationAsync(BulkQuotationRequestDTO bulkQuotationRequest)
+    {
+        try
+        {
+            // Validate that at least one requirement is selected
+            if (bulkQuotationRequest.SelectedRequirements == null || !bulkQuotationRequest.SelectedRequirements.Any())
+            {
+                return new ApiResponse { Status = false, Message = "At least one requirement must be selected." };
+            }
+
+            // Get all selected requirements with related entities
+            var requirementIds = bulkQuotationRequest.SelectedRequirements.Select(sr => sr.RequirementId).ToList();
+            var requirements = await _context.Requirements
+                .Include(r => r.Client)
+                .Include(r => r.Project)
+                .Where(r => requirementIds.Contains(r.RequirementId) && r.IsActive)
+                .ToListAsync();
+
+            if (requirements.Count != bulkQuotationRequest.SelectedRequirements.Count)
+            {
+                return new ApiResponse { Status = false, Message = "One or more selected requirements not found or inactive." };
+            }
+
+            // Validate that all requirements belong to the same client and project
+            var firstRequirement = requirements.First();
+            if (requirements.Any(r => r.ClientId != firstRequirement.ClientId || r.ProjectId != firstRequirement.ProjectId))
+            {
+                return new ApiResponse { Status = false, Message = "All selected requirements must belong to the same client and project." };
+            }
+
+            if (firstRequirement.Client == null || firstRequirement.Project == null)
+            {
+                return new ApiResponse { Status = false, Message = "Client or project information not found." };
+            }
+
+            // Create quotation
+            var quotation = new Quotation
+            {
+                ClientId = firstRequirement.ClientId,
+                ProjectId = firstRequirement.ProjectId,
+                CreationDate = DateTime.UtcNow.AddHours(5.5),
+                Status = "Sent",
+                TotalCost = bulkQuotationRequest.SelectedRequirements.Sum(sr => sr.QuotationCost),
+                QuotationRequirements = new List<QuotationRequirement>()
+            };
+
+            _context.Quotations.Add(quotation);
+            await _context.SaveChangesAsync();
+
+            // Create quotation requirements
+            var quotationRequirements = new List<QuotationRequirement>();
+            foreach (var selectedReq in bulkQuotationRequest.SelectedRequirements)
+            {
+                quotationRequirements.Add(new QuotationRequirement
+                {
+                    QuotationId = quotation.QuotationId,
+                    RequirementId = selectedReq.RequirementId,
+                    RequirementCost = selectedReq.QuotationCost
+                });
+            }
+
+            _context.QuotationRequirements?.AddRange(quotationRequirements);
+
+            // Update requirements to mark as quoted and associate with quotation
+            foreach (var requirement in requirements)
+            {
+                requirement.IsQuoted = true;
+                requirement.QuotationId = quotation.QuotationId;
+            }
+
+            _context.Requirements.UpdateRange(requirements);
+            await _context.SaveChangesAsync();
+
+            // Generate PDF quotation
+            // TODO: Implement GenerateBulkRequirementQuotation in PdfGeneratorService
+            // For now, we'll use the first requirement to generate a basic PDF
+            var firstSelectedReq = bulkQuotationRequest.SelectedRequirements.First();
+            var pdfBytes = _pdfService.GenerateRequirementQuotation(
+                firstRequirement,
+                new RequirementQuotationRequestDTO 
+                {
+                    RequirementId = firstSelectedReq.RequirementId,
+                    QuotationCost = quotation.TotalCost,
+                    EstimatedDuration = firstSelectedReq.EstimatedDuration,
+                    Description = $"Bulk quotation for {requirements.Count} requirements. {bulkQuotationRequest.AdditionalNotes}",
+                    DeliveryDate = firstSelectedReq.DeliveryDate
+                },
+                firstRequirement.Client?.Name ?? "N/A",
+                firstRequirement.Client?.ContactNo ?? "N/A",
+                firstRequirement.Client?.Email ?? "N/A",
+                firstRequirement.Project?.ProjectName ?? "N/A"
+            );
+
+            // Prepare Email Body
+            var emailBody = await _emailService.GetEmailTemplateAsync("BulkRequirementQuotation.html");
+            if (string.IsNullOrEmpty(emailBody))
+            {
+                // Fallback to a simple email template if the bulk template doesn't exist
+                emailBody = await _emailService.GetEmailTemplateAsync("RequirementQuotation.html");
+            }
+
+            var requirementTitles = string.Join(", ", requirements.Select(r => r.RequirementTitle));
+            emailBody = emailBody.Replace("{{ClientAdminName}}", firstRequirement.Client?.Name ?? "N/A")
+                                 .Replace("{{RequirementTitle}}", requirementTitles)
+                                 .Replace("{{ProjectName}}", firstRequirement.Project?.ProjectName ?? "N/A")
+                                 .Replace("{{ClientContact}}", firstRequirement.Client?.ContactNo ?? "N/A")
+                                 .Replace("{{ClientEmail}}", firstRequirement.Client?.Email ?? "N/A")
+                                 .Replace("{{TotalCost}}", quotation.TotalCost.ToString("C"))
+                                 .Replace("{{RequirementCount}}", requirements.Count.ToString());
+
+            // Send Email with PDF Attachment
+            await _emailService.SendEmailWithAttachmentAsync(
+                firstRequirement.Client?.Email ?? "",
+                $"[Bulk Quotation] {firstRequirement.Project?.ProjectName} - G3NEXUS",
+                emailBody,
+                pdfBytes,
+                $"Bulk_Quotation_{quotation.QuotationId}.pdf",
+                isHtml: true
+            );
+
+            return new ApiResponse 
+            { 
+                Status = true, 
+                Message = $"Bulk quotation sent successfully to {firstRequirement.Client?.Name}. Quotation ID: {quotation.QuotationId}" 
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse 
+            { 
+                Status = false, 
+                Message = $"Failed to send bulk quotation: {ex.Message}" 
             };
         }
     }

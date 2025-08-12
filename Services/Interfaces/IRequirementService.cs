@@ -10,4 +10,5 @@ public interface IRequirementService
     Task<RequirementDTO?> UpdateRequirementAsync(int requirementId, RequirementDTO requirementDto);
     Task<ApiResponse> DeActivateRequirementAsync(int requirementId);
     Task<ApiResponse> SendRequirementQuotationAsync(RequirementQuotationRequestDTO quotationRequest);
+    Task<ApiResponse> SendBulkQuotationAsync(BulkQuotationRequestDTO bulkQuotationRequest);
 }
