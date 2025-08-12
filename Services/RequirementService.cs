@@ -7,10 +7,14 @@ namespace G3NexusBackend.Services;
 public class RequirementService : IRequirementService
 {
     private readonly G3NexusDbContext _context;
+    private readonly IEmailService _emailService;
+    private readonly IPdfGeneratorService _pdfService;
 
-    public RequirementService(G3NexusDbContext context)
+    public RequirementService(G3NexusDbContext context, IEmailService emailService, IPdfGeneratorService pdfService)
     {
         _context = context;
+        _emailService = emailService;
+        _pdfService = pdfService;
     }
 
     public async Task<IEnumerable<RequirementListItemDTO>> GetAllRequirementsAsync()
@@ -161,5 +165,80 @@ public class RequirementService : IRequirementService
         await _context.SaveChangesAsync();
 
         return new ApiResponse { Status = true, Message = "Requirement successfully deactivated." };
+    }
+
+    public async Task<ApiResponse> SendRequirementQuotationAsync(RequirementQuotationRequestDTO quotationRequest)
+    {
+        try
+        {
+            // Get requirement with related entities
+            var requirement = await _context.Requirements
+                .Include(r => r.Client)
+                .Include(r => r.Project)
+                .FirstOrDefaultAsync(r => r.RequirementId == quotationRequest.RequirementId && r.IsActive);
+
+            if (requirement == null)
+            {
+                return new ApiResponse { Status = false, Message = "Requirement not found or inactive." };
+            }
+
+            if (requirement.Client == null)
+            {
+                return new ApiResponse { Status = false, Message = "Client information not found." };
+            }
+
+            if (requirement.Project == null)
+            {
+                return new ApiResponse { Status = false, Message = "Project information not found." };
+            }
+
+            // Generate PDF quotation
+            var pdfBytes = _pdfService.GenerateRequirementQuotation(
+                requirement,
+                quotationRequest,
+                requirement.Client.Name ?? "N/A",
+                requirement.Client.ContactNo ?? "N/A",
+                requirement.Client.Email ?? "N/A",
+                requirement.Project.ProjectName ?? "N/A"
+            );
+
+            // Prepare Email Body
+            var emailBody = await _emailService.GetEmailTemplateAsync("RequirementQuotation.html");
+            emailBody = emailBody.Replace("{{ClientAdminName}}", requirement.Client.Name ?? "N/A")
+                                 .Replace("{{RequirementTitle}}", requirement.RequirementTitle ?? "N/A")
+                                 .Replace("{{ProjectName}}", requirement.Project.ProjectName ?? "N/A")
+                                 .Replace("{{ClientContact}}", requirement.Client.ContactNo ?? "N/A")
+                                 .Replace("{{ClientEmail}}", requirement.Client.Email ?? "N/A")
+                                 .Replace("{{Priority}}", requirement.Priority ?? "N/A");
+
+            // Send Email with PDF Attachment
+            await _emailService.SendEmailWithAttachmentAsync(
+                requirement.Client.Email ?? "",
+                $"[Requirement Quotation] {requirement.RequirementTitle} - G3NEXUS",
+                emailBody,
+                pdfBytes,
+                $"Requirement_Quotation_{requirement.RequirementId}.pdf",
+                isHtml: true
+            );
+
+            // Update requirement to mark as quoted
+            requirement.IsQuoted = true;
+            _context.Requirements.Update(requirement);
+            await _context.SaveChangesAsync();
+
+            return new ApiResponse 
+            { 
+                Status = true, 
+                Message = "Requirement quotation sent successfully to client." 
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse 
+            { 
+                Status = false, 
+                Message = $"Failed to send requirement quotation: {ex.Message}" 
+            };
+        }
     }
 }

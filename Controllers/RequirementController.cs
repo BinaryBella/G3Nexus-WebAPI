@@ -80,5 +80,28 @@ namespace G3NexusBackend.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("send-quotation")]
+        public async Task<IActionResult> SendRequirementQuotation(RequirementQuotationRequestDTO quotationRequest)
+        {
+            try
+            {
+                var response = await _requirementService.SendRequirementQuotationAsync(quotationRequest);
+                if (!response.Status)
+                {
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse 
+                { 
+                    Status = false, 
+                    Message = $"Internal server error: {ex.Message}" 
+                });
+            }
+        }
     }
 }
