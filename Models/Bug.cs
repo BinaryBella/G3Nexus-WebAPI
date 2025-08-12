@@ -9,11 +9,12 @@ public class Bug
     public string Attachment { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-   // Foreign Keys
+    // Foreign Keys
     public int ClientId { get; set; }
     public int ProjectId { get; set; }
 
     // Navigation Properties
     public Client Client { get; set; }
     public Project Project { get; set; }
+    public bool IsNew { get; set; } = true;
 }

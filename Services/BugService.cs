@@ -12,34 +12,39 @@ public class BugService : IBugService
     {
         _context = context;
     }
-   
-    public async Task<IEnumerable<BugDTO>> GetAllBugsAsync(int userId, DateTime userLastLogin)
+
+    public async Task<IEnumerable<BugListItemDTC>> GetAllBugsAsync(int userId)
     {
         var bugs = await _context.Bugs
             .Where(b => b.IsActive)
+            .Include(b => b.Client)
+            .Include(b => b.Project)
             .ToListAsync();
 
-        return bugs.Select(b => new BugDTO
+        return bugs.Select(b => new BugListItemDTC
         {
             BugId = b.BugId,
-            BugTitle =  b.BugTitle,
+            BugTitle = b.BugTitle,
             Severity = b.Severity,
-            BugDescription = b.BugDescription,
-            Attachment = b.Attachment,
-            IsActive = b.IsActive,
             ClientId = b.ClientId,
             ProjectId = b.ProjectId,
-            IsNew = b.CreatedAt > userLastLogin
+            IsNew = b.IsNew,
+            ClientName = b.Client.Name,
+            ProjectName = b.Project.ProjectName
         });
     }
     
     public async Task<BugDTO?> GetBugByIdAsync(int bugId)
     {
-        var bug = await _context.Bugs.FindAsync(bugId);
+        var bug = await _context.Bugs.FirstOrDefaultAsync(b => b.BugId == bugId);
         if (bug is not {IsActive: true})
         {
             return null;
         }
+
+        bug.IsNew = false;
+        _context.Bugs.Update(bug);
+        await _context.SaveChangesAsync();
 
         return new BugDTO
         {
@@ -56,18 +61,35 @@ public class BugService : IBugService
 
     public async Task<BugDTO> CreateBugAsync(BugDTO bugDto)
     {
-        // Check if client exists
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == bugDto.ClientId);
+        var clientId = await _context.Clients
+            .Where(c => c.Id == bugDto.ClientId && c.IsActive)
+            .Select(c => c.Id)
+            .FirstOrDefaultAsync();
+
+        // Validate the client exists and is active
+        var clientExists = await _context.Clients.AnyAsync(c => c.Id == clientId && c.IsActive);
         if (!clientExists)
         {
-            throw new KeyNotFoundException($"Client with ID {bugDto.ClientId} not found.");
+            throw new KeyNotFoundException($"Client with ID {clientId} not found.");
         }
 
-        // Check if project exists
-        var projectExists = await _context.Projects.AnyAsync(p => p.ProjectId == bugDto.ProjectId);
+        // Ensure the client has an active company
+        var clientCompany = await _context.Clients
+            .Where(c => c.Id == clientId)
+            .Include(c => c.Company)
+            .Where(c => c.Company.IsActive)
+            .Select(c => c.Company)
+            .FirstOrDefaultAsync();
+        if (clientCompany == null)
+        {
+            throw new KeyNotFoundException($"Company for client with ID {clientId} not found or inactive.");
+        }
+
+        // Validate the project exists and belongs to the client's company
+        var projectExists = await _context.Projects.AnyAsync(p => p.ProjectId == bugDto.ProjectId && p.CompanyId == clientCompany.CompanyId && p.IsActive);
         if (!projectExists)
         {
-            throw new KeyNotFoundException($"Project with ID {bugDto.ProjectId} not found.");
+            throw new KeyNotFoundException($"There is no such a project belongs to your company.");
         }
 
         var sriLankaTime = DateTime.UtcNow.AddHours(5.5);
@@ -96,7 +118,7 @@ public class BugService : IBugService
         var bug = await _context.Bugs.FindAsync(bugId);
         if (bug is not {IsActive: true})
         {
-            return null;
+            throw new KeyNotFoundException($"Bug with ID {bugId} not found or already inactive.");
         }
 
         var clientExists = await _context.Clients.AnyAsync(c => c.Id == bugDto.ClientId);
@@ -127,7 +149,7 @@ public class BugService : IBugService
     public async Task<ApiResponse> DeActivateBugAsync(int bugId)
     {
         var bug = await _context.Bugs.FindAsync(bugId);
-        if (bug is not {IsActive: true})
+        if (bug == null || !bug.IsActive)
         {
             return new ApiResponse { Status = false, Message = "Bug not found or already inactive." };
         }
@@ -137,31 +159,5 @@ public class BugService : IBugService
         await _context.SaveChangesAsync();
 
         return new ApiResponse { Status = true, Message = "Bug successfully deactivated." };
-    }
-    
-    public async Task<BugDTO?> MarkAsViewedAsync(int BugId)
-    {
-        var Bug = await _context.Bugs.FindAsync(BugId);
-        if (Bug == null || !Bug.IsActive)
-        {
-            return null;
-        }
-
-        Bug.CreatedAt = DateTime.MinValue; // Reset the "new" indicator
-        _context.Bugs.Update(Bug);
-        await _context.SaveChangesAsync();
-
-        return new BugDTO
-        {
-            BugId = Bug.BugId,
-            BugTitle = Bug.BugTitle,
-            Severity = Bug.Severity,
-            BugDescription = Bug.BugDescription,
-            Attachment = Bug.Attachment,
-            IsActive = Bug.IsActive,
-            ClientId = Bug.ClientId,
-            ProjectId = Bug.ProjectId,
-            IsNew = false
-        };
     }
 }

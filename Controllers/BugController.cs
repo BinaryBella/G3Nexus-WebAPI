@@ -25,7 +25,7 @@ namespace G3NexusBackend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBugs([FromQuery] int userId, [FromQuery] DateTime lastLogin)
         {
-            var bugs = await _bugService.GetAllBugsAsync(userId, lastLogin);
+            var bugs = await _bugService.GetAllBugsAsync(userId);
             return Ok(new ApiResponse { Status = true, Data = bugs });
         }
         
@@ -85,19 +85,6 @@ namespace G3NexusBackend.Controllers
             }
 
             return Ok(response);
-        }
-        
-        
-        [HttpPut("MarkAsViewed/{id:int}")]
-        public async Task<IActionResult> MarkBugAsViewed(int id)
-        {
-            var bug = await _bugService.MarkAsViewedAsync(id);
-            if (bug == null)
-            {
-                return NotFound(new ApiResponse { Status = false, Message = "bug not found" });
-            }
-
-            return Ok(new ApiResponse { Status = true, Data = bug });
         }
     }
 }
