@@ -7,7 +7,7 @@ namespace G3NexusBackend.Models
         public int RequirementId { get; set; }
         public decimal RequirementCost { get; set; }
 
-    public Quotation? Quotation { get; set; }
-    public Requirement? Requirement { get; set; }
+        public Quotation? Quotation { get; set; }
+        public Requirement? Requirement { get; set; }
     }
 }

@@ -3,8 +3,6 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
-using G3NexusBackend.Models;
-
 public class PdfGeneratorService : IPdfGeneratorService
 {
     private readonly string G3NexusBlue = "#2b4b93";
@@ -359,7 +357,7 @@ public class PdfGeneratorService : IPdfGeneratorService
                  .FontColor(G3NexusBlue);
     }
 
-    public byte[] GenerateRequirementQuotation(Requirement requirement, RequirementQuotationRequestDTO quotationRequest, string clientName, string clientContact, string clientEmail, string projectName)
+    public byte[] GenerateRequirementQuotation(Requirement requirement, RequirementQuotationRequestDTO quotationRequest, string clientContact, string clientEmail, string projectName)
     {
         QuestPDF.Settings.License = LicenseType.Community;
 
@@ -397,6 +395,44 @@ public class PdfGeneratorService : IPdfGeneratorService
         return stream.ToArray();
     }
 
+    public byte[] GenerateBugQuotation(Bug bug, BugQuotationRequestDTO quotationRequest, string clientContact, string clientEmail, string projectName)
+    {
+        QuestPDF.Settings.License = LicenseType.Community;
+
+        var document = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(20, Unit.Millimetre);
+                page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Segoe UI"));
+
+                page.Header().Height(80).Element(container => CreateBugQuotationHeader(container, bug, clientContact, clientEmail, projectName));
+
+                page.Content().Column(col =>
+                {
+                    // Company Details
+                    col.Item().PaddingBottom(15).Element(CreateCompanyDetails);
+
+                    // REQUIREMENT DETAILS Section
+                    col.Item().Element(container => CreateSectionHeader(container, "BUG DETAILS"));
+                    col.Item().Element(container => CreateBugDetailsTable(container, bug, quotationRequest, projectName));
+
+                    // COST BREAKDOWN Section
+                    col.Item().PaddingTop(10).Element(container => CreateSectionHeader(container, "COST BREAKDOWN"));
+                    col.Item().Element(container => CreateBugCostTable(container, quotationRequest));
+
+                    // Footer
+                    col.Item().PaddingTop(40).Element(CreateFooter);
+                });
+            });
+        });
+
+        using var stream = new MemoryStream();
+        document.GeneratePdf(stream);
+        return stream.ToArray();
+    }
+
     private void CreateRequirementQuotationHeader(IContainer container, Requirement requirement, string clientContact, string clientEmail, string projectName)
     {
         container.Row(row =>
@@ -418,6 +454,40 @@ public class PdfGeneratorService : IPdfGeneratorService
             row.ConstantItem(200).Column(col =>
             {
                 col.Item().Text($"Quotation ID: REQ-{requirement.RequirementId:D6}")
+                   .FontSize(9).FontColor(TextGray);
+                col.Item().Text($"Date: {DateTime.Now:dd/MM/yyyy}")
+                   .FontSize(9).FontColor(TextGray);
+                col.Item().Text($"Project: {projectName}")
+                   .FontSize(9).FontColor(TextGray);
+                col.Item().Text($"Client: {clientContact}")
+                   .FontSize(9).FontColor(TextGray);
+                col.Item().Text($"Email: {clientEmail}")
+                   .FontSize(9).FontColor(TextGray);
+            });
+        });
+    }
+
+    private void CreateBugQuotationHeader(IContainer container, Bug bug, string clientContact, string clientEmail, string projectName)
+    {
+        container.Row(row =>
+        {
+            // Left side - Logo and Title
+            row.RelativeItem().Column(col =>
+            {
+                col.Item().Text("G3NEXUS")
+                   .FontSize(28)
+                   .Bold()
+                   .FontColor(G3NexusBlue);
+
+                col.Item().Text("BUG QUOTATION")
+                   .FontSize(14)
+                   .FontColor("#333");
+            });
+
+            // Right side - Quotation Info
+            row.ConstantItem(200).Column(col =>
+            {
+                col.Item().Text($"Quotation ID: BUG-{bug.BugId:D6}")
                    .FontSize(9).FontColor(TextGray);
                 col.Item().Text($"Date: {DateTime.Now:dd/MM/yyyy}")
                    .FontSize(9).FontColor(TextGray);
@@ -479,6 +549,54 @@ public class PdfGeneratorService : IPdfGeneratorService
         }
     }
 
+    private void CreateBugDetailsTable(IContainer container, Bug bug, BugQuotationRequestDTO quotationRequest, string projectName)
+    {
+        container.Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.ConstantColumn(120);
+                columns.RelativeColumn();
+            });
+
+            // Title
+            table.Cell().Element(CellStyle).Text("Bug Title:").Bold();
+            table.Cell().Element(CellStyle).Text(bug.BugTitle ?? "N/A");
+
+            // Priority
+            table.Cell().Element(CellStyle).Text("Severity:").Bold();
+            table.Cell().Element(CellStyle).Text(bug.Severity ?? "N/A");
+
+            // Project
+            table.Cell().Element(CellStyle).Text("Project:").Bold();
+            table.Cell().Element(CellStyle).Text(projectName);
+
+            // Description
+            table.Cell().Element(CellStyle).Text("Description:").Bold();
+            table.Cell().Element(CellStyle).Text(bug.BugDescription ?? "N/A");
+
+            // Estimated Duration
+            table.Cell().Element(CellStyle).Text("Estimated Duration:").Bold();
+            table.Cell().Element(CellStyle).Text(quotationRequest.EstimatedDuration ?? "N/A");
+
+            // Delivery Date
+            table.Cell().Element(CellStyle).Text("Expected Delivery:").Bold();
+            table.Cell().Element(CellStyle).Text(quotationRequest.DeliveryDate.ToString("dd/MM/yyyy"));
+
+            // Additional Notes
+            if (!string.IsNullOrEmpty(quotationRequest.Description))
+            {
+                table.Cell().Element(CellStyle).Text("Additional Notes:").Bold();
+                table.Cell().Element(CellStyle).Text(quotationRequest.Description);
+            }
+        });
+
+        IContainer CellStyle(IContainer container)
+        {
+            return container.Border(1).BorderColor("#dee2e6").Padding(8).Background("#f8f9fa");
+        }
+    }
+
     private void CreateRequirementCostTable(IContainer container, RequirementQuotationRequestDTO quotationRequest)
     {
         container.Table(table =>
@@ -500,6 +618,52 @@ public class PdfGeneratorService : IPdfGeneratorService
 
             // Cost Row
             table.Cell().Element(DataCellStyle).Text("Requirement Implementation");
+            table.Cell().Element(DataCellStyle).Text(quotationRequest.EstimatedDuration);
+            table.Cell().Element(DataCellStyle).AlignRight().Text($"{quotationRequest.QuotationCost:N2}");
+
+            // Total Row
+            table.Cell().Element(TotalCellStyle).Text("TOTAL COST").Bold();
+            table.Cell().Element(TotalCellStyle).Text("");
+            table.Cell().Element(TotalCellStyle).AlignRight().Text($"LKR {quotationRequest.QuotationCost:N2}").Bold();
+        });
+
+        IContainer HeaderCellStyle(IContainer container)
+        {
+            return container.Border(1).BorderColor(BorderGray).Padding(8).Background(LightGray);
+        }
+
+        IContainer DataCellStyle(IContainer container)
+        {
+            return container.Border(1).BorderColor(BorderGray).Padding(8).Background(Colors.White);
+        }
+
+        IContainer TotalCellStyle(IContainer container)
+        {
+            return container.Border(1).BorderColor(BorderGray).Padding(8).Background(LightGray);
+        }
+    }
+
+    private void CreateBugCostTable(IContainer container, BugQuotationRequestDTO quotationRequest)
+    {
+        container.Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn(3);
+                columns.RelativeColumn(1);
+                columns.RelativeColumn(1);
+            });
+
+            // Header
+            table.Header(header =>
+            {
+                header.Cell().Element(HeaderCellStyle).Text("Description");
+                header.Cell().Element(HeaderCellStyle).Text("Duration");
+                header.Cell().Element(HeaderCellStyle).Text("Cost (LKR)");
+            });
+
+            // Cost Row
+            table.Cell().Element(DataCellStyle).Text("Bug Implementation");
             table.Cell().Element(DataCellStyle).Text(quotationRequest.EstimatedDuration);
             table.Cell().Element(DataCellStyle).AlignRight().Text($"{quotationRequest.QuotationCost:N2}");
 

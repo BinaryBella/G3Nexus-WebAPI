@@ -198,7 +198,6 @@ public class RequirementService : IRequirementService
             var pdfBytes = _pdfService.GenerateRequirementQuotation(
                 requirement,
                 quotationRequest,
-                requirement.Client.Name ?? "N/A",
                 requirement.Client.ContactNo ?? "N/A",
                 requirement.Client.Email ?? "N/A",
                 requirement.Project.ProjectName ?? "N/A"
@@ -331,7 +330,6 @@ public class RequirementService : IRequirementService
                     Description = $"Bulk quotation for {requirements.Count} requirements. {bulkQuotationRequest.AdditionalNotes}",
                     DeliveryDate = firstSelectedReq.DeliveryDate
                 },
-                firstRequirement.Client?.Name ?? "N/A",
                 firstRequirement.Client?.ContactNo ?? "N/A",
                 firstRequirement.Client?.Email ?? "N/A",
                 firstRequirement.Project?.ProjectName ?? "N/A"

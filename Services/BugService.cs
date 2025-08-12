@@ -193,31 +193,28 @@ public class BugService : IBugService
             }
 
             // Generate PDF quotation
-            // TODO: Implement GenerateBugQuotation in PdfGeneratorService
-            // For now, we'll use the existing RequirementQuotation method with adapted data
-            var tempRequirement = new Requirement
+            var tempBug = new Bug
             {
-                RequirementId = bug.BugId,
-                RequirementTitle = $"Bug Fix: {bug.BugTitle}",
-                RequirementDescription = bug.BugDescription,
-                Priority = bug.Severity,
+                BugId = bug.BugId,
+                BugTitle = $"Bug Fix: {bug.BugTitle}",
+                BugDescription = bug.BugDescription,
+                Severity = bug.Severity,
                 ClientId = bug.ClientId,
                 ProjectId = bug.ProjectId,
                 Client = bug.Client,
                 Project = bug.Project
             };
 
-            var pdfBytes = _pdfService.GenerateRequirementQuotation(
-                tempRequirement,
-                new RequirementQuotationRequestDTO 
+            var pdfBytes = _pdfService.GenerateBugQuotation(
+                tempBug,
+                new BugQuotationRequestDTO 
                 {
-                    RequirementId = quotationRequest.BugId,
+                    BugId = quotationRequest.BugId,
                     QuotationCost = quotationRequest.QuotationCost,
                     EstimatedDuration = quotationRequest.EstimatedDuration,
                     Description = quotationRequest.Description,
                     DeliveryDate = quotationRequest.DeliveryDate
                 },
-                bug.Client?.Name ?? "N/A",
                 bug.Client?.ContactNo ?? "N/A",
                 bug.Client?.Email ?? "N/A",
                 bug.Project?.ProjectName ?? "N/A"
@@ -306,25 +303,25 @@ public class BugService : IBugService
                 CreationDate = DateTime.UtcNow.AddHours(5.5),
                 Status = "Sent",
                 TotalCost = bulkQuotationRequest.SelectedBugs.Sum(sb => sb.QuotationCost),
-                QuotationRequirements = new List<QuotationRequirement>()
+                QuotationBugs = new List<QuotationBug>()
             };
 
             _context.Quotations?.Add(quotation);
             await _context.SaveChangesAsync();
 
-            // Create quotation requirements (using the same table for bugs)
-            var quotationRequirements = new List<QuotationRequirement>();
+            // Create quotation bugs (using the same table for bugs)
+            var quotationBugs = new List<QuotationBug>();
             foreach (var selectedBug in bulkQuotationRequest.SelectedBugs)
             {
-                quotationRequirements.Add(new QuotationRequirement
+                quotationBugs.Add(new QuotationBug
                 {
                     QuotationId = quotation.QuotationId,
-                    RequirementId = selectedBug.BugId, // Using RequirementId field for BugId
-                    RequirementCost = selectedBug.QuotationCost
+                    BugId = selectedBug.BugId, // Using BugId field for BugId
+                    BugCost = selectedBug.QuotationCost
                 });
             }
 
-            _context.QuotationRequirements?.AddRange(quotationRequirements);
+            _context.QuotationBugs?.AddRange(quotationBugs);
 
             // Update bugs to mark as quoted and associate with quotation
             foreach (var bug in bugs)
@@ -340,29 +337,28 @@ public class BugService : IBugService
             // TODO: Implement GenerateBulkBugQuotation in PdfGeneratorService
             // For now, we'll use the first bug to generate a basic PDF
             var firstSelectedBug = bulkQuotationRequest.SelectedBugs.First();
-            var tempRequirement = new Requirement
+            var tempBug = new Bug
             {
-                RequirementId = firstBug.BugId,
-                RequirementTitle = $"Bulk Bug Fixes: {bugs.Count} bugs",
-                RequirementDescription = $"Multiple bug fixes. {bulkQuotationRequest.AdditionalNotes}",
-                Priority = firstBug.Severity,
+                BugId = firstBug.BugId,
+                BugTitle = $"Bulk Bug Fixes: {bugs.Count} bugs",
+                BugDescription = $"Multiple bug fixes. {bulkQuotationRequest.AdditionalNotes}",
+                Severity = firstBug.Severity,
                 ClientId = firstBug.ClientId,
                 ProjectId = firstBug.ProjectId,
                 Client = firstBug.Client,
                 Project = firstBug.Project
             };
 
-            var pdfBytes = _pdfService.GenerateRequirementQuotation(
-                tempRequirement,
-                new RequirementQuotationRequestDTO 
+            var pdfBytes = _pdfService.GenerateBugQuotation(
+                tempBug,
+                new BugQuotationRequestDTO 
                 {
-                    RequirementId = firstSelectedBug.BugId,
+                    BugId = firstSelectedBug.BugId,
                     QuotationCost = quotation.TotalCost,
                     EstimatedDuration = firstSelectedBug.EstimatedDuration,
                     Description = $"Bulk quotation for {bugs.Count} bugs. {bulkQuotationRequest.AdditionalNotes}",
                     DeliveryDate = firstSelectedBug.DeliveryDate
                 },
-                firstBug.Client?.Name ?? "N/A",
                 firstBug.Client?.ContactNo ?? "N/A",
                 firstBug.Client?.Email ?? "N/A",
                 firstBug.Project?.ProjectName ?? "N/A"

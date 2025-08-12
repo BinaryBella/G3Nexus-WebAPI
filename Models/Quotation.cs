@@ -13,5 +13,6 @@ namespace G3NexusBackend.Models
         public decimal TotalCost { get; set; }
 
         public ICollection<QuotationRequirement> QuotationRequirements { get; set; }
+        public ICollection<QuotationBug> QuotationBugs { get; set; }
     }
 }

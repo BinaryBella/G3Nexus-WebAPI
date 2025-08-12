@@ -21,6 +21,7 @@ public class G3NexusDbContext : DbContext
 
     public DbSet<Quotation>? Quotations { get; set; }
     public DbSet<QuotationRequirement>? QuotationRequirements { get; set; }
+    public DbSet<QuotationBug>? QuotationBugs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
