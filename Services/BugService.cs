@@ -13,7 +13,7 @@ public class BugService : IBugService
         _context = context;
     }
 
-    public async Task<IEnumerable<BugListItemDTC>> GetAllBugsAsync(int userId)
+    public async Task<IEnumerable<BugListItemDTO>> GetAllBugsAsync(int userId)
     {
         var bugs = await _context.Bugs
             .Where(b => b.IsActive)
@@ -21,7 +21,7 @@ public class BugService : IBugService
             .Include(b => b.Project)
             .ToListAsync();
 
-        return bugs.Select(b => new BugListItemDTC
+        return bugs.Select(b => new BugListItemDTO
         {
             BugId = b.BugId,
             BugTitle = b.BugTitle,

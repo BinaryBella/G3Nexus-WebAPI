@@ -2,7 +2,7 @@ using System;
 
 namespace G3NexusBackend.Data.DTO;
 
-public class BugListItemDTC
+public class BugListItemDTO
 {
     public int BugId { get; set; }
     public string BugTitle { get; set; }

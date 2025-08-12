@@ -5,7 +5,7 @@ namespace G3NexusBackend.Services.Interfaces;
 
 public interface IBugService
 {
-    Task<IEnumerable<BugListItemDTC>> GetAllBugsAsync(int userId);
+    Task<IEnumerable<BugListItemDTO>> GetAllBugsAsync(int userId);
     Task<BugDTO?> GetBugByIdAsync(int bugId);
     Task<BugDTO> CreateBugAsync(BugDTO bugDto);
     Task<BugDTO?> UpdateBugAsync(int bugId, BugDTO bugDto);
