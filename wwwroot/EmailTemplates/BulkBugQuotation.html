@@ -6,104 +6,309 @@
     <title>Bulk Bug Fix Quotation - G3NEXUS</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .email-container {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(43, 75, 147, 0.1);
         }
         .header {
-            background-color: #dc3545;
+            background: linear-gradient(135deg, #2b4b93, #3d5aa0);
             color: white;
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
-            border-radius: 5px 5px 0 0;
+            position: relative;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        .header .subtitle {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
         }
         .content {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border: 1px solid #dee2e6;
+            background-color: #ffffff;
+            padding: 30px;
         }
         .footer {
-            background-color: #6c757d;
+            background: linear-gradient(135deg, #2b4b93, #3d5aa0);
             color: white;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            border-radius: 0 0 5px 5px;
         }
         .highlight {
-            background-color: #fff3cd;
-            padding: 10px;
-            border-left: 4px solid #ffc107;
-            margin: 15px 0;
+            background: #dadada;
+            padding: 20px;
+            border-left: 5px solid #2b4b93;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
         }
         .details {
-            background-color: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
+            background-color: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #e8ebf7;
         }
         .cost-highlight {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            padding: 10px;
-            border-radius: 5px;
+            background: linear-gradient(135deg, #2b4b93, #3d5aa0);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
             font-weight: bold;
             text-align: center;
+            margin: 25px 0;
+            font-size: 20px;
+            box-shadow: 0 4px 16px rgba(43, 75, 147, 0.3);
+        }
+        .quotation-id {
+            background-color: #2b4b93;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .bug-list {
+            background-color: #ececec;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2b4b93;
             margin: 15px 0;
+        }
+        .bug-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #c4c4c4;
+            font-size: 14px;
+        }
+        .bug-item:last-child {
+            border-bottom: none;
+        }
+        .contact-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .contact-item {
+            padding: 12px;
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid #e8ebf7;
+        }
+        .contact-label {
+            font-weight: 600;
+            color: #2b4b93;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .contact-value {
+            margin-top: 4px;
+            color: #333;
+        }
+        .next-steps {
+            background: linear-gradient(135deg, #f8f9ff, #ffffff);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e8ebf7;
+        }
+        .next-steps h3 {
+            color: #2b4b93;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .next-steps ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .next-steps li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        .priority-notice {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .priority-notice strong {
+            color: #c62828;
+        }
+        .signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e8ebf7;
+        }
+        .company-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2b4b93, #3d5aa0);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .bug-severity {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .severity-high {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        .severity-medium {
+            background-color: #fff3e0;
+            color: #ef6c00;
+            border: 1px solid #ffcc80;
+        }
+        .severity-low {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Bulk Bug Fix Quotation - G3NEXUS</h1>
-    </div>
-    
-    <div class="content">
-        <h2>Dear {{ClientAdminName}},</h2>
-        
-        <p>We have reviewed the multiple bugs you reported and are pleased to provide you with a comprehensive quotation for fixing all identified issues in the <strong>{{ProjectName}}</strong> project.</p>
-        
-        <div class="highlight">
-            <strong></strong>Bug Summary:</strong><br>
-            • Total Bugs: {{BugCount}}<br>
-            • Bugs: {{BugTitle}}<br>
-            • Project: {{ProjectName}}
+    <div class="email-container">
+        <div class="header">
+            <h1>Bulk Bug Fix Quotation - G3NEXUS</h1>
+            <p class="subtitle">Expert Bug Resolution & Software Maintenance</p>
         </div>
         
-        <div class="cost-highlight">
-            Total Bug Fix Cost: {{TotalCost}}
+        <div class="content">
+            <div class="quotation-id">Bug Fix Quote #{{QuotationId}}</div>
+            
+            <h2>Dear {{ClientAdminName}},</h2>
+            
+            <p>We have thoroughly reviewed the multiple bugs you reported and are pleased to provide you with a comprehensive quotation for fixing all identified issues in the <strong>{{ProjectName}}</strong> project.</p>
+            
+            <div class="highlight">
+                <strong>Bug Summary:</strong><br><br>
+                • <strong>Quotation ID:</strong> #{{QuotationId}}<br>
+                • <strong>Total Bugs:</strong> {{BugCount}}<br>
+                • <strong>Project:</strong> {{ProjectName}}<br><br>
+                
+                <div class="bug-list">
+                    <strong>Bugs Included:</strong><br>
+                    <div style="margin-top: 10px;">{{BugSummary}}</div>
+                </div>
+            </div>
+            
+            <div class="cost-highlight">
+                Total Bug Fix Cost: {{TotalCost}}
+            </div>
+            
+            <div class="details">
+                <h3 style="color: #2b4b93; margin-top: 0;">Contact Information</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-label">Client Name</div>
+                        <div class="contact-value">{{ClientAdminName}}</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">Phone</div>
+                        <div class="contact-value">{{ClientContact}}</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value">{{ClientEmail}}</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">Project</div>
+                        <div class="contact-value">{{ProjectName}}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="next-steps">
+                <h3>What's Next?</h3>
+                <ul>
+                    <li><strong>Review</strong> the attached detailed bug fix quotation PDF</li>
+                    <li><strong>Contact us</strong> if you have any questions or need clarifications</li>
+                    <li><strong>Approve</strong> the quotation to prioritize all bug fixes</li>
+                    <li><strong>Our team</strong> will work systematically to resolve all issues</li>
+                    <li><strong>Testing</strong> will be conducted after each bug fix for quality assurance</li>
+                </ul>
+            </div>
+            
+            <div class="priority-notice">
+                <strong>Priority Notice:</strong> Critical bugs will be addressed first, followed by medium and low priority issues. Our development team follows a systematic approach to ensure comprehensive bug resolution without introducing new issues.
+            </div>
+            
+            <p>Please find the detailed bug fix quotation attached as a PDF document. Our experienced development team is ready to address all these bugs efficiently and systematically once approved.</p>
+            
+            <p>We understand the importance of maintaining a bug-free application and are committed to delivering high-quality solutions that restore your system's optimal performance.</p>
+            
+            <div class="signature">
+                <p>Thank you for choosing G3NEXUS for your software maintenance and bug resolution needs!</p>
+                
+                <p>
+                    <span class="company-logo">G3</span>
+                    <strong>G3NEXUS Development Team</strong><br>
+                    <em style="color: #2b4b93;">Expert Bug Resolution & Software Maintenance</em>
+                </p>
+            </div>
         </div>
         
-        <div class="details">
-            <h3>Contact Information:</h3>
-            <p><strong>Client:</strong> {{ClientAdminName}}</p>
-            <p><strong>Phone:</strong> {{ClientContact}}</p>
-            <p><strong>Email:</strong> {{ClientEmail}}</p>
+        <div class="footer">
+            <p><strong>&copy; 2025 G3NEXUS. All rights reserved.</strong></p>
+            <p>Professional Bug Resolution | Quality Assurance Guaranteed</p>
         </div>
-        
-        <div class="details">
-            <h3>What's Next?</h3>
-            <ul>
-                <li>Review the attached detailed quotation PDF</li>
-                <li>Contact us if you have any questions or need clarifications</li>
-                <li>We will prioritize all bug fixes upon your approval</li>
-                <li>Our team will work systematically to resolve all issues</li>
-            </ul>
-        </div>
-        
-        <p>Please find the detailed quotation attached as a PDF document. Our experienced development team is ready to address all these bugs efficiently once approved.</p>
-        
-        <p>Thank you for choosing G3NEXUS for your software maintenance and bug resolution needs!</p>
-        
-        <p>Best regards,<br>
-        <strong>G3NEXUS Development Team</strong></p>
-    </div>
-    
-    <div class="footer">
-        <p>&copy; 2025 G3NEXUS. All rights reserved.</p>
-        <p>Professional Bug Resolution & Software Maintenance</p>
     </div>
 </body>
 </html>
