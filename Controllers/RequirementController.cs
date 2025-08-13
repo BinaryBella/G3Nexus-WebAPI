@@ -23,6 +23,20 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = requirements });
         }
 
+        [HttpPost("by-project")]
+        public async Task<IActionResult> GetRequirementsByProject(RequirementsByProjectRequestDTO request)
+        {
+            var requirements = await _requirementService.GetRequirementsByProjectAsync(request);
+            return Ok(new ApiResponse { Status = true, Data = requirements });
+        }
+
+        [HttpPost("validate-bulk-selection")]
+        public async Task<IActionResult> ValidateBulkQuotationSelection(BulkQuotationValidationDTO validation)
+        {
+            var response = await _requirementService.ValidateBulkQuotationSelectionAsync(validation);
+            return Ok(response);
+        }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetRequirementById(int id)
         {
