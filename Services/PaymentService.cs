@@ -22,6 +22,7 @@ public class PaymentService : IPaymentService
             {
                 PaymentId = p.PaymentId,
                 ProjectId = p.ProjectId,
+                ClientId = p.ClientId,
                 PaymentAmount = p.PaymentAmount,
                 PaymentType = p.PaymentType,
                 PaymentDescription = p.PaymentDescription,
@@ -44,6 +45,7 @@ public class PaymentService : IPaymentService
         {
             PaymentId = payment.PaymentId,
             ProjectId = payment.ProjectId,
+            ClientId = payment.ClientId,
             PaymentAmount = payment.PaymentAmount,
             PaymentType = payment.PaymentType,
             PaymentDescription = payment.PaymentDescription,
@@ -51,6 +53,25 @@ public class PaymentService : IPaymentService
             Attachment = payment.Attachment,
             IsActive = payment.IsActive
         };
+    }
+
+    public async Task<IEnumerable<PaymentDTO>> GetPaymentsByClientIdAsync(int clientId)
+    {
+        return await _context.Payments
+            .Where(p => p.IsActive && p.ClientId == clientId)
+            .Select(p => new PaymentDTO
+            {
+                PaymentId = p.PaymentId,
+                ProjectId = p.ProjectId,
+                ClientId = p.ClientId,
+                PaymentAmount = p.PaymentAmount,
+                PaymentType = p.PaymentType,
+                PaymentDescription = p.PaymentDescription,
+                PaymentDate = p.PaymentDate,
+                Attachment = p.Attachment,
+                IsActive = p.IsActive
+            })
+            .ToListAsync();
     }
 
     public async Task<PaymentDTO> CreatePaymentAsync(PaymentDTO paymentDto)
@@ -61,9 +82,16 @@ public class PaymentService : IPaymentService
             throw new KeyNotFoundException($"Project with ID {paymentDto.ProjectId} not found.");
         }
 
+        var clientExists = await _context.Clients.AnyAsync(c => c.Id == paymentDto.ClientId);
+        if (!clientExists)
+        {
+            throw new KeyNotFoundException($"Client with ID {paymentDto.ClientId} not found.");
+        }
+
         var payment = new Payment
         {
             ProjectId = paymentDto.ProjectId,
+            ClientId = paymentDto.ClientId,
             PaymentAmount = paymentDto.PaymentAmount,
             PaymentType = paymentDto.PaymentType,
             PaymentDescription = paymentDto.PaymentDescription,
@@ -114,7 +142,14 @@ public class PaymentService : IPaymentService
             throw new KeyNotFoundException($"Project with ID {paymentDto.ProjectId} not found.");
         }
 
+        var clientExists = await _context.Clients.AnyAsync(c => c.Id == paymentDto.ClientId);
+        if (!clientExists)
+        {
+            throw new KeyNotFoundException($"Client with ID {paymentDto.ClientId} not found.");
+        }
+
         payment.ProjectId = paymentDto.ProjectId;
+        payment.ClientId = paymentDto.ClientId;
         payment.PaymentAmount = paymentDto.PaymentAmount;
         payment.PaymentType = paymentDto.PaymentType;
         payment.PaymentDescription = paymentDto.PaymentDescription;

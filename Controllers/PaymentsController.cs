@@ -34,6 +34,13 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = payment });
         }
 
+        [HttpGet("client/{clientId:int}")]
+        public async Task<IActionResult> GetPaymentsByClientId(int clientId)
+        {
+            var payments = await _paymentService.GetPaymentsByClientIdAsync(clientId);
+            return Ok(new ApiResponse { Status = true, Data = payments });
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreatePayment(PaymentDTO paymentDto)
         {

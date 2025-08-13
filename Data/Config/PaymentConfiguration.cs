@@ -28,10 +28,15 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(p => p.Attachment)
             .HasMaxLength(255); // Set appropriate max length
 
-        // Configure the relationship
+        // Configure the relationships
         builder.HasOne(p => p.Project)
             .WithMany(p => p.Payments)
             .HasForeignKey(p => p.ProjectId)
             .OnDelete(DeleteBehavior.Cascade); // Specify delete behavior if needed
+
+        builder.HasOne(p => p.Client)
+            .WithMany() // Assuming Client doesn't have a navigation property back to Payments
+            .HasForeignKey(p => p.ClientId)
+            .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete for client payments
     }
 }
