@@ -2,6 +2,7 @@ using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
+using G3NexusBackend.Data;
 
 namespace G3NexusBackend.Services;
 
@@ -327,6 +328,19 @@ public class RequirementService : IRequirementService
             // Update requirement to mark as quoted
             requirement.IsQuoted = true;
             _context.Requirements.Update(requirement);
+
+            var quotation = new Quotation
+            {
+                ClientId = requirement.ClientId,
+                ProjectId = requirement.ProjectId,
+                EmployeeId = quotationRequest.EmployeeId,
+                CreatedDate = DateTime.UtcNow.AddHours(5.5),
+                Type = Constants.RequirementQuotationType,
+                TotalCost = quotationRequest.QuotationCost
+            };
+
+            _context.Quotations?.Add(quotation);
+
             await _context.SaveChangesAsync();
 
             return new ApiResponse 
@@ -412,25 +426,14 @@ public class RequirementService : IRequirementService
                 {
                     ClientId = firstRequirement.ClientId,
                     ProjectId = firstRequirement.ProjectId,
-                    CreationDate = DateTime.UtcNow.AddHours(5.5), // Sri Lanka time
-                    Status = "Sent",
-                    TotalCost = totalCost,
-                    QuotationRequirements = new List<QuotationRequirement>()
+                    EmployeeId = bulkQuotationRequest.EmployeeId,
+                    CreatedDate = DateTime.UtcNow.AddHours(5.5),
+                    Type = Constants.RequirementQuotationType,
+                    TotalCost = totalCost
                 };
 
                 _context.Quotations?.Add(quotation);
                 await _context.SaveChangesAsync(); // Save to get QuotationId
-
-                // 8. Create detailed quotation requirement records
-                var quotationRequirements = bulkQuotationRequest.SelectedRequirements.Select(selectedReq => 
-                    new QuotationRequirement
-                    {
-                        QuotationId = quotation.QuotationId,
-                        RequirementId = selectedReq.RequirementId,
-                        RequirementCost = selectedReq.QuotationCost
-                    }).ToList();
-
-                _context.QuotationRequirements?.AddRange(quotationRequirements);
 
                 // 9. Update requirements to mark as quoted and associate with quotation
                 foreach (var requirement in requirements)

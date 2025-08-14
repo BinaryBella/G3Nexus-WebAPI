@@ -6,6 +6,7 @@ namespace G3NexusBackend.Data.DTO
         public int ClientId { get; set; }
         public int ProjectId { get; set; }
         public string AdditionalNotes { get; set; } = string.Empty;
+        public int EmployeeId { get; set; }
     }
 
     public class RequirementQuotationItemDTO

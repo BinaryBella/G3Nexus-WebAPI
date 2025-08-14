@@ -15,4 +15,5 @@ public class Client
     public Company Company { get; set; } // Navigation property for related company
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs
+    public ICollection<Quotation> Quotations { get; set; } // Navigation property for related quotations
 }

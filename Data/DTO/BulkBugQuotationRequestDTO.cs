@@ -5,6 +5,7 @@ namespace G3NexusBackend.Data.DTO
         public List<BugQuotationItemDTO> SelectedBugs { get; set; } = new();
         public int ClientId { get; set; }
         public int ProjectId { get; set; }
+        public int EmployeeId { get; set; }
         public string AdditionalNotes { get; set; } = string.Empty;
     }
 

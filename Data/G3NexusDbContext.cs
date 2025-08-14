@@ -46,5 +46,6 @@ public class G3NexusDbContext : DbContext
         modelBuilder.ApplyConfiguration(new EmployeeProjectConfiguration());
         modelBuilder.ApplyConfiguration(new QuotationCostsConfiguration());
         modelBuilder.ApplyConfiguration(new ProjectTermsConditionsConfiguration());
+        modelBuilder.ApplyConfiguration(new QuotationConfiguration());
     }
 }

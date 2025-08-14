@@ -348,24 +348,27 @@ namespace G3NexusBackend.Data
                     {
                         ClientId = clients[0].Id,
                         ProjectId = projects[0].ProjectId,
-                        CreationDate = DateTime.Now.AddDays(-55),
-                        Status = "Approved",
+                        EmployeeId = employees[0].EmployeeId,
+                        CreatedDate = DateTime.Now.AddDays(-55),
+                        Type = Constants.FinalQuotationType,
                         TotalCost = 160000.00m
                     },
                     new Quotation
                     {
                         ClientId = clients[1].Id,
                         ProjectId = projects[1].ProjectId,
-                        CreationDate = DateTime.Now.AddDays(-40),
-                        Status = "Approved",
+                        EmployeeId = employees[1].EmployeeId,
+                        CreatedDate = DateTime.Now.AddDays(-40),
+                        Type = Constants.AdvancedQuotationType,
                         TotalCost = 85000.00m
                     },
                     new Quotation
                     {
                         ClientId = clients[2].Id,
                         ProjectId = projects[2].ProjectId,
-                        CreationDate = DateTime.Now.AddDays(-25),
-                        Status = "Draft",
+                        EmployeeId = employees[2].EmployeeId,
+                        CreatedDate = DateTime.Now.AddDays(-25),
+                        Type = Constants.RequirementQuotationType,
                         TotalCost = 50000.00m
                     }
                 };

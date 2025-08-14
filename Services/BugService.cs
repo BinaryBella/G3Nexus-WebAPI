@@ -2,6 +2,7 @@ using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using G3NexusBackend.Models;
 using Microsoft.EntityFrameworkCore;
+using G3NexusBackend.Data;
 
 namespace G3NexusBackend.Services;
 
@@ -242,6 +243,20 @@ public class BugService : IBugService
             // Update bug to mark as quoted
             bug.IsQuoted = true;
             _context.Bugs.Update(bug);
+
+            // Create quotation
+            var quotation = new Quotation
+            {
+                ClientId = bug.ClientId,
+                ProjectId = bug.ProjectId,
+                EmployeeId = quotationRequest.EmployeeId,
+                CreatedDate = DateTime.UtcNow.AddHours(5.5),
+                Type = Constants.BugQuotationType,
+                TotalCost = quotationRequest.QuotationCost
+            };
+
+            _context.Quotations?.Add(quotation);
+
             await _context.SaveChangesAsync();
 
             return new ApiResponse 
@@ -295,15 +310,21 @@ public class BugService : IBugService
                 return new ApiResponse { Status = false, Message = "Client or project information not found." };
             }
 
+            var totalCost = bulkQuotationRequest.SelectedBugs.Sum(sr => sr.QuotationCost);
+            if (totalCost <= 0)
+            {
+                return new ApiResponse { Status = false, Message = "Total quotation cost must be greater than zero." };
+            }
+
             // Create quotation
             var quotation = new Quotation
             {
                 ClientId = firstBug.ClientId,
                 ProjectId = firstBug.ProjectId,
-                CreationDate = DateTime.UtcNow.AddHours(5.5),
-                Status = "Sent",
-                TotalCost = bulkQuotationRequest.SelectedBugs.Sum(sb => sb.QuotationCost),
-                QuotationBugs = new List<QuotationBug>()
+                EmployeeId = bulkQuotationRequest.EmployeeId,
+                CreatedDate = DateTime.UtcNow.AddHours(5.5),
+                Type = Constants.BugQuotationType,
+                TotalCost = totalCost
             };
 
             _context.Quotations?.Add(quotation);

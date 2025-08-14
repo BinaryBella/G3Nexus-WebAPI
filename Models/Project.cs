@@ -6,14 +6,14 @@ public class Project
     public string ProjectName { get; set; }
     public string ProjectType { get; set; }
     public string ProjectSize { get; set; }
-    public DateTime CreationDate { get; set; } 
-    public string ProjectDescription { get; set; } 
-    public decimal EstimatedBudget { get; set; } 
-    public DateTime? ActualStartDate { get; set; } 
-    public DateTime? ActualEndDate { get; set; } 
-    public decimal TotalBudget { get; set; } 
-    public string PaymentType { get; set; } 
-    public string PaymentStatus { get; set; } 
+    public DateTime CreationDate { get; set; }
+    public string ProjectDescription { get; set; }
+    public decimal EstimatedBudget { get; set; }
+    public DateTime? ActualStartDate { get; set; }
+    public DateTime? ActualEndDate { get; set; }
+    public decimal TotalBudget { get; set; }
+    public string PaymentType { get; set; }
+    public string PaymentStatus { get; set; }
     public string Status { get; set; }
     public bool IsActive { get; set; }
     public int CompanyId { get; set; } // Foreign Key
@@ -22,9 +22,10 @@ public class Project
     public ICollection<Requirement> Requirements { get; set; } // Navigation property for related requirements
     public ICollection<Bug> Bugs { get; set; } // Navigation property for related bugs
     public ICollection<Payment> Payments { get; set; } // Navigation property for related payments
-    
+
     // Many-to-many navigation
     public ICollection<EmployeeProject> EmployeeProjects { get; set; }
-    public QuotationCost QuotationCost { get; set; }    
+    public QuotationCost QuotationCost { get; set; }
     public ICollection<ProjectTermsConditions> ProjectTermsConditions { get; set; }
+    public ICollection<Quotation> Quotations { get; set; } // Navigation property for related quotations
 }
