@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace G3NexusBackend.Migrations
 {
-    public partial class intialMigration : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -42,23 +42,6 @@ namespace G3NexusBackend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Employees", x => x.EmployeeId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Quotations",
-                columns: table => new
-                {
-                    QuotationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    ProjectId = table.Column<int>(type: "int", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Quotations", x => x.QuotationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -112,7 +95,7 @@ namespace G3NexusBackend.Migrations
                 name: "Clients",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    ClientId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ContactNo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -126,7 +109,7 @@ namespace G3NexusBackend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Clients", x => x.Id);
+                    table.PrimaryKey("PK_Clients", x => x.ClientId);
                     table.ForeignKey(
                         name: "FK_Clients_Company_CompanyId",
                         column: x => x.CompanyId,
@@ -168,38 +151,6 @@ namespace G3NexusBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bugs",
-                columns: table => new
-                {
-                    BugId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BugTitle = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Severity = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    BugDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Attachment = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", maxLength: 50, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    ProjectId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bugs", x => x.BugId);
-                    table.ForeignKey(
-                        name: "FK_Bugs_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bugs_Projects_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "Projects",
-                        principalColumn: "ProjectId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "EmployeeProjects",
                 columns: table => new
                 {
@@ -230,6 +181,7 @@ namespace G3NexusBackend.Migrations
                     PaymentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProjectId = table.Column<int>(type: "int", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
                     PaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PaymentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PaymentDescription = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
@@ -240,6 +192,12 @@ namespace G3NexusBackend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Payments", x => x.PaymentId);
+                    table.ForeignKey(
+                        name: "FK_Payments_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Payments_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -305,6 +263,82 @@ namespace G3NexusBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Quotations",
+                columns: table => new
+                {
+                    QuotationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Quotations", x => x.QuotationId);
+                    table.ForeignKey(
+                        name: "FK_Quotations_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Quotations_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Quotations_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "ProjectId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bugs",
+                columns: table => new
+                {
+                    BugId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BugTitle = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Severity = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    BugDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Attachment = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false),
+                    QuotationId = table.Column<int>(type: "int", nullable: true),
+                    IsQuoted = table.Column<bool>(type: "bit", nullable: false),
+                    IsNew = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bugs", x => x.BugId);
+                    table.ForeignKey(
+                        name: "FK_Bugs_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bugs_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "ProjectId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bugs_Quotations_QuotationId",
+                        column: x => x.QuotationId,
+                        principalTable: "Quotations",
+                        principalColumn: "QuotationId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Requirements",
                 columns: table => new
                 {
@@ -329,7 +363,7 @@ namespace G3NexusBackend.Migrations
                         name: "FK_Requirements_Clients_ClientId",
                         column: x => x.ClientId,
                         principalTable: "Clients",
-                        principalColumn: "Id",
+                        principalColumn: "ClientId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Requirements_Projects_ProjectId",
@@ -342,6 +376,33 @@ namespace G3NexusBackend.Migrations
                         column: x => x.QuotationId,
                         principalTable: "Quotations",
                         principalColumn: "QuotationId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuotationBugs",
+                columns: table => new
+                {
+                    QuotationBugId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    QuotationId = table.Column<int>(type: "int", nullable: false),
+                    BugId = table.Column<int>(type: "int", nullable: false),
+                    BugCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuotationBugs", x => x.QuotationBugId);
+                    table.ForeignKey(
+                        name: "FK_QuotationBugs_Bugs_BugId",
+                        column: x => x.BugId,
+                        principalTable: "Bugs",
+                        principalColumn: "BugId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_QuotationBugs_Quotations_QuotationId",
+                        column: x => x.QuotationId,
+                        principalTable: "Quotations",
+                        principalColumn: "QuotationId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -382,6 +443,11 @@ namespace G3NexusBackend.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bugs_QuotationId",
+                table: "Bugs",
+                column: "QuotationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Clients_CompanyId",
                 table: "Clients",
                 column: "CompanyId");
@@ -390,6 +456,11 @@ namespace G3NexusBackend.Migrations
                 name: "IX_EmployeeProjects_ProjectId",
                 table: "EmployeeProjects",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_ClientId",
+                table: "Payments",
+                column: "ClientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_ProjectId",
@@ -412,6 +483,16 @@ namespace G3NexusBackend.Migrations
                 column: "TermsConditionsTCId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_QuotationBugs_BugId",
+                table: "QuotationBugs",
+                column: "BugId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuotationBugs_QuotationId",
+                table: "QuotationBugs",
+                column: "QuotationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QuotationCosts_ProjectId",
                 table: "QuotationCosts",
                 column: "ProjectId",
@@ -426,6 +507,21 @@ namespace G3NexusBackend.Migrations
                 name: "IX_QuotationRequirements_RequirementId",
                 table: "QuotationRequirements",
                 column: "RequirementId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotations_ClientId",
+                table: "Quotations",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotations_EmployeeId",
+                table: "Quotations",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotations_ProjectId",
+                table: "Quotations",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Requirements_ClientId",
@@ -446,9 +542,6 @@ namespace G3NexusBackend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Bugs");
-
-            migrationBuilder.DropTable(
                 name: "EmployeeProjects");
 
             migrationBuilder.DropTable(
@@ -456,6 +549,9 @@ namespace G3NexusBackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProjectTermsConditions");
+
+            migrationBuilder.DropTable(
+                name: "QuotationBugs");
 
             migrationBuilder.DropTable(
                 name: "QuotationCosts");
@@ -470,22 +566,25 @@ namespace G3NexusBackend.Migrations
                 name: "Verifications");
 
             migrationBuilder.DropTable(
-                name: "Employees");
+                name: "TermsConditions");
 
             migrationBuilder.DropTable(
-                name: "TermsConditions");
+                name: "Bugs");
 
             migrationBuilder.DropTable(
                 name: "Requirements");
 
             migrationBuilder.DropTable(
+                name: "Quotations");
+
+            migrationBuilder.DropTable(
                 name: "Clients");
 
             migrationBuilder.DropTable(
-                name: "Projects");
+                name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "Quotations");
+                name: "Projects");
 
             migrationBuilder.DropTable(
                 name: "Company");

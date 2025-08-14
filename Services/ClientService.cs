@@ -22,7 +22,7 @@ public class ClientService : IClientService
             .Where(c => c.IsActive) // Only get active clients
             .Select(c => new ClientDTO
             {
-                Id = c.Id,
+                Id = c.ClientId,
                 Name = c.Name,
                 ContactNo = c.ContactNo,
                 Email = c.Email,
@@ -44,7 +44,7 @@ public class ClientService : IClientService
 
         return new ClientDTO
         {
-            Id = client.Id,
+            Id = client.ClientId,
             Name = client.Name,
             ContactNo = client.ContactNo,
             Email = client.Email,
@@ -94,7 +94,7 @@ public class ClientService : IClientService
         _context.Clients.Add(client);
         await _context.SaveChangesAsync();
 
-        clientDto.Id = client.Id;
+        clientDto.Id = client.ClientId;
         
         var emailTemplate = await _emailService.GetEmailTemplateAsync("PasswordEmailTemplate.html");
         emailTemplate = emailTemplate.Replace("{{Name}}", clientDto.Name)
@@ -137,7 +137,7 @@ public class ClientService : IClientService
             throw new KeyNotFoundException("Client not found or already inactive.");
         }
 
-        var clientRequirements = await _context.Requirements.Where(r => r.ClientId == client.Id).Select(r => r.RequirementTitle).ToListAsync();
+        var clientRequirements = await _context.Requirements.Where(r => r.ClientId == client.ClientId).Select(r => r.RequirementTitle).ToListAsync();
         if (clientRequirements.Any())
         {
             return new ApiResponse
@@ -148,7 +148,7 @@ public class ClientService : IClientService
             };
         }
 
-        var clientBugs = await _context.Bugs.Where(r => r.ClientId == client.Id).Select(r => r.BugTitle).ToListAsync();
+        var clientBugs = await _context.Bugs.Where(r => r.ClientId == client.ClientId).Select(r => r.BugTitle).ToListAsync();
         if (clientBugs.Any())
         {
             return new ApiResponse
@@ -174,7 +174,7 @@ public class ClientService : IClientService
                         c.IsActive)
             .Select(c => new ClientDTO
             {
-                Id = c.Id,
+                Id = c.ClientId,
                 Name = c.Name,
                 Email = c.Email,
                 ContactNo = c.ContactNo,

@@ -82,7 +82,7 @@ public class PaymentService : IPaymentService
             throw new KeyNotFoundException($"Project with ID {paymentDto.ProjectId} not found.");
         }
 
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == paymentDto.ClientId);
+        var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == paymentDto.ClientId);
         if (!clientExists)
         {
             throw new KeyNotFoundException($"Client with ID {paymentDto.ClientId} not found.");
@@ -142,7 +142,7 @@ public class PaymentService : IPaymentService
             throw new KeyNotFoundException($"Project with ID {paymentDto.ProjectId} not found.");
         }
 
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == paymentDto.ClientId);
+        var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == paymentDto.ClientId);
         if (!clientExists)
         {
             throw new KeyNotFoundException($"Client with ID {paymentDto.ClientId} not found.");

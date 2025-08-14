@@ -83,11 +83,11 @@ namespace G3NexusBackend.Migrations
 
             modelBuilder.Entity("Client", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ClientId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientId"), 1L, 1);
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -129,7 +129,7 @@ namespace G3NexusBackend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ClientId");
 
                     b.HasIndex("CompanyId");
 
@@ -383,13 +383,7 @@ namespace G3NexusBackend.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EmployeeId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProjectId1")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalCost")
@@ -406,11 +400,7 @@ namespace G3NexusBackend.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.HasIndex("EmployeeId1");
-
                     b.HasIndex("ProjectId");
-
-                    b.HasIndex("ProjectId1");
 
                     b.ToTable("Quotations", (string)null);
                 });
@@ -763,24 +753,16 @@ namespace G3NexusBackend.Migrations
                         .IsRequired();
 
                     b.HasOne("Employee", "Employee")
-                        .WithMany()
+                        .WithMany("CreatedQuotations")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Employee", null)
-                        .WithMany("CreatedQuotations")
-                        .HasForeignKey("EmployeeId1");
-
                     b.HasOne("G3NexusBackend.Models.Project", "Project")
-                        .WithMany()
+                        .WithMany("Quotations")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("G3NexusBackend.Models.Project", null)
-                        .WithMany("Quotations")
-                        .HasForeignKey("ProjectId1");
 
                     b.Navigation("Client");
 

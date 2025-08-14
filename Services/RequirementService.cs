@@ -172,12 +172,12 @@ public class RequirementService : IRequirementService
     public async Task<RequirementDTO> CreateRequirementAsync(RequirementDTO requirementDto)
     {
         var clientId = await _context.Clients
-            .Where(c => c.Id == requirementDto.ClientId && c.IsActive)
-            .Select(c => c.Id)
+            .Where(c => c.ClientId == requirementDto.ClientId && c.IsActive)
+            .Select(c => c.ClientId)
             .FirstOrDefaultAsync();
 
         // Validate the client exists and is active
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == clientId && c.IsActive);
+        var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == clientId && c.IsActive);
         if (!clientExists)
         {
             throw new KeyNotFoundException($"Client with ID {clientId} not found.");
@@ -185,7 +185,7 @@ public class RequirementService : IRequirementService
 
         // Ensure the client has an active company
         var clientCompany = await _context.Clients
-            .Where(c => c.Id == clientId)
+            .Where(c => c.ClientId == clientId)
             .Include(c => c.Company)
             .Where(c => c.Company.IsActive)
             .Select(c => c.Company)
@@ -232,7 +232,7 @@ public class RequirementService : IRequirementService
             throw new KeyNotFoundException($"Requirement with ID {requirementId} not found or already inactive.");
         }
 
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == requirementDto.ClientId);
+        var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == requirementDto.ClientId);
         if (!clientExists)
         {
             throw new KeyNotFoundException($"Client with ID {requirementDto.ClientId} not found.");
@@ -285,6 +285,20 @@ public class RequirementService : IRequirementService
             if (requirement == null)
             {
                 return new ApiResponse { Status = false, Message = "Requirement not found or inactive." };
+            }
+
+            // Validate EmployeeId exists
+            if (_context.Employees == null)
+            {
+                return new ApiResponse { Status = false, Message = "Database context error." };
+            }
+
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.EmployeeId == quotationRequest.EmployeeId && e.IsActive);
+
+            if (employee == null)
+            {
+                return new ApiResponse { Status = false, Message = "Employee not found or inactive." };
             }
 
             if (requirement.Client == null)
@@ -384,6 +398,12 @@ public class RequirementService : IRequirementService
 
                 // 3. Get all selected requirements with related entities in a single query
                 var requirementIds = bulkQuotationRequest.SelectedRequirements.Select(sr => sr.RequirementId).ToList();
+                
+                if (_context.Requirements == null)
+                {
+                    return new ApiResponse { Status = false, Message = "Database context error." };
+                }
+
                 var requirements = await _context.Requirements
                     .Include(r => r.Client)
                     .Include(r => r.Project)
@@ -412,6 +432,20 @@ public class RequirementService : IRequirementService
                 if (firstRequirement.Client == null || firstRequirement.Project == null)
                 {
                     return new ApiResponse { Status = false, Message = "Client or project information not found." };
+                }
+
+                // 5.5. Validate EmployeeId exists
+                if (_context.Employees == null)
+                {
+                    return new ApiResponse { Status = false, Message = "Database context error." };
+                }
+
+                var employee = await _context.Employees
+                    .FirstOrDefaultAsync(e => e.EmployeeId == bulkQuotationRequest.EmployeeId && e.IsActive);
+
+                if (employee == null)
+                {
+                    return new ApiResponse { Status = false, Message = "Employee not found or inactive." };
                 }
 
                 // 6. Calculate total cost from selected requirements

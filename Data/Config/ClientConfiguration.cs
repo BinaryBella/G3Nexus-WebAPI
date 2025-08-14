@@ -11,7 +11,7 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.ToTable("Clients");
 
         // Primary Key
-        builder.HasKey(c => c.Id);
+        builder.HasKey(c => c.ClientId);
 
         // Properties
         builder.Property(c => c.Name)
@@ -55,6 +55,12 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
             .HasForeignKey(b => b.ClientId)
             .OnDelete(DeleteBehavior.Cascade); // Cascade delete
 
+
+        builder.HasMany(q => q.Quotations)
+            .WithOne(c => c.Client)
+            .HasForeignKey(q => q.ClientId)
+            .OnDelete(DeleteBehavior.Restrict);
+            
         // // Foreign Keys and Relationships
         // builder.HasOne(r => r.Company)
         //     .WithMany(c => c.Clients)

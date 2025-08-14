@@ -25,24 +25,5 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
             .HasColumnType("decimal(18, 2)")
             .IsRequired();
 
-        // Relationships with NO ACTION to prevent cascade cycles
-        
-        // Relationship with Client - NO ACTION to prevent cycles
-        builder.HasOne(q => q.Client)
-            .WithMany(c => c.Quotations)
-            .HasForeignKey(q => q.ClientId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Relationship with Project - NO ACTION to prevent cycles
-        builder.HasOne(q => q.Project)
-            .WithMany()
-            .HasForeignKey(q => q.ProjectId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Relationship with Employee - NO ACTION to prevent cycles
-        builder.HasOne(q => q.Employee)
-            .WithMany()
-            .HasForeignKey(q => q.EmployeeId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

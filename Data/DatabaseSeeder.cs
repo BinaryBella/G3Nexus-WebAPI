@@ -290,7 +290,7 @@ namespace G3NexusBackend.Data
                 {
                     new Requirement
                     {
-                        ClientId = clients[0].Id,
+                        ClientId = clients[0].ClientId,
                         ProjectId = projects[0].ProjectId,
                         RequirementTitle = "User Authentication System",
                         Priority = "High",
@@ -302,7 +302,7 @@ namespace G3NexusBackend.Data
                     },
                     new Requirement
                     {
-                        ClientId = clients[0].Id,
+                        ClientId = clients[0].ClientId,
                         ProjectId = projects[0].ProjectId,
                         RequirementTitle = "Shopping Cart Functionality",
                         Priority = "High",
@@ -314,7 +314,7 @@ namespace G3NexusBackend.Data
                     },
                     new Requirement
                     {
-                        ClientId = clients[1].Id,
+                        ClientId = clients[1].ClientId,
                         ProjectId = projects[1].ProjectId,
                         RequirementTitle = "Biometric Authentication",
                         Priority = "High",
@@ -326,7 +326,7 @@ namespace G3NexusBackend.Data
                     },
                     new Requirement
                     {
-                        ClientId = clients[2].Id,
+                        ClientId = clients[2].ClientId,
                         ProjectId = projects[2].ProjectId,
                         RequirementTitle = "Lead Management",
                         Priority = "Medium",
@@ -346,7 +346,7 @@ namespace G3NexusBackend.Data
                 {
                     new Quotation
                     {
-                        ClientId = clients[0].Id,
+                        ClientId = clients[0].ClientId,
                         ProjectId = projects[0].ProjectId,
                         EmployeeId = employees[0].EmployeeId,
                         CreatedDate = DateTime.Now.AddDays(-55),
@@ -355,7 +355,7 @@ namespace G3NexusBackend.Data
                     },
                     new Quotation
                     {
-                        ClientId = clients[1].Id,
+                        ClientId = clients[1].ClientId,
                         ProjectId = projects[1].ProjectId,
                         EmployeeId = employees[1].EmployeeId,
                         CreatedDate = DateTime.Now.AddDays(-40),
@@ -364,7 +364,7 @@ namespace G3NexusBackend.Data
                     },
                     new Quotation
                     {
-                        ClientId = clients[2].Id,
+                        ClientId = clients[2].ClientId,
                         ProjectId = projects[2].ProjectId,
                         EmployeeId = employees[2].EmployeeId,
                         CreatedDate = DateTime.Now.AddDays(-25),
@@ -393,7 +393,7 @@ namespace G3NexusBackend.Data
                 {
                     new Bug
                     {
-                        ClientId = clients[0].Id,
+                        ClientId = clients[0].ClientId,
                         ProjectId = projects[0].ProjectId,
                         BugTitle = "Login page not responsive on mobile",
                         Severity = "Medium",
@@ -405,7 +405,7 @@ namespace G3NexusBackend.Data
                     },
                     new Bug
                     {
-                        ClientId = clients[0].Id,
+                        ClientId = clients[0].ClientId,
                         ProjectId = projects[0].ProjectId,
                         BugTitle = "Payment gateway timeout error",
                         Severity = "High",
@@ -417,7 +417,7 @@ namespace G3NexusBackend.Data
                     },
                     new Bug
                     {
-                        ClientId = clients[1].Id,
+                        ClientId = clients[1].ClientId,
                         ProjectId = projects[1].ProjectId,
                         BugTitle = "Biometric authentication fails on some devices",
                         Severity = "High",
@@ -438,6 +438,7 @@ namespace G3NexusBackend.Data
                     new Payment
                     {
                         ProjectId = projects[0].ProjectId,
+                        ClientId = clients[0].ClientId,
                         PaymentAmount = 48000.00m,
                         PaymentType = "Initial Payment",
                         PaymentDescription = "30% initial payment for E-Commerce Platform project",
@@ -447,6 +448,7 @@ namespace G3NexusBackend.Data
                     new Payment
                     {
                         ProjectId = projects[0].ProjectId,
+                        ClientId = clients[0].ClientId,
                         PaymentAmount = 64000.00m,
                         PaymentType = "Milestone Payment",
                         PaymentDescription = "40% payment after completing authentication module",
@@ -456,6 +458,7 @@ namespace G3NexusBackend.Data
                     new Payment
                     {
                         ProjectId = projects[1].ProjectId,
+                        ClientId = clients[1].ClientId,
                         PaymentAmount = 25500.00m,
                         PaymentType = "Initial Payment",
                         PaymentDescription = "30% initial payment for Mobile Banking App",

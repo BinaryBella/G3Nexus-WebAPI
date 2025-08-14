@@ -69,12 +69,12 @@ public class BugService : IBugService
     public async Task<BugDTO> CreateBugAsync(BugDTO bugDto)
     {
         var clientId = await _context.Clients
-            .Where(c => c.Id == bugDto.ClientId && c.IsActive)
-            .Select(c => c.Id)
+            .Where(c => c.ClientId == bugDto.ClientId && c.IsActive)
+            .Select(c => c.ClientId)
             .FirstOrDefaultAsync();
 
         // Validate the client exists and is active
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == clientId && c.IsActive);
+        var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == clientId && c.IsActive);
         if (!clientExists)
         {
             throw new KeyNotFoundException($"Client with ID {clientId} not found.");
@@ -82,7 +82,7 @@ public class BugService : IBugService
 
         // Ensure the client has an active company
         var clientCompany = await _context.Clients
-            .Where(c => c.Id == clientId)
+            .Where(c => c.ClientId == clientId)
             .Include(c => c.Company)
             .Where(c => c.Company.IsActive)
             .Select(c => c.Company)
@@ -128,7 +128,7 @@ public class BugService : IBugService
             throw new KeyNotFoundException($"Bug with ID {bugId} not found or already inactive.");
         }
 
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == bugDto.ClientId);
+        var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == bugDto.ClientId);
         if (!clientExists)
         {
             throw new KeyNotFoundException($"Client with ID {bugDto.ClientId} not found.");
@@ -191,6 +191,20 @@ public class BugService : IBugService
             if (bug.Project == null)
             {
                 return new ApiResponse { Status = false, Message = "Project information not found." };
+            }
+
+            // Validate EmployeeId exists
+            if (_context.Employees == null)
+            {
+                return new ApiResponse { Status = false, Message = "Database context error." };
+            }
+
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.EmployeeId == quotationRequest.EmployeeId && e.IsActive);
+
+            if (employee == null)
+            {
+                return new ApiResponse { Status = false, Message = "Employee not found or inactive." };
             }
 
             // Generate PDF quotation
@@ -287,6 +301,12 @@ public class BugService : IBugService
 
             // Get all selected bugs with related entities
             var bugIds = bulkQuotationRequest.SelectedBugs.Select(sb => sb.BugId).ToList();
+            
+            if (_context.Bugs == null)
+            {
+                return new ApiResponse { Status = false, Message = "Database context error." };
+            }
+
             var bugs = await _context.Bugs
                 .Include(b => b.Client)
                 .Include(b => b.Project)
@@ -308,6 +328,20 @@ public class BugService : IBugService
             if (firstBug.Client == null || firstBug.Project == null)
             {
                 return new ApiResponse { Status = false, Message = "Client or project information not found." };
+            }
+
+            // Validate EmployeeId exists
+            if (_context.Employees == null)
+            {
+                return new ApiResponse { Status = false, Message = "Database context error." };
+            }
+
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.EmployeeId == bulkQuotationRequest.EmployeeId && e.IsActive);
+
+            if (employee == null)
+            {
+                return new ApiResponse { Status = false, Message = "Employee not found or inactive." };
             }
 
             var totalCost = bulkQuotationRequest.SelectedBugs.Sum(sr => sr.QuotationCost);

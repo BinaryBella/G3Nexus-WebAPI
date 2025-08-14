@@ -37,7 +37,7 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 
         builder.Property(p => p.TotalBudget)
             .HasColumnType("decimal(18, 2)");
-        
+
         builder.Property(b => b.IsActive)
             .IsRequired()
             .HasMaxLength(50);
@@ -46,7 +46,10 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .WithMany(c => c.Projects)
             .HasForeignKey(b => b.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
-        
-        
+
+        builder.HasMany(p => p.Quotations)
+            .WithOne(q => q.Project)
+            .HasForeignKey(q => q.ProjectId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

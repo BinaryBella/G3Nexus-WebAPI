@@ -42,7 +42,7 @@ public class AuthService : IAuthService
             }
 
             var userRole = client?.Role ?? employee?.Role;
-            var userId = client?.Id ?? employee?.EmployeeId;
+            var userId = client?.ClientId ?? employee?.EmployeeId;
 
             // Check the password. Hashed password is saved in the database
             var hashedPassword = client?.Password ?? employee?.Password;
