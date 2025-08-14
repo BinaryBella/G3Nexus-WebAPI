@@ -235,29 +235,6 @@ public class BugService : IBugService
                 bug.Project?.ProjectName ?? "N/A"
             );
 
-            // Prepare Email Body
-            var emailBody = await _emailService.GetEmailTemplateAsync("BugQuotation.html");
-            emailBody = emailBody.Replace("{{ClientAdminName}}", bug.Client?.Name ?? "N/A")
-                                 .Replace("{{BugTitle}}", bug.BugTitle ?? "N/A")
-                                 .Replace("{{ProjectName}}", bug.Project?.ProjectName ?? "N/A")
-                                 .Replace("{{ClientContact}}", bug.Client?.ContactNo ?? "N/A")
-                                 .Replace("{{ClientEmail}}", bug.Client?.Email ?? "N/A")
-                                 .Replace("{{Severity}}", bug.Severity ?? "N/A");
-
-            // Send Email with PDF Attachment
-            await _emailService.SendEmailWithAttachmentAsync(
-                bug.Client?.Email ?? "",
-                $"[Bug Quotation] {bug.BugTitle} - G3NEXUS",
-                emailBody,
-                pdfBytes,
-                $"Bug_Quotation_{bug.BugId}.pdf",
-                isHtml: true
-            );
-
-            // Update bug to mark as quoted
-            bug.IsQuoted = true;
-            _context.Bugs.Update(bug);
-
             // Create quotation
             var quotation = new Quotation
             {
@@ -270,6 +247,32 @@ public class BugService : IBugService
             };
 
             _context.Quotations?.Add(quotation);
+
+            await _context.SaveChangesAsync();
+
+            // Prepare Email Body
+            var emailBody = await _emailService.GetEmailTemplateAsync("BugQuotation.html");
+            emailBody = emailBody.Replace("{{ClientAdminName}}", bug.Client?.Name ?? "N/A")
+                                 .Replace("{{BugTitle}}", bug.BugTitle ?? "N/A")
+                                 .Replace("{{ProjectName}}", bug.Project?.ProjectName ?? "N/A")
+                                 .Replace("{{ClientContact}}", bug.Client?.ContactNo ?? "N/A")
+                                 .Replace("{{ClientEmail}}", bug.Client?.Email ?? "N/A")
+                                 .Replace("{{Severity}}", bug.Severity ?? "N/A")
+                                 .Replace("{{QuotationId}}", quotation.QuotationId.ToString());
+
+            // Send Email with PDF Attachment
+            await _emailService.SendEmailWithAttachmentAsync(
+                bug.Client?.Email ?? "",
+                $"[Bug Quotation] {bug.BugTitle} - G3NEXUS",
+                emailBody,
+                pdfBytes,
+                $"Bug_Quotation_{quotation.QuotationId}.pdf",
+                isHtml: true
+            );
+
+            // Update bug to mark as quoted
+            bug.IsQuoted = true;
+            _context.Bugs.Update(bug);
 
             await _context.SaveChangesAsync();
 
@@ -428,13 +431,17 @@ public class BugService : IBugService
             }
 
             var bugTitles = string.Join(", ", bugs.Select(b => b.BugTitle));
+            var bugDescriptions = string.Join("<br><br>", bugs.Select(b => $"<strong>{b.BugTitle}:</strong> {b.BugDescription}"));
+            
             emailBody = emailBody.Replace("{{ClientAdminName}}", firstBug.Client?.Name ?? "N/A")
                                  .Replace("{{BugTitle}}", bugTitles)
                                  .Replace("{{ProjectName}}", firstBug.Project?.ProjectName ?? "N/A")
                                  .Replace("{{ClientContact}}", firstBug.Client?.ContactNo ?? "N/A")
                                  .Replace("{{ClientEmail}}", firstBug.Client?.Email ?? "N/A")
                                  .Replace("{{TotalCost}}", quotation.TotalCost.ToString("C"))
-                                 .Replace("{{BugCount}}", bugs.Count.ToString());
+                                 .Replace("{{BugCount}}", bugs.Count.ToString())
+                                 .Replace("{{QuotationId}}", quotation.QuotationId.ToString())
+                                 .Replace("{{BugDescription}}", bugDescriptions);
 
             // Send Email with PDF Attachment
             await _emailService.SendEmailWithAttachmentAsync(

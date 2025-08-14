@@ -311,6 +311,20 @@ public class RequirementService : IRequirementService
                 return new ApiResponse { Status = false, Message = "Project information not found." };
             }
 
+            // Create quotation first to get QuotationId
+            var quotation = new Quotation
+            {
+                ClientId = requirement.ClientId,
+                ProjectId = requirement.ProjectId,
+                EmployeeId = quotationRequest.EmployeeId,
+                CreatedDate = DateTime.UtcNow.AddHours(5.5),
+                Type = Constants.RequirementQuotationType,
+                TotalCost = quotationRequest.QuotationCost
+            };
+
+            _context.Quotations?.Add(quotation);
+            await _context.SaveChangesAsync(); // Save to get QuotationId
+
             // Generate PDF quotation
             var pdfBytes = _pdfService.GenerateRequirementQuotation(
                 requirement,
@@ -327,7 +341,8 @@ public class RequirementService : IRequirementService
                                  .Replace("{{ProjectName}}", requirement.Project.ProjectName ?? "N/A")
                                  .Replace("{{ClientContact}}", requirement.Client.ContactNo ?? "N/A")
                                  .Replace("{{ClientEmail}}", requirement.Client.Email ?? "N/A")
-                                 .Replace("{{Priority}}", requirement.Priority ?? "N/A");
+                                 .Replace("{{Priority}}", requirement.Priority ?? "N/A")
+                                 .Replace("{{QuotationId}}", quotation.QuotationId.ToString());
 
             // Send Email with PDF Attachment
             await _emailService.SendEmailWithAttachmentAsync(
@@ -335,25 +350,13 @@ public class RequirementService : IRequirementService
                 $"[Requirement Quotation] {requirement.RequirementTitle} - G3NEXUS",
                 emailBody,
                 pdfBytes,
-                $"Requirement_Quotation_{requirement.RequirementId}.pdf",
+                $"Requirement_Quotation_{quotation.QuotationId}.pdf",
                 isHtml: true
             );
 
             // Update requirement to mark as quoted
             requirement.IsQuoted = true;
             _context.Requirements.Update(requirement);
-
-            var quotation = new Quotation
-            {
-                ClientId = requirement.ClientId,
-                ProjectId = requirement.ProjectId,
-                EmployeeId = quotationRequest.EmployeeId,
-                CreatedDate = DateTime.UtcNow.AddHours(5.5),
-                Type = Constants.RequirementQuotationType,
-                TotalCost = quotationRequest.QuotationCost
-            };
-
-            _context.Quotations?.Add(quotation);
 
             await _context.SaveChangesAsync();
 
