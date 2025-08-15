@@ -22,7 +22,7 @@ public class ClientService : IClientService
             .Where(c => c.IsActive) // Only get active clients
             .Select(c => new ClientDTO
             {
-                Id = c.ClientId,
+                ClientId = c.ClientId,
                 Name = c.Name,
                 ContactNo = c.ContactNo,
                 Email = c.Email,
@@ -44,7 +44,7 @@ public class ClientService : IClientService
 
         return new ClientDTO
         {
-            Id = client.ClientId,
+            ClientId = client.ClientId,
             Name = client.Name,
             ContactNo = client.ContactNo,
             Email = client.Email,
@@ -94,7 +94,7 @@ public class ClientService : IClientService
         _context.Clients.Add(client);
         await _context.SaveChangesAsync();
 
-        clientDto.Id = client.ClientId;
+        clientDto.ClientId = client.ClientId;
         
         var emailTemplate = await _emailService.GetEmailTemplateAsync("PasswordEmailTemplate.html");
         emailTemplate = emailTemplate.Replace("{{Name}}", clientDto.Name)
@@ -111,7 +111,7 @@ public class ClientService : IClientService
     }
     public async Task<ClientEditDTO?> UpdateClientAsync(ClientEditDTO clientDto)
     {
-        var client = await _context.Clients.FindAsync(clientDto.Id);
+        var client = await _context.Clients.FindAsync(clientDto.ClientId);
         if (client is not {IsActive: true})
         {
             return null;
@@ -174,7 +174,7 @@ public class ClientService : IClientService
                         c.IsActive)
             .Select(c => new ClientDTO
             {
-                Id = c.ClientId,
+                ClientId = c.ClientId,
                 Name = c.Name,
                 Email = c.Email,
                 ContactNo = c.ContactNo,

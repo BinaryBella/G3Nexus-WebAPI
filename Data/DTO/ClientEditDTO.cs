@@ -4,7 +4,7 @@ namespace G3NexusBackend.Data.DTO
 {
     public class ClientEditDTO
     {
-        public int Id { get; set; }
+        public int ClientId { get; set; }
         public string Name { get; set; }
         public string ContactNo { get; set; }
 

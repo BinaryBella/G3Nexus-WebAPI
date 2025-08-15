@@ -43,7 +43,7 @@ namespace G3NexusBackend.Controllers
                 return BadRequest(response);
             }
 
-            return CreatedAtAction(nameof(GetClientById), new { id = ((ClientDTO)response.Data).Id }, response);
+            return CreatedAtAction(nameof(GetClientById), new { id = ((ClientDTO)response.Data).ClientId }, response);
         }
 
         [HttpPut]
