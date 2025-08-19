@@ -270,8 +270,9 @@ public class BugService : IBugService
                 isHtml: true
             );
 
-            // Update bug to mark as quoted
+            // Update bug to mark as quoted and link to quotation
             bug.IsQuoted = true;
+            bug.QuotationId = quotation.QuotationId;
             _context.Bugs.Update(bug);
 
             await _context.SaveChangesAsync();

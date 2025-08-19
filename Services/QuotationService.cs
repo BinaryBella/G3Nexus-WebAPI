@@ -16,28 +16,83 @@ namespace G3NexusBackend.Services
 
         public async Task<List<QuotationDisplayDTO>> GetAllQuotationsAsync()
         {
-            return await _context.Quotations!
+            var quotations = await _context.Quotations!
                 .Include(q => q.Client)
                 .Include(q => q.Project)
                 .Include(q => q.Employee)
-                .Select(q => new QuotationDisplayDTO
-                {
-                    QuotationId = q.QuotationId,
-                    ClientId = q.ClientId,
-                    ClientName = q.Client != null ? q.Client.Name : "Unknown",
-                    ClientEmail = q.Client != null ? q.Client.Email : "Unknown",
-                    ProjectId = q.ProjectId,
-                    ProjectName = q.Project != null ? q.Project.ProjectName : "Unknown",
-                    ProjectDescription = q.Project != null ? q.Project.ProjectDescription : "Unknown",
-                    EmployeeId = q.EmployeeId,
-                    EmployeeName = q.Employee != null ? q.Employee.Name : "Unknown",
-                    EmployeeEmail = q.Employee != null ? q.Employee.Email : "Unknown",
-                    CreatedDate = q.CreatedDate,
-                    Type = q.Type,
-                    TotalCost = q.TotalCost
-                })
                 .OrderByDescending(q => q.CreatedDate)
                 .ToListAsync();
+
+            var result = new List<QuotationDisplayDTO>();
+
+            foreach (var quotation in quotations)
+            {
+                var quotationDto = new QuotationDisplayDTO
+                {
+                    QuotationId = quotation.QuotationId,
+                    ClientId = quotation.ClientId,
+                    ClientName = quotation.Client?.Name ?? "Unknown",
+                    ClientEmail = quotation.Client?.Email ?? "Unknown",
+                    ProjectId = quotation.ProjectId,
+                    ProjectName = quotation.Project?.ProjectName ?? "Unknown",
+                    ProjectDescription = quotation.Project?.ProjectDescription ?? "Unknown",
+                    EmployeeId = quotation.EmployeeId,
+                    EmployeeName = quotation.Employee?.Name ?? "Unknown",
+                    EmployeeEmail = quotation.Employee?.Email ?? "Unknown",
+                    CreatedDate = quotation.CreatedDate,
+                    Type = quotation.Type,
+                    TotalCost = quotation.TotalCost,
+                    Items = new List<QuotationItemDTO>()
+                };
+
+                // Get requirements for this quotation (using direct relationship)
+                var requirements = await _context.Requirements!
+                    .Where(r => r.QuotationId == quotation.QuotationId)
+                    .ToListAsync();
+
+                foreach (var req in requirements)
+                {
+                    quotationDto.Items.Add(new QuotationItemDTO
+                    {
+                        ItemId = req.RequirementId,
+                        ItemType = "Requirement",
+                        Title = req.RequirementTitle ?? "No title",
+                        Description = req.RequirementDescription ?? "No description",
+                        Category = req.RequirementTitle ?? "General",
+                        Priority = req.Priority ?? "Medium",
+                        Cost = quotation.TotalCost, // Since we don't have individual costs, use total
+                        Attachment = req.Attachment,
+                        IsActive = req.IsActive,
+                        CreatedAt = req.CreatedAt
+                    });
+                }
+
+                // Get bugs for this quotation (using direct relationship)
+                var bugs = await _context.Bugs!
+                    .Where(b => b.QuotationId == quotation.QuotationId)
+                    .ToListAsync();
+
+                foreach (var bug in bugs)
+                {
+                    quotationDto.Items.Add(new QuotationItemDTO
+                    {
+                        ItemId = bug.BugId,
+                        ItemType = "Bug",
+                        Title = bug.BugTitle ?? "No title",
+                        Description = bug.BugDescription ?? "No description",
+                        Category = bug.BugTitle ?? "General",
+                        Priority = bug.Severity ?? "Medium",
+                        Cost = quotation.TotalCost, // Since we don't have individual costs, use total
+                        Attachment = bug.Attachment,
+                        IsActive = bug.IsActive,
+                        CreatedAt = bug.CreatedAt
+                    });
+                }
+
+                result.Add(quotationDto);
+            }
+
+            return result;
         }
 
         public async Task<QuotationDetailDTO?> GetQuotationByIdAsync(int quotationId)
@@ -280,6 +335,51 @@ namespace G3NexusBackend.Services
                 LatestQuotationDate = quotations.Max(q => q.CreatedDate),
                 OldestQuotationDate = quotations.Min(q => q.CreatedDate)
             };
+        }
+
+        public async Task<List<QuotationItemDTO>> GetQuotationItemsAsync(int quotationId)
+        {
+            var items = new List<QuotationItemDTO>();
+
+            // Get requirements for this quotation
+            var quotationRequirements = await _context.QuotationRequirements!
+                .Include(qr => qr.Requirement)
+                .Where(qr => qr.QuotationId == quotationId)
+                .ToListAsync();
+
+            foreach (var qr in quotationRequirements)
+            {
+                items.Add(new QuotationItemDTO
+                {
+                    ItemId = qr.RequirementId,
+                    ItemType = "Requirement",
+                    Description = qr.Requirement?.RequirementDescription ?? "No description",
+                    Category = qr.Requirement?.RequirementTitle ?? "General",
+                    Priority = qr.Requirement?.Priority ?? "Medium",
+                    Cost = qr.RequirementCost
+                });
+            }
+
+            // Get bugs for this quotation
+            var quotationBugs = await _context.QuotationBugs!
+                .Include(qb => qb.Bug)
+                .Where(qb => qb.QuotationId == quotationId)
+                .ToListAsync();
+
+            foreach (var qb in quotationBugs)
+            {
+                items.Add(new QuotationItemDTO
+                {
+                    ItemId = qb.BugId,
+                    ItemType = "Bug",
+                    Description = qb.Bug?.BugDescription ?? "No description",
+                    Category = qb.Bug?.BugTitle ?? "General",
+                    Priority = qb.Bug?.Severity ?? "Medium",
+                    Cost = qb.BugCost
+                });
+            }
+
+            return items.OrderBy(i => i.ItemType).ThenBy(i => i.ItemId).ToList();
         }
     }
 }

@@ -170,5 +170,24 @@ namespace G3NexusBackend.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while retrieving quotation summary.", error = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Get detailed items (requirements/bugs) for a specific quotation for modal popup display
+        /// </summary>
+        /// <param name="quotationId">Quotation ID</param>
+        /// <returns>List of requirements and bugs with descriptions for the specified quotation</returns>
+        [HttpGet("{quotationId}/items")]
+        public async Task<IActionResult> GetQuotationItems(int quotationId)
+        {
+            try
+            {
+                var items = await _quotationService.GetQuotationItemsAsync(quotationId);
+                return Ok(new { success = true, data = items });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while retrieving quotation items.", error = ex.Message });
+            }
+        }
     }
 }

@@ -354,8 +354,9 @@ public class RequirementService : IRequirementService
                 isHtml: true
             );
 
-            // Update requirement to mark as quoted
+            // Update requirement to mark as quoted and link to quotation
             requirement.IsQuoted = true;
+            requirement.QuotationId = quotation.QuotationId;
             _context.Requirements.Update(requirement);
 
             await _context.SaveChangesAsync();

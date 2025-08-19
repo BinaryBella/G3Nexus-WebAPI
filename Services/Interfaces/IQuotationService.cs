@@ -12,5 +12,6 @@ namespace G3NexusBackend.Services.Interfaces
         Task<List<QuotationDisplayDTO>> GetQuotationsByTypeAsync(string type);
         Task<List<QuotationDisplayDTO>> GetQuotationsByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<QuotationSummaryDTO> GetQuotationSummaryAsync();
+        Task<List<QuotationItemDTO>> GetQuotationItemsAsync(int quotationId);
     }
 }
