@@ -327,6 +327,19 @@ public class ProjectService : IProjectService
             return new ApiResponse { Status = false, Message = "Project not found or already inactive." };
         }
 
+        var requirements = _context.Requirements!.Where(r => r.ProjectId == projectId && r.IsActive).Any();
+        var bugs = _context.Bugs!.Where(b => b.ProjectId == projectId && b.IsActive).Any();
+
+        if (requirements)
+        {
+            return new ApiResponse { Status = false, Message = "Project cannot be deactivated while it has active requirements." };
+        }
+
+        if (bugs)
+        {
+            return new ApiResponse { Status = false, Message = "Project cannot be deactivated while it has active bugs." };
+        }
+
         project.IsActive = false;
         _context.Projects.Update(project);
         await _context.SaveChangesAsync();

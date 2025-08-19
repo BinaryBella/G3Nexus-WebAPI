@@ -113,6 +113,15 @@ public async Task<CompanyDTO?> GetCompanyByIdAsync(int CompanyId)
             return new ApiResponse { Status = false, Message = "This company has associated clients and cannot be deleted. Please remove all clients before deleting the company." };
         }
 
+        var activeProjects = await _context.Projects
+            .Where(p => p.CompanyId == CompanyId && p.IsActive)
+            .ToListAsync();
+
+        if (activeProjects.Any())
+        {
+            return new ApiResponse { Status = false, Message = "This company has associated projects and cannot be deleted. Please remove all projects before deleting the company." };
+        }
+
         company.IsActive = false;
         _context.Companies.Update(company);
         await _context.SaveChangesAsync();
