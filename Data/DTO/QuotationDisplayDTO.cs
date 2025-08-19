@@ -15,7 +15,7 @@ namespace G3NexusBackend.Data.DTO
         public string EmployeeName { get; set; } = string.Empty;
         public string EmployeeEmail { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
-        public string Type { get; set; } = string.Empty; // "Bug" or "Requirement"
+        public string Type { get; set; } = string.Empty;
         public decimal TotalCost { get; set; }
         
         // Additional fields for modal popup display
