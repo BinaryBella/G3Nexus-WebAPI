@@ -27,6 +27,7 @@ public class EmployeeService : IEmployeeService
                 Email = e.Email,
                 Address = e.Address,
                 Role = e.Role,
+                ProfileImageUrl = e.ProfileImageUrl,
                 IsActive = e.IsActive
             })
             .ToListAsync();
@@ -48,6 +49,7 @@ public class EmployeeService : IEmployeeService
             Email = employee.Email,
             Address = employee.Address,
             Role = employee.Role,
+            ProfileImageUrl = employee.ProfileImageUrl,
             IsActive = employee.IsActive
         };
     }

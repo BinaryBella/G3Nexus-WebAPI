@@ -28,6 +28,7 @@ public class ClientService : IClientService
                 Email = c.Email,
                 Address = c.Address,
                 Role = c.Role,
+                ProfileImageUrl = c.ProfileImageUrl,
                 IsActive = c.IsActive,
                 CompanyId = c.CompanyId
             })
@@ -50,6 +51,7 @@ public class ClientService : IClientService
             Email = client.Email,
             Address = client.Address,
             Role = client.Role,
+            ProfileImageUrl = client.ProfileImageUrl,
             IsActive = client.IsActive,
             CompanyId = client.CompanyId
         };
@@ -87,6 +89,7 @@ public class ClientService : IClientService
             Address = clientDto.Address,
             Password = BCrypt.Net.BCrypt.HashPassword(clientDto.Password),
             Role = clientDto.Role,
+            ProfileImageUrl = clientDto.ProfileImageUrl,
             IsActive = true,
             CompanyId = clientDto.CompanyId
         };
