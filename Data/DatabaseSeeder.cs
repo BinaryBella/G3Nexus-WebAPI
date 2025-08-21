@@ -118,7 +118,7 @@ namespace G3NexusBackend.Data
                         Email = "bob.arch@g3nexus.com",
                         Address = "200 Architect Avenue",
                         Password = BCrypt.Net.BCrypt.HashPassword("ArchPassword123!"),
-                        Role = "COMPANY_USER",
+                        Role = "COMPANY_ADMIN",
                         IsActive = true
                     },
                     new Employee
@@ -128,7 +128,7 @@ namespace G3NexusBackend.Data
                         Email = "carol.test@g3nexus.com",
                         Address = "300 QA Street",
                         Password = BCrypt.Net.BCrypt.HashPassword("TestPassword123!"),
-                        Role = "COMPANY_USER",
+                        Role = "COMPANY_DEVELOPER",
                         IsActive = true
                     },
                     new Employee
@@ -138,7 +138,7 @@ namespace G3NexusBackend.Data
                         Email = "david.mgr@g3nexus.com",
                         Address = "400 Management Road",
                         Password = BCrypt.Net.BCrypt.HashPassword("MgrPassword123!"),
-                        Role = "COMPANY_USER",
+                        Role = "COMPANY_DEVELOPER",
                         IsActive = true
                     }
                 };
