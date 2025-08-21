@@ -11,4 +11,5 @@ public interface IAuthService
     Task CreateVerificationTokenAsync(string email);
     Task<bool> IsValidVerificationToken(string email, string verificationCode);
     Task<bool> ChangePasswordAsync(string email, string newPassword);
+    Task<ApiResponse> ChangePasswordWithValidationAsync(string email, ChangePasswordDTO changePasswordDto);
 }

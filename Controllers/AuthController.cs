@@ -117,4 +117,30 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Password reset successfully" });
     }
     
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDto)
+    {
+        var userEmail = User.FindFirst(ClaimTypes.Email)?.Value ?? User.FindFirst(ClaimTypes.Name)?.Value ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized(new { message = "Invalid user" });
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await _authService.ChangePasswordWithValidationAsync(userEmail, changePasswordDto);
+        
+        if (result.Status)
+        {
+            return Ok(result);
+        }
+        
+        return BadRequest(result);
+    }
+    
 }

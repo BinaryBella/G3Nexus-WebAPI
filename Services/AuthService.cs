@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using G3NexusBackend.Data;
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Models;
 using G3NexusBackend.Services.Interfaces;
@@ -266,6 +267,58 @@ public class AuthService : IAuthService
 
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<ApiResponse> ChangePasswordWithValidationAsync(string email, ChangePasswordDTO changePasswordDto)
+    {
+        try
+        {
+            // Find the user (client or employee)
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email && c.IsActive);
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email && e.IsActive);
+
+            if (client == null && employee == null)
+            {
+                return new ApiResponse { Status = false, Message = "User not found" };
+            }
+
+            // Get the current hashed password
+            var currentHashedPassword = client?.Password ?? employee?.Password;
+
+            // Verify the current password
+            if (!BCrypt.Net.BCrypt.Verify(changePasswordDto.CurrentPassword, currentHashedPassword))
+            {
+                return new ApiResponse { Status = false, Message = "Current password is incorrect" };
+            }
+
+            // Check if new password is different from current password
+            if (BCrypt.Net.BCrypt.Verify(changePasswordDto.NewPassword, currentHashedPassword))
+            {
+                return new ApiResponse { Status = false, Message = "New password must be different from current password" };
+            }
+
+            // Update the password
+            var newHashedPassword = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
+
+            if (client != null)
+            {
+                client.Password = newHashedPassword;
+                _context.Clients.Update(client);
+            }
+            else if (employee != null)
+            {
+                employee.Password = newHashedPassword;
+                _context.Employees.Update(employee);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new ApiResponse { Status = true, Message = "Password changed successfully" };
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse { Status = false, Message = $"An error occurred: {ex.Message}" };
+        }
     }
 
 }
