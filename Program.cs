@@ -47,7 +47,6 @@ builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
 builder.Services.AddScoped<IQuotationCostService, QuotationCostService>();
 builder.Services.AddScoped<IQuotationService, QuotationService>();
-builder.Services.AddScoped<IPerformanceChartsService, PerformanceChartsService>();
 
 
 // Add Swagger with JWT Authentication support
