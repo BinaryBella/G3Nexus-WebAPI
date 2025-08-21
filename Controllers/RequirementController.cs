@@ -83,6 +83,18 @@ namespace G3NexusBackend.Controllers
             }
         }
 
+        [HttpPatch("{id:int}/status")]
+        public async Task<IActionResult> UpdateRequirementStatus(int id, [FromBody] StatusUpdateDTO statusUpdate)
+        {
+            var response = await _requirementService.UpdateRequirementStatusAsync(id, statusUpdate.Status);
+            if (!response.Status)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
+        }
+
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeactivateRequirement(int id)
         {

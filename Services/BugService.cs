@@ -35,6 +35,7 @@ public class BugService : IBugService
             ClientId = b.ClientId,
             ProjectId = b.ProjectId,
             IsNew = b.IsNew,
+            Status = b.Status,
             ClientName = b.Client?.Name,
             ProjectName = b.Project?.ProjectName,
             IsQuoted = b.IsQuoted
@@ -61,6 +62,7 @@ public class BugService : IBugService
             BugDescription = bug.BugDescription,
             Attachment = bug.Attachment,
             IsActive = bug.IsActive,
+            Status = bug.Status,
             ClientId = bug.ClientId,
             ProjectId = bug.ProjectId
         };
@@ -144,13 +146,41 @@ public class BugService : IBugService
         bug.Severity = bugDto.Severity;
         bug.BugDescription = bugDto.BugDescription;
         bug.Attachment = bugDto.Attachment;
+        bug.Status = bugDto.Status;
         bug.ClientId = bugDto.ClientId;
         bug.ProjectId = bugDto.ProjectId;
 
         _context.Bugs.Update(bug);
         await _context.SaveChangesAsync();
 
-        return bugDto;
+        return new BugDTO
+        {
+            BugId = bug.BugId,
+            BugTitle = bug.BugTitle,
+            Severity = bug.Severity,
+            BugDescription = bug.BugDescription,
+            Attachment = bug.Attachment,
+            IsActive = bug.IsActive,
+            IsNew = bug.IsNew,
+            Status = bug.Status,
+            ClientId = bug.ClientId,
+            ProjectId = bug.ProjectId
+        };
+    }
+
+    public async Task<ApiResponse> UpdateBugStatusAsync(int bugId, G3NexusBackend.Models.TaskStatus status)
+    {
+        var bug = await _context.Bugs.FindAsync(bugId);
+        if (bug == null || !bug.IsActive)
+        {
+            return new ApiResponse { Status = false, Message = "Bug not found or already inactive." };
+        }
+
+        bug.Status = status;
+        _context.Bugs.Update(bug);
+        await _context.SaveChangesAsync();
+
+        return new ApiResponse { Status = true, Message = "Bug status updated successfully." };
     }
 
     public async Task<ApiResponse> DeActivateBugAsync(int bugId)

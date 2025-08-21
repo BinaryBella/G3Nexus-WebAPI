@@ -35,6 +35,7 @@ public class RequirementService : IRequirementService
             ClientId = r.ClientId,
             ProjectId = r.ProjectId,
             IsNew = r.IsNew,
+            Status = r.Status,
             ClientName = r.Client?.Name,
             ProjectName = r.Project?.ProjectName,
             IsQuoted = r.IsQuoted
@@ -58,6 +59,7 @@ public class RequirementService : IRequirementService
             ClientId = r.ClientId,
             ProjectId = r.ProjectId,
             IsNew = r.IsNew,
+            Status = r.Status,
             ClientName = r.Client?.Name,
             ProjectName = r.Project?.ProjectName,
             IsQuoted = r.IsQuoted
@@ -163,6 +165,7 @@ public class RequirementService : IRequirementService
             RequirementDescription = requirement.RequirementDescription,
             Attachment = requirement.Attachment,
             IsActive = requirement.IsActive,
+            Status = requirement.Status,
             ClientId = requirement.ClientId,
             ProjectId = requirement.ProjectId,
             IsNew = false
@@ -248,13 +251,41 @@ public class RequirementService : IRequirementService
         requirement.Priority = requirementDto.Priority;
         requirement.RequirementDescription = requirementDto.RequirementDescription;
         requirement.Attachment = requirementDto.Attachment;
+        requirement.Status = requirementDto.Status;
         requirement.ClientId = requirementDto.ClientId;
         requirement.ProjectId = requirementDto.ProjectId;
 
         _context.Requirements.Update(requirement);
         await _context.SaveChangesAsync();
 
-        return requirementDto;
+        return new RequirementDTO
+        {
+            RequirementId = requirement.RequirementId,
+            RequirementTitle = requirement.RequirementTitle,
+            Priority = requirement.Priority,
+            RequirementDescription = requirement.RequirementDescription,
+            Attachment = requirement.Attachment,
+            IsActive = requirement.IsActive,
+            IsNew = requirement.IsNew,
+            Status = requirement.Status,
+            ClientId = requirement.ClientId,
+            ProjectId = requirement.ProjectId
+        };
+    }
+
+    public async Task<ApiResponse> UpdateRequirementStatusAsync(int requirementId, G3NexusBackend.Models.TaskStatus status)
+    {
+        var requirement = await _context.Requirements.FindAsync(requirementId);
+        if (requirement == null || !requirement.IsActive)
+        {
+            return new ApiResponse { Status = false, Message = "Requirement not found or already inactive." };
+        }
+
+        requirement.Status = status;
+        _context.Requirements.Update(requirement);
+        await _context.SaveChangesAsync();
+
+        return new ApiResponse { Status = true, Message = "Requirement status updated successfully." };
     }
 
     public async Task<ApiResponse> DeActivateRequirementAsync(int requirementId)

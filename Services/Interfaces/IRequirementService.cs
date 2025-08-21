@@ -9,6 +9,7 @@ public interface IRequirementService
     Task<RequirementDTO?> GetRequirementByIdAsync(int requirementId);
     Task<RequirementDTO> CreateRequirementAsync(RequirementDTO requirementDto);
     Task<RequirementDTO?> UpdateRequirementAsync(int requirementId, RequirementDTO requirementDto);
+    Task<ApiResponse> UpdateRequirementStatusAsync(int requirementId, G3NexusBackend.Models.TaskStatus status);
     Task<ApiResponse> DeActivateRequirementAsync(int requirementId);
     Task<ApiResponse> SendRequirementQuotationAsync(RequirementQuotationRequestDTO quotationRequest);
     Task<ApiResponse> SendBulkQuotationAsync(BulkQuotationRequestDTO bulkQuotationRequest);

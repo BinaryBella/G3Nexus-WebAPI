@@ -8,6 +8,7 @@ public class Bug
     public string? BugDescription { get; set; }
     public string? Attachment { get; set; }
     public bool IsActive { get; set; }
+    public G3NexusBackend.Models.TaskStatus Status { get; set; } = G3NexusBackend.Models.TaskStatus.Pending;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     // Foreign Keys

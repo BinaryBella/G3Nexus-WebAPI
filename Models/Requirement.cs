@@ -9,6 +9,7 @@ public class Requirement
     public string? Attachment { get; set; }
     public bool IsActive { get; set; }
     public bool IsNew { get; set; }
+    public G3NexusBackend.Models.TaskStatus Status { get; set; } = G3NexusBackend.Models.TaskStatus.Pending;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     // Foreign Keys
     public int ClientId { get; set; }

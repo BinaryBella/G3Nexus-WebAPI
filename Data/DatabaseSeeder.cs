@@ -298,6 +298,7 @@ namespace G3NexusBackend.Data
                         Attachment = "auth_requirements.pdf",
                         IsActive = true,
                         IsNew = true,
+                        Status = G3NexusBackend.Models.TaskStatus.InProgress,
                         CreatedAt = DateTime.UtcNow.AddDays(-55)
                     },
                     new Requirement
@@ -310,6 +311,7 @@ namespace G3NexusBackend.Data
                         Attachment = "cart_requirements.pdf",
                         IsActive = true,
                         IsNew = false,
+                        Status = G3NexusBackend.Models.TaskStatus.Complete,
                         CreatedAt = DateTime.UtcNow.AddDays(-50)
                     },
                     new Requirement
@@ -322,6 +324,7 @@ namespace G3NexusBackend.Data
                         Attachment = "biometric_specs.pdf",
                         IsActive = true,
                         IsNew = true,
+                        Status = G3NexusBackend.Models.TaskStatus.Pending,
                         CreatedAt = DateTime.UtcNow.AddDays(-35)
                     },
                     new Requirement
@@ -334,6 +337,7 @@ namespace G3NexusBackend.Data
                         Attachment = "lead_requirements.pdf",
                         IsActive = true,
                         IsNew = true,
+                        Status = G3NexusBackend.Models.TaskStatus.UnderReview,
                         CreatedAt = DateTime.UtcNow.AddDays(-25)
                     }
                 };
@@ -401,6 +405,7 @@ namespace G3NexusBackend.Data
                         Attachment = "mobile_login_bug.png",
                         IsNew = true,
                         IsActive = true,
+                        Status = G3NexusBackend.Models.TaskStatus.InProgress,
                         CreatedAt = DateTime.UtcNow.AddDays(-10)
                     },
                     new Bug
@@ -413,6 +418,7 @@ namespace G3NexusBackend.Data
                         Attachment = "payment_error_log.txt",
                         IsNew = false,
                         IsActive = true,
+                        Status = G3NexusBackend.Models.TaskStatus.UnderReview,
                         CreatedAt = DateTime.UtcNow.AddDays(-15)
                     },
                     new Bug
@@ -425,6 +431,7 @@ namespace G3NexusBackend.Data
                         Attachment = "biometric_compatibility.xlsx",
                         IsNew = true,
                         IsActive = true,
+                        Status = G3NexusBackend.Models.TaskStatus.Pending,
                         CreatedAt = DateTime.UtcNow.AddDays(-5)
                     }
                 };

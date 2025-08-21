@@ -1,3 +1,5 @@
+using G3NexusBackend.Models;
+
 namespace G3NexusBackend.Data.DTO
 {
     public class RequirementListItemDTO
@@ -6,6 +8,7 @@ namespace G3NexusBackend.Data.DTO
         public string? RequirementTitle { get; set; }
         public string? Priority { get; set; }
         public bool IsNew { get; set; }
+        public G3NexusBackend.Models.TaskStatus Status { get; set; }
         public int ClientId { get; set; }
         public int ProjectId { get; set; }
         public string? ClientName { get; set; }

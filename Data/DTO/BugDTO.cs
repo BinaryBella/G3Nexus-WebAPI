@@ -1,14 +1,17 @@
+using G3NexusBackend.Models;
+
 namespace G3NexusBackend.Data.DTO
 {
     public class BugDTO
     {
         public int BugId { get; set; }
-        public string BugTitle { get; set; }
-        public string Severity { get; set; }
-        public string BugDescription { get; set; }
-        public string Attachment { get; set; }
+        public string? BugTitle { get; set; }
+        public string? Severity { get; set; }
+        public string? BugDescription { get; set; }
+        public string? Attachment { get; set; }
         public bool IsActive { get; set; }
         public bool IsNew { get; set; }
+        public G3NexusBackend.Models.TaskStatus Status { get; set; }
         public int ClientId { get; set; }
         public int ProjectId { get; set; }
     }
