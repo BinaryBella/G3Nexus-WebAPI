@@ -1,6 +1,7 @@
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace G3NexusBackend.Controllers
 {
@@ -15,15 +16,17 @@ namespace G3NexusBackend.Controllers
             _employeeService = employeeService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetEmployees()
+    [HttpGet]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetEmployees()
         {
             var employees = await _employeeService.GetAllEmployeesAsync();
             return Ok(new ApiResponse { Status = true, Data = employees });
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetEmployeeById(int id)
+    [HttpGet("{id:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetEmployeeById(int id)
         {
             var employee = await _employeeService.GetEmployeeByIdAsync(id);
             if (employee == null)
@@ -34,8 +37,9 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = employee });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateEmployee(EmployeeDTO employeeDto)
+    [HttpPost]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> CreateEmployee(EmployeeDTO employeeDto)
         {
             var response = await _employeeService.CreateEmployeeAsync(employeeDto);
             if (!response.Status)
@@ -46,8 +50,9 @@ namespace G3NexusBackend.Controllers
             return CreatedAtAction(nameof(GetEmployeeById), new { id = ((EmployeeDTO)response.Data).EmployeeId }, response);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateEmployee(EmployeeDTO employeeDto)
+    [HttpPut]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> UpdateEmployee(EmployeeDTO employeeDto)
         {
             var id = employeeDto.EmployeeId;
             var employee = await _employeeService.UpdateEmployeeAsync(id, employeeDto);
@@ -59,8 +64,9 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = employee });
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeactivateEmployee(int id)
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> DeactivateEmployee(int id)
         {
             var response = await _employeeService.DeActivateEmployeeAsync(id);
             if (!response.Status)

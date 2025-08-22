@@ -20,8 +20,9 @@ namespace G3NexusBackend.Controllers
         /// Get all quotations for admin display
         /// </summary>
         /// <returns>List of all quotations with related data</returns>
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllQuotations()
+    [HttpGet("all")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetAllQuotations()
         {
             try
             {
@@ -39,8 +40,9 @@ namespace G3NexusBackend.Controllers
         /// </summary>
         /// <param name="id">Quotation ID</param>
         /// <returns>Detailed quotation information</returns>
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetQuotationById(int id)
+    [HttpGet("{id}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetQuotationById(int id)
         {
             try
             {
@@ -62,8 +64,9 @@ namespace G3NexusBackend.Controllers
         /// </summary>
         /// <param name="clientId">Client ID</param>
         /// <returns>List of quotations for the specified client</returns>
-        [HttpGet("client/{clientId}")]
-        public async Task<IActionResult> GetQuotationsByClientId(int clientId)
+    [HttpGet("client/{clientId}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetQuotationsByClientId(int clientId)
         {
             try
             {
@@ -81,8 +84,9 @@ namespace G3NexusBackend.Controllers
         /// </summary>
         /// <param name="projectId">Project ID</param>
         /// <returns>List of quotations for the specified project</returns>
-        [HttpGet("project/{projectId}")]
-        public async Task<IActionResult> GetQuotationsByProjectId(int projectId)
+    [HttpGet("project/{projectId}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetQuotationsByProjectId(int projectId)
         {
             try
             {
@@ -100,8 +104,9 @@ namespace G3NexusBackend.Controllers
         /// </summary>
         /// <param name="employeeId">Employee ID</param>
         /// <returns>List of quotations created by the specified employee</returns>
-        [HttpGet("employee/{employeeId}")]
-        public async Task<IActionResult> GetQuotationsByEmployeeId(int employeeId)
+    [HttpGet("employee/{employeeId}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetQuotationsByEmployeeId(int employeeId)
         {
             try
             {
@@ -119,8 +124,9 @@ namespace G3NexusBackend.Controllers
         /// </summary>
         /// <param name="type">Quotation type</param>
         /// <returns>List of quotations of the specified type</returns>
-        [HttpGet("type/{type}")]
-        public async Task<IActionResult> GetQuotationsByType(string type)
+    [HttpGet("type/{type}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetQuotationsByType(string type)
         {
             try
             {
@@ -139,8 +145,9 @@ namespace G3NexusBackend.Controllers
         /// <param name="startDate">Start date</param>
         /// <param name="endDate">End date</param>
         /// <returns>List of quotations created within the specified date range</returns>
-        [HttpGet("date-range")]
-        public async Task<IActionResult> GetQuotationsByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    [HttpGet("date-range")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetQuotationsByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             try
             {
@@ -157,8 +164,9 @@ namespace G3NexusBackend.Controllers
         /// Get quotation summary statistics for admin dashboard
         /// </summary>
         /// <returns>Summary statistics of all quotations</returns>
-        [HttpGet("summary")]
-        public async Task<IActionResult> GetQuotationSummary()
+    [HttpGet("summary")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetQuotationSummary()
         {
             try
             {
@@ -176,8 +184,9 @@ namespace G3NexusBackend.Controllers
         /// </summary>
         /// <param name="quotationId">Quotation ID</param>
         /// <returns>List of requirements and bugs with descriptions for the specified quotation</returns>
-        [HttpGet("{quotationId}/items")]
-        public async Task<IActionResult> GetQuotationItems(int quotationId)
+    [HttpGet("{quotationId}/items")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> GetQuotationItems(int quotationId)
         {
             try
             {

@@ -1,6 +1,7 @@
 ﻿using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace G3NexusBackend.Controllers
 {
@@ -15,22 +16,25 @@ namespace G3NexusBackend.Controllers
             _projectService = projectService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetProjects()
+    [HttpGet]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetProjects()
         {
             var projects = await _projectService.GetAllProjectsAsync();
             return Ok(new ApiResponse { Status = true, Data = projects });
         }
 
-        [HttpGet("client/{email}")]
-        public async Task<IActionResult> GetProjectsByClientId(string email)
+    [HttpGet("client/{email}")]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetProjectsByClientId(string email)
         {
             var projects = await _projectService.GetProjectsByClientIdAsync(email);
             return Ok(new ApiResponse { Status = true, Data = projects });
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetProjectById(int id)
+    [HttpGet("{id:int}")]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetProjectById(int id)
         {
             var project = await _projectService.GetProjectByIdAsync(id);
             if (project == null)
@@ -41,15 +45,17 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = project });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateProject(AddProjectRequestDto projectRequestDto)
+    [HttpPost]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> CreateProject(AddProjectRequestDto projectRequestDto)
         {
             var project = await _projectService.CreateProjectAsync(projectRequestDto);
             return CreatedAtAction(nameof(GetProjectById), new { id = project.ProjectId }, new ApiResponse { Status = true, Data = project });
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateProject(ProjectDTO projectDto)
+    [HttpPut]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> UpdateProject(ProjectDTO projectDto)
         {
             var id = projectDto.ProjectId;
             var project = await _projectService.UpdateProjectAsync(id, projectDto);
@@ -61,8 +67,9 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = project });
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeactivateProject(int id)
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> DeactivateProject(int id)
         {
             var response = await _projectService.DeActivateProjectAsync(id);
             if (!response.Status)

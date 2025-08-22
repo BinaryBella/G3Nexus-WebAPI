@@ -1,6 +1,7 @@
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace G3NexusBackend.Controllers
 {
@@ -15,15 +16,17 @@ namespace G3NexusBackend.Controllers
             _clientService = clientService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetClients()
+    [HttpGet]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetClients()
         {
             var clients = await _clientService.GetAllClientsAsync();
             return Ok(new ApiResponse { Status = true, Data = clients });
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetClientById(int id)
+    [HttpGet("{id:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetClientById(int id)
         {
             var client = await _clientService.GetClientByIdAsync(id);
             if (client == null)
@@ -34,8 +37,9 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = client });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateClient(ClientDTO clientDto)
+    [HttpPost]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> CreateClient(ClientDTO clientDto)
         {
             var response = await _clientService.CreateClientAsync(clientDto);
             if (!response.Status)
@@ -46,8 +50,9 @@ namespace G3NexusBackend.Controllers
             return CreatedAtAction(nameof(GetClientById), new { id = ((ClientDTO)response.Data).ClientId }, response);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateClient(ClientEditDTO clientDto)
+    [HttpPut]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> UpdateClient(ClientEditDTO clientDto)
         {
             var client = await _clientService.UpdateClientAsync(clientDto);
             if (client == null)
@@ -58,8 +63,9 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = client });
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeactivateClient(int id)
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> DeactivateClient(int id)
         {
             try
             {

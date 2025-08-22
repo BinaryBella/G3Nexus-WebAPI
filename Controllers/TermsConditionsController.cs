@@ -1,6 +1,7 @@
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace G3NexusBackend.Controllers;
 
@@ -16,6 +17,7 @@ public class TermsConditionsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "COMPANY_ADMIN")]
     public async Task<IActionResult> GetAllTermsAsync()
     {
         var termsConditions = await _termsConditionsService.GetAllTermsAsync();
@@ -23,6 +25,7 @@ public class TermsConditionsController : ControllerBase
     }
     
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
     public async Task<IActionResult> GetTermsById(int id)
     {
         var terms = await _termsConditionsService.GetTermsByIdAsync(id);
@@ -35,6 +38,7 @@ public class TermsConditionsController : ControllerBase
     }
     
     [HttpPost]
+    [Authorize(Roles = "COMPANY_ADMIN")]
     public async Task<IActionResult> CreateTermsAsync(TermsConditionsDTO termsConditionsDto)
     {
         try
@@ -49,6 +53,7 @@ public class TermsConditionsController : ControllerBase
     }
     
     [HttpPut]
+    [Authorize(Roles = "COMPANY_ADMIN")]
     public async Task<IActionResult> UpdateTermsAsync(TermsConditionsDTO termsConditionsDto)
     {
         try
@@ -69,6 +74,7 @@ public class TermsConditionsController : ControllerBase
     }
     
     [HttpDelete("{tcId:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
     public async Task<IActionResult> DeactivateTerm(int tcId)
     {
         var response = await _termsConditionsService.DeActivateTermAsync(tcId);

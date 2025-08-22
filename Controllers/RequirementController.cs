@@ -1,6 +1,7 @@
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace G3NexusBackend.Controllers
 {
@@ -16,29 +17,33 @@ namespace G3NexusBackend.Controllers
         }
 
         // GET: api/Requirement?userId=12&lastLogin=2025-07-23T06:00:00Z
-        [HttpGet]
-        public async Task<IActionResult> GetRequirements()
+    [HttpGet]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetRequirements()
         {
             var requirements = await _requirementService.GetAllRequirementsAsync();
             return Ok(new ApiResponse { Status = true, Data = requirements });
         }
 
-        [HttpPost("by-project")]
-        public async Task<IActionResult> GetRequirementsByProject(RequirementsByProjectRequestDTO request)
+    [HttpPost("by-project")]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetRequirementsByProject(RequirementsByProjectRequestDTO request)
         {
             var requirements = await _requirementService.GetRequirementsByProjectAsync(request);
             return Ok(new ApiResponse { Status = true, Data = requirements });
         }
 
-        [HttpPost("validate-bulk-selection")]
-        public async Task<IActionResult> ValidateBulkQuotationSelection(BulkQuotationValidationDTO validation)
+    [HttpPost("validate-bulk-selection")]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> ValidateBulkQuotationSelection(BulkQuotationValidationDTO validation)
         {
             var response = await _requirementService.ValidateBulkQuotationSelectionAsync(validation);
             return Ok(response);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetRequirementById(int id)
+    [HttpGet("{id:int}")]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> GetRequirementById(int id)
         {
             var requirement = await _requirementService.GetRequirementByIdAsync(id);
             if (requirement == null)
@@ -49,8 +54,9 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = requirement });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateRequirement(RequirementDTO requirementDto)
+    [HttpPost]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER")]
+    public async Task<IActionResult> CreateRequirement(RequirementDTO requirementDto)
         {
             try
             {
@@ -63,8 +69,9 @@ namespace G3NexusBackend.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateRequirement(RequirementDTO requirementDto)
+    [HttpPut]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> UpdateRequirement(RequirementDTO requirementDto)
         {
             try
             {
@@ -83,8 +90,9 @@ namespace G3NexusBackend.Controllers
             }
         }
 
-        [HttpPatch("{id:int}/status")]
-        public async Task<IActionResult> UpdateRequirementStatus(int id, [FromBody] StatusUpdateDTO statusUpdate)
+    [HttpPatch("{id:int}/status")]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> UpdateRequirementStatus(int id, [FromBody] StatusUpdateDTO statusUpdate)
         {
             var response = await _requirementService.UpdateRequirementStatusAsync(id, statusUpdate.Status);
             if (!response.Status)
@@ -95,8 +103,9 @@ namespace G3NexusBackend.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeactivateRequirement(int id)
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> DeactivateRequirement(int id)
         {
             var response = await _requirementService.DeActivateRequirementAsync(id);
             if (!response.Status)
@@ -107,8 +116,9 @@ namespace G3NexusBackend.Controllers
             return Ok(response);
         }
 
-        [HttpPost("send-quotation")]
-        public async Task<IActionResult> SendRequirementQuotation(RequirementQuotationRequestDTO quotationRequest)
+    [HttpPost("send-quotation")]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> SendRequirementQuotation(RequirementQuotationRequestDTO quotationRequest)
         {
             try
             {
@@ -130,8 +140,9 @@ namespace G3NexusBackend.Controllers
             }
         }
 
-        [HttpPost("send-bulk-quotation")]
-        public async Task<IActionResult> SendBulkQuotation(BulkQuotationRequestDTO bulkQuotationRequest)
+    [HttpPost("send-bulk-quotation")]
+    [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    public async Task<IActionResult> SendBulkQuotation(BulkQuotationRequestDTO bulkQuotationRequest)
         {
             try
             {

@@ -1,6 +1,7 @@
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace G3NexusBackend.Controllers
 {
@@ -14,15 +15,9 @@ namespace G3NexusBackend.Controllers
         {
             _bugService = bugService;
         }
-        //
-        // [HttpGet]
-        // public async Task<IActionResult> GetBugs()
-        // {
-        //     var bugs = await _bugService.GetAllBugsAsync();
-        //     return Ok(new ApiResponse { Status = true, Data = bugs });
-        // }
 
         [HttpGet]
+        [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
         public async Task<IActionResult> GetBugs([FromQuery] int userId, [FromQuery] DateTime lastLogin)
         {
             var bugs = await _bugService.GetAllBugsAsync(userId);
@@ -30,6 +25,7 @@ namespace G3NexusBackend.Controllers
         }
         
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER,COMPANY_ADMIN,COMPANY_DEVELOPER")]
         public async Task<IActionResult> GetBugById(int id)
         {
             var bug = await _bugService.GetBugByIdAsync(id);
@@ -37,11 +33,11 @@ namespace G3NexusBackend.Controllers
             {
                 return NotFound(new ApiResponse { Status = false, Message = "Bug not found" });
             }
-
             return Ok(new ApiResponse { Status = true, Data = bug });
         }
 
         [HttpPost]
+        [Authorize(Roles = "CLIENT_ADMIN,CLIENT_USER")]
         public async Task<IActionResult> CreateBug(BugDTO bugDto)
         {
             try
@@ -56,6 +52,7 @@ namespace G3NexusBackend.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
         public async Task<IActionResult> UpdateBug(BugDTO bugDto)
         {
             try
@@ -66,7 +63,6 @@ namespace G3NexusBackend.Controllers
                 {
                     return NotFound(new ApiResponse { Status = false, Message = "Bug not found" });
                 }
-
                 return Ok(new ApiResponse { Status = true, Data = bug });
             }
             catch (KeyNotFoundException ex)
@@ -75,7 +71,8 @@ namespace G3NexusBackend.Controllers
             }
         }
 
-        [HttpPatch("{id:int}/status")]
+    [HttpPatch("{id:int}/status")]
+        [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
         public async Task<IActionResult> UpdateBugStatus(int id, [FromBody] StatusUpdateDTO statusUpdate)
         {
             var response = await _bugService.UpdateBugStatusAsync(id, statusUpdate.Status);
@@ -83,11 +80,11 @@ namespace G3NexusBackend.Controllers
             {
                 return NotFound(response);
             }
-
             return Ok(response);
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
         public async Task<IActionResult> DeactivateBug(int id)
         {
             var response = await _bugService.DeActivateBugAsync(id);
@@ -95,11 +92,11 @@ namespace G3NexusBackend.Controllers
             {
                 return NotFound(response);
             }
-
             return Ok(response);
         }
 
         [HttpPost("send-quotation")]
+        [Authorize(Roles = "COMPANY_ADMIN")]
         public async Task<IActionResult> SendBugQuotation(BugQuotationRequestDTO quotationRequest)
         {
             try
@@ -109,7 +106,6 @@ namespace G3NexusBackend.Controllers
                 {
                     return BadRequest(response);
                 }
-
                 return Ok(response);
             }
             catch (Exception ex)
@@ -123,6 +119,7 @@ namespace G3NexusBackend.Controllers
         }
 
         [HttpPost("send-bulk-quotation")]
+        [Authorize(Roles = "COMPANY_ADMIN")]
         public async Task<IActionResult> SendBulkBugQuotation(BulkBugQuotationRequestDTO bulkQuotationRequest)
         {
             try
@@ -132,7 +129,6 @@ namespace G3NexusBackend.Controllers
                 {
                     return BadRequest(response);
                 }
-
                 return Ok(response);
             }
             catch (Exception ex)

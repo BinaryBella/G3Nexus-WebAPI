@@ -1,6 +1,7 @@
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace G3NexusBackend.Controllers
 {
@@ -15,15 +16,17 @@ namespace G3NexusBackend.Controllers
             _paymentService = paymentService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetPayments()
+    [HttpGet]
+    [Authorize(Roles = "CLIENT_ADMIN,COMPANY_ADMIN")]
+    public async Task<IActionResult> GetPayments()
         {
             var payments = await _paymentService.GetAllPaymentsAsync();
             return Ok(new ApiResponse { Status = true, Data = payments });
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetPaymentById(int id)
+    [HttpGet("{id:int}")]
+    [Authorize(Roles = "CLIENT_ADMIN,COMPANY_ADMIN")]
+    public async Task<IActionResult> GetPaymentById(int id)
         {
             var payment = await _paymentService.GetPaymentByIdAsync(id);
             if (payment == null)
@@ -34,15 +37,17 @@ namespace G3NexusBackend.Controllers
             return Ok(new ApiResponse { Status = true, Data = payment });
         }
 
-        [HttpGet("client/{clientId:int}")]
-        public async Task<IActionResult> GetPaymentsByClientId(int clientId)
+    [HttpGet("client/{clientId:int}")]
+    [Authorize(Roles = "CLIENT_ADMIN,COMPANY_ADMIN")]
+    public async Task<IActionResult> GetPaymentsByClientId(int clientId)
         {
             var payments = await _paymentService.GetPaymentsByClientIdAsync(clientId);
             return Ok(new ApiResponse { Status = true, Data = payments });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreatePayment(PaymentDTO paymentDto)
+    [HttpPost]
+    [Authorize(Roles = "CLIENT_ADMIN")]
+    public async Task<IActionResult> CreatePayment(PaymentDTO paymentDto)
         {
             try
             {
@@ -56,8 +61,9 @@ namespace G3NexusBackend.Controllers
         }
 
         
-        [HttpPut]
-        public async Task<IActionResult> UpdatePayment(PaymentDTO paymentDto)
+    [HttpPut]
+    [Authorize(Roles = "CLIENT_ADMIN,COMPANY_ADMIN")]
+    public async Task<IActionResult> UpdatePayment(PaymentDTO paymentDto)
         {
             try
             {
@@ -77,8 +83,9 @@ namespace G3NexusBackend.Controllers
 
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeactivatePayment(int id)
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
+    public async Task<IActionResult> DeactivatePayment(int id)
         {
             var response = await _paymentService.DeActivatePaymentAsync(id);
             if (!response.Status)

@@ -1,6 +1,7 @@
 using G3NexusBackend.Data.DTO;
 using G3NexusBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace G3NexusBackend.Controllers;
 
@@ -16,6 +17,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
     public async Task<IActionResult> GetAllCompaniesAsync()
     {
         var companies = await _companyService.GetAllCompaniesAsync();
@@ -23,6 +25,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpGet("{CompanyId:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
     public async Task<IActionResult> GetCompanyById(int CompanyId)
     {
         var company = await _companyService.GetCompanyByIdAsync(CompanyId);
@@ -35,6 +38,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "COMPANY_ADMIN")]
     public async Task<IActionResult> CreateCompaniesAsync(CompanyDTO companyDto)
     {
         var response = await _companyService.CreateCompaniesAsync(companyDto);
@@ -47,6 +51,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "COMPANY_ADMIN")]
     public async Task<IActionResult> UpdateCompaniesAsync(CompanyDTO companyDto)
     {
         var company = await _companyService.UpdateCompaniesAsync(companyDto);
@@ -59,6 +64,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpDelete("{CompanyId:int}")]
+    [Authorize(Roles = "COMPANY_ADMIN")]
     public async Task<IActionResult> DeActivateCompanyAsync(int CompanyId)
     {
         var response = await _companyService.DeActivateCompanyAsync(CompanyId);
