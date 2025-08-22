@@ -17,7 +17,7 @@ namespace G3NexusBackend.Controllers
         }
 
     [HttpGet]
-    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER,CLIENT_ADMIN,CLIENT_USER")]
     public async Task<IActionResult> GetClients()
         {
             var clients = await _clientService.GetAllClientsAsync();
@@ -25,7 +25,7 @@ namespace G3NexusBackend.Controllers
         }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER")]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER,CLIENT_ADMIN,CLIENT_USER")]
     public async Task<IActionResult> GetClientById(int id)
         {
             var client = await _clientService.GetClientByIdAsync(id);
@@ -38,7 +38,7 @@ namespace G3NexusBackend.Controllers
         }
 
     [HttpPost]
-    [Authorize(Roles = "COMPANY_ADMIN")]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER,CLIENT_ADMIN,CLIENT_USER")]
     public async Task<IActionResult> CreateClient(ClientDTO clientDto)
         {
             var response = await _clientService.CreateClientAsync(clientDto);
@@ -51,7 +51,7 @@ namespace G3NexusBackend.Controllers
         }
 
     [HttpPut]
-    [Authorize(Roles = "COMPANY_ADMIN")]
+    [Authorize(Roles = "COMPANY_ADMIN,COMPANY_DEVELOPER,CLIENT_ADMIN,CLIENT_USER")]
     public async Task<IActionResult> UpdateClient(ClientEditDTO clientDto)
         {
             var client = await _clientService.UpdateClientAsync(clientDto);
