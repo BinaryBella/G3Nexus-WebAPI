@@ -35,7 +35,7 @@ public class AuthService : IAuthService
                 return new ApiResponse { Status = false, Message = "Email and password are required" };
             }
 
-            var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == email && c.IsActive);
+            var client = await _context.Clients.Where(c => c.Email == email && c.IsActive).Include(c => c.Company).FirstOrDefaultAsync();
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == email && e.IsActive);
             if (client == null && employee == null)
             {
@@ -44,6 +44,8 @@ public class AuthService : IAuthService
 
             var userRole = client?.Role ?? employee?.Role;
             var userId = client?.ClientId ?? employee?.EmployeeId;
+            var profilePic = client?.ProfileImageUrl ?? employee?.ProfileImageUrl ?? string.Empty;
+            var org = client?.Company.CompanyName ?? string.Empty;
 
             // Check the password. Hashed password is saved in the database
             var hashedPassword = client?.Password ?? employee?.Password;
@@ -52,7 +54,7 @@ public class AuthService : IAuthService
                 return new ApiResponse { Status = false, Message = "Invalid email or password" };
             }
 
-            var refreshToken = GenerateJwtToken(email, userRole!, userId!.Value.ToString(), TokenType.RefreshToken);
+            var refreshToken = GenerateJwtToken(email, userRole!, userId!.Value.ToString(), profilePic, org, TokenType.RefreshToken);
             var refreshTokenObject = new RefreshToken
             {
                 Email = email,
@@ -65,7 +67,7 @@ public class AuthService : IAuthService
             await _context.SaveChangesAsync();
             return new ApiResponse { Status = true, Message = "Authentication successful", Data =
                 new {
-                    AccessToken = GenerateJwtToken(email, userRole!, userId!.Value.ToString(), TokenType.AccessToken),
+                    AccessToken = GenerateJwtToken(email, userRole!, userId!.Value.ToString(), profilePic, org, TokenType.AccessToken),
                     RefreshToken = refreshToken
                 } };
             
@@ -106,12 +108,14 @@ public class AuthService : IAuthService
 
             var userEmail = client?.Email ?? employee?.Email;
             var userRole = client?.Role ?? employee?.Role;
-            
+            var profilePic = client?.ProfileImageUrl ?? employee?.ProfileImageUrl ?? string.Empty;
+            var org = client?.Company.CompanyName ?? string.Empty;
+
             if (userEmail == null || userRole == null)
                 return new ApiResponse { Status = false, Message = "User not found" };
 
             // Generate new tokens
-            var newAccessToken = GenerateJwtToken(userEmail, userRole, userId, TokenType.AccessToken);
+            var newAccessToken = GenerateJwtToken(userEmail, userRole, userId, profilePic, org, TokenType.AccessToken);
 
             return new ApiResponse
             {
@@ -137,13 +141,15 @@ public class AuthService : IAuthService
         return client != null || employee != null;
     }
 
-    private string GenerateJwtToken(string email, string role, string userId, TokenType tokenType)
+    private string GenerateJwtToken(string email, string role, string userId, string profilePic, string org, TokenType tokenType)
     {
         var claims = new List<Claim>
         {
             new (ClaimTypes.Email, email),
             new (ClaimTypes.NameIdentifier, userId.ToString()),
             new (ClaimTypes.Role, role),
+            new ("ProfileImageUrl", profilePic),
+            new ("Organization", org),
             new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
