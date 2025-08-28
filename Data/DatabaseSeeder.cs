@@ -78,7 +78,7 @@ namespace G3NexusBackend.Data
                         Email = "sarah.johnson@digital.com",
                         Address = "202 Corporate Center, NY",
                         Password = BCrypt.Net.BCrypt.HashPassword("Password123!"),
-                        Role = "CLIENT_ADMIN",
+                        Role = "CLIENT_USER",
                         IsActive = true,
                         CompanyId = companies[1].CompanyId
                     },
