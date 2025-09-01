@@ -1,14 +1,16 @@
-﻿namespace G3NexusBackend.Models
+﻿namespace G3NexusBackend.Models;
+
+public class Payment
 {
-    public class Payment
-    {
-        public int PaymentId { get; set; }
-        public int ProjectId { get; set; }
-        public Project Project { get; set; }  
-        public decimal PaymentAmount { get; set; }
-        public string PaymentType { get; set; }
-        public string PaymentDescription { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public string Attachment { get; set; }
-    }
+    public int PaymentId { get; set; } // Primary Key
+    public int ProjectId { get; set; }  // Foreign Key for Project
+    public Project Project { get; set; } = null!;  // Navigation Property for the related Project
+    public int ClientId { get; set; }  // Foreign Key for Client
+    public Client Client { get; set; } = null!;  // Navigation Property for the related Client
+    public decimal PaymentAmount { get; set; }
+    public string PaymentType { get; set; } = string.Empty;
+    public string PaymentDescription { get; set; } = string.Empty;
+    public DateTime PaymentDate { get; set; }
+    public string Attachment { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
 }

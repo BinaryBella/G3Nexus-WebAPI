@@ -21,7 +21,7 @@ namespace G3NexusBackend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("G3NexusBackend.Models.Bug", b =>
+            modelBuilder.Entity("Bug", b =>
                 {
                     b.Property<int>("BugId")
                         .ValueGeneratedOnAdd()
@@ -30,33 +30,204 @@ namespace G3NexusBackend.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BugId"), 1L, 1);
 
                     b.Property<string>("Attachment")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("BugDescription")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("BugTitle")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasMaxLength(50)
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsNew")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsQuoted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("QuotationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("BugId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("QuotationId");
+
+                    b.ToTable("Bugs", (string)null);
+                });
+
+            modelBuilder.Entity("Client", b =>
+                {
+                    b.Property<int>("ClientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientId"), 1L, 1);
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContactNo")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.HasKey("BugId");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasMaxLength(50)
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ProfileImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("ClientId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Clients", (string)null);
+                });
+
+            modelBuilder.Entity("Employee", b =>
+                {
+                    b.Property<int>("EmployeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"), 1L, 1);
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ContactNo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasMaxLength(50)
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ProfileImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("EmployeeId");
+
+                    b.ToTable("Employees", (string)null);
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.Company", b =>
+                {
+                    b.Property<int>("CompanyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyId"), 1L, 1);
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.HasKey("CompanyId");
+
+                    b.ToTable("Company", (string)null);
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.EmployeeProject", b =>
+                {
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmployeeId", "ProjectId");
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Bugs", (string)null);
+                    b.ToTable("EmployeeProjects", (string)null);
                 });
 
             modelBuilder.Entity("G3NexusBackend.Models.Payment", b =>
@@ -72,6 +243,12 @@ namespace G3NexusBackend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("PaymentAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -80,8 +257,8 @@ namespace G3NexusBackend.Migrations
 
                     b.Property<string>("PaymentDescription")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("PaymentType")
                         .IsRequired()
@@ -93,9 +270,11 @@ namespace G3NexusBackend.Migrations
 
                     b.HasKey("PaymentId");
 
+                    b.HasIndex("ClientId");
+
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("G3NexusBackend.Models.Project", b =>
@@ -112,11 +291,26 @@ namespace G3NexusBackend.Migrations
                     b.Property<DateTime?>("ActualStartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("EstimatedBudget")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasMaxLength(50)
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProjectDescription")
                         .IsRequired()
@@ -145,93 +339,217 @@ namespace G3NexusBackend.Migrations
                     b.Property<decimal>("TotalBudget")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("ProjectId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("Projects", (string)null);
                 });
 
-            modelBuilder.Entity("G3NexusBackend.Models.Requirement", b =>
+            modelBuilder.Entity("G3NexusBackend.Models.ProjectTermsConditions", b =>
                 {
-                    b.Property<int>("RequirementId")
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TCId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsChecked")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("TermsConditionsTCId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectId", "TCId");
+
+                    b.HasIndex("TCId");
+
+                    b.HasIndex("TermsConditionsTCId");
+
+                    b.ToTable("ProjectTermsConditions");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.Quotation", b =>
+                {
+                    b.Property<int>("QuotationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequirementId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuotationId"), 1L, 1);
 
-                    b.Property<string>("Attachment")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Priority")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<string>("RequirementDescription")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("RequirementTitle")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("RequirementId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Requirements", (string)null);
-                });
-
-            modelBuilder.Entity("G3NexusBackend.Models.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactNo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("EmailAddress")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("QuotationId");
 
-                    b.ToTable("Users", (string)null);
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Quotations", (string)null);
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.QuotationBug", b =>
+                {
+                    b.Property<int>("QuotationBugId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuotationBugId"), 1L, 1);
+
+                    b.Property<decimal>("BugCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("BugId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuotationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QuotationBugId");
+
+                    b.HasIndex("BugId");
+
+                    b.HasIndex("QuotationId");
+
+                    b.ToTable("QuotationBugs");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.QuotationCost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal>("AdvancePayment")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DeploymentCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DevelopmentCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("HostingAndDomain")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SSLCertificate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ServerCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId")
+                        .IsUnique();
+
+                    b.ToTable("QuotationCosts", (string)null);
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.QuotationRequirement", b =>
+                {
+                    b.Property<int>("QuotationRequirementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuotationRequirementId"), 1L, 1);
+
+                    b.Property<int>("QuotationId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RequirementCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RequirementId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QuotationRequirementId");
+
+                    b.HasIndex("QuotationId");
+
+                    b.HasIndex("RequirementId");
+
+                    b.ToTable("QuotationRequirements");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRevoked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(MAX)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RefreshTokens", (string)null);
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.TermsConditions", b =>
+                {
+                    b.Property<int>("TCId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TCId"), 1L, 1);
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("TCId");
+
+                    b.ToTable("TermsConditions", (string)null);
                 });
 
             modelBuilder.Entity("G3NexusBackend.Models.Verification", b =>
@@ -242,11 +560,12 @@ namespace G3NexusBackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VId"), 1L, 1);
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
 
                     b.Property<string>("VerificationCode")
                         .IsRequired()
@@ -255,64 +574,327 @@ namespace G3NexusBackend.Migrations
 
                     b.HasKey("VId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Verifications", (string)null);
                 });
 
-            modelBuilder.Entity("G3NexusBackend.Models.Bug", b =>
+            modelBuilder.Entity("Requirement", b =>
                 {
+                    b.Property<int>("RequirementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequirementId"), 1L, 1);
+
+                    b.Property<string>("Attachment")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasMaxLength(50)
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsNew")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsQuoted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuotationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RequirementDescription")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RequirementTitle")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("RequirementId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("QuotationId");
+
+                    b.ToTable("Requirements", (string)null);
+                });
+
+            modelBuilder.Entity("Bug", b =>
+                {
+                    b.HasOne("Client", "Client")
+                        .WithMany("Bugs")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("G3NexusBackend.Models.Project", "Project")
-                        .WithMany()
+                        .WithMany("Bugs")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.Quotation", "Quotation")
+                        .WithMany()
+                        .HasForeignKey("QuotationId");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("Quotation");
+                });
+
+            modelBuilder.Entity("Client", b =>
+                {
+                    b.HasOne("G3NexusBackend.Models.Company", "Company")
+                        .WithMany("Clients")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.EmployeeProject", b =>
+                {
+                    b.HasOne("Employee", "Employee")
+                        .WithMany("EmployeeProjects")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.Project", "Project")
+                        .WithMany("EmployeeProjects")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
 
                     b.Navigation("Project");
                 });
 
             modelBuilder.Entity("G3NexusBackend.Models.Payment", b =>
                 {
-                    b.HasOne("G3NexusBackend.Models.Project", "Project")
+                    b.HasOne("Client", "Client")
                         .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.Project", "Project")
+                        .WithMany("Payments")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Client");
 
                     b.Navigation("Project");
                 });
 
             modelBuilder.Entity("G3NexusBackend.Models.Project", b =>
                 {
-                    b.HasOne("G3NexusBackend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("G3NexusBackend.Models.Company", "Company")
+                        .WithMany("Projects")
+                        .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("G3NexusBackend.Models.Requirement", b =>
+            modelBuilder.Entity("G3NexusBackend.Models.ProjectTermsConditions", b =>
                 {
                     b.HasOne("G3NexusBackend.Models.Project", "Project")
-                        .WithMany()
+                        .WithMany("ProjectTermsConditions")
                         .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.TermsConditions", "TermsConditions")
+                        .WithMany()
+                        .HasForeignKey("TCId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.TermsConditions", null)
+                        .WithMany("ProjectTermsConditions")
+                        .HasForeignKey("TermsConditionsTCId");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("TermsConditions");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.Quotation", b =>
+                {
+                    b.HasOne("Client", "Client")
+                        .WithMany("Quotations")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Employee", "Employee")
+                        .WithMany("CreatedQuotations")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.Project", "Project")
+                        .WithMany("Quotations")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.QuotationBug", b =>
+                {
+                    b.HasOne("Bug", "Bug")
+                        .WithMany()
+                        .HasForeignKey("BugId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.Quotation", "Quotation")
+                        .WithMany()
+                        .HasForeignKey("QuotationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bug");
+
+                    b.Navigation("Quotation");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.QuotationCost", b =>
+                {
+                    b.HasOne("G3NexusBackend.Models.Project", "Project")
+                        .WithOne("QuotationCost")
+                        .HasForeignKey("G3NexusBackend.Models.QuotationCost", "ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("G3NexusBackend.Models.Verification", b =>
+            modelBuilder.Entity("G3NexusBackend.Models.QuotationRequirement", b =>
                 {
-                    b.HasOne("G3NexusBackend.Models.User", "User")
+                    b.HasOne("G3NexusBackend.Models.Quotation", "Quotation")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("QuotationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Requirement", "Requirement")
+                        .WithMany()
+                        .HasForeignKey("RequirementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quotation");
+
+                    b.Navigation("Requirement");
+                });
+
+            modelBuilder.Entity("Requirement", b =>
+                {
+                    b.HasOne("Client", "Client")
+                        .WithMany("Requirements")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.Project", "Project")
+                        .WithMany("Requirements")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G3NexusBackend.Models.Quotation", "Quotation")
+                        .WithMany()
+                        .HasForeignKey("QuotationId");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("Quotation");
+                });
+
+            modelBuilder.Entity("Client", b =>
+                {
+                    b.Navigation("Bugs");
+
+                    b.Navigation("Quotations");
+
+                    b.Navigation("Requirements");
+                });
+
+            modelBuilder.Entity("Employee", b =>
+                {
+                    b.Navigation("CreatedQuotations");
+
+                    b.Navigation("EmployeeProjects");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.Company", b =>
+                {
+                    b.Navigation("Clients");
+
+                    b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.Project", b =>
+                {
+                    b.Navigation("Bugs");
+
+                    b.Navigation("EmployeeProjects");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("ProjectTermsConditions");
+
+                    b.Navigation("QuotationCost")
+                        .IsRequired();
+
+                    b.Navigation("Quotations");
+
+                    b.Navigation("Requirements");
+                });
+
+            modelBuilder.Entity("G3NexusBackend.Models.TermsConditions", b =>
+                {
+                    b.Navigation("ProjectTermsConditions");
                 });
 #pragma warning restore 612, 618
         }

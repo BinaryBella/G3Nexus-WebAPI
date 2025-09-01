@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G3NEXUS Requirement Quotation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .logo-section h1 {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4a90e2;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .logo-section .subtitle {
+            font-size: 18px;
+            color: #333;
+            font-weight: normal;
+        }
+
+        .quotation-info {
+            text-align: right;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .quotation-info div {
+            margin-bottom: 3px;
+        }
+
+        /* Company Details */
+        .company-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .company-left, .company-right {
+            width: 45%;
+        }
+
+        .company-left div, .company-right div {
+            margin-bottom: 3px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            background: #2b4b93;
+            color: white;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 20px 0 15px 0;
+            border-radius: 3px;
+        }
+
+        /* Details Table */
+        .details-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .details-table tr {
+            background: #f8f9fa;
+        }
+
+        .details-table tr:nth-child(even) {
+            background: #e9ecef;
+        }
+
+        .details-table td {
+            padding: 8px 12px;
+            font-size: 11px;
+            border: none;
+        }
+
+        .details-table .label {
+            font-weight: bold;
+            color: #555;
+            width: 25%;
+            vertical-align: top;
+        }
+
+        .details-table .value {
+            color: #333;
+        }
+
+        /* Cost Table */
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 11px;
+        }
+
+        .cost-table th {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #555;
+            border: 1px solid #dee2e6;
+        }
+
+        .cost-table td {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            background: white;
+        }
+
+        .cost-table .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .cost-table .total-row {
+            background: #f8f9fa;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .cost-table .total-row td {
+            background: #f8f9fa;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #4a90e2;
+            font-weight: bold;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .page {
+                width: auto;
+                margin: 0;
+                box-shadow: none;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Email Content -->
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #333; background: #f5f5f5; padding: 30px;">
+    <h2 style="color: #2b4b93;">Requirement Quotation – {{RequirementTitle}}</h2>
+    <p>Dear {{ClientAdminName}},</p>
+    <p>Please find attached the detailed quotation for the requirement "{{RequirementTitle}}" under the {{ProjectName}} project.</p>
+    <ul>
+        <li>Requirement details and specifications</li>
+        <li>Client Contact No: <strong>{{ClientContact}}</strong></li>
+        <li>Client Email: <strong>{{ClientEmail}}</strong></li>
+        <li>Cost breakdown and implementation timeline</li>
+        <li>Priority Level: <strong>{{Priority}}</strong></li>
+    </ul>
+    <p>We look forward to your confirmation to proceed with this requirement. Implementation will commence upon approval.</p>
+    <p>If you have any questions or require clarifications, please feel free to reach out.</p>
+    <br>
+    <p>Best regards,<br>
+    G3 Technologies (Pvt) Ltd<br>
+    +123-456-7890<br>
+    info@g3tech.com</p>
+</div>
+
+</body>
+</html>

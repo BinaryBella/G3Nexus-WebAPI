@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Quotation - G3NEXUS</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .email-container {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(43, 75, 147, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #2b4b93, #3d5aa0);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        .header .subtitle {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 30px;
+        }
+        .footer {
+            background: linear-gradient(135deg, #2b4b93, #3d5aa0);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .highlight {
+            background: linear-gradient(135deg, #f8f9ff, #ffffff);
+            padding: 20px;
+            border-left: 5px solid #2b4b93;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(43, 75, 147, 0.1);
+        }
+        .details {
+            background-color: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #e8ebf7;
+        }
+        .cost-highlight {
+            background: linear-gradient(135deg, #2b4b93, #3d5aa0);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            margin: 25px 0;
+            font-size: 20px;
+            box-shadow: 0 4px 16px rgba(43, 75, 147, 0.3);
+        }
+        .quotation-id {
+            background-color: #2b4b93;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .requirement-list {
+            background-color: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2b4b93;
+            margin: 15px 0;
+        }
+        .requirement-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e8ebf7;
+            font-size: 14px;
+        }
+        .requirement-item:last-child {
+            border-bottom: none;
+        }
+        .contact-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .contact-item {
+            padding: 12px;
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid #e8ebf7;
+        }
+        .contact-label {
+            font-weight: 600;
+            color: #2b4b93;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .contact-value {
+            margin-top: 4px;
+            color: #333;
+        }
+        .next-steps {
+            background: linear-gradient(135deg, #f8f9ff, #ffffff);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e8ebf7;
+        }
+        .next-steps h3 {
+            color: #2b4b93;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .next-steps ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .next-steps li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        .additional-notes {
+            background-color: #c4c4c4;
+            border-left: 4px solid #8d8d8d;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .additional-notes strong {
+            color: #ffffff;
+        }
+        .signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e8ebf7;
+        }
+        .company-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2b4b93, #3d5aa0);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Bulk Quotation - G3NEXUS</h1>
+            <p class="subtitle">Professional Software Development Solutions</p>
+        </div>
+        
+        <div class="content">
+            <div class="quotation-id">Quotation #{{QuotationId}}</div>
+            
+            <h2>Dear {{ClientAdminName}},</h2>
+            
+            <p>We are pleased to provide you with a comprehensive quotation for your selected requirements in the <strong>{{ProjectName}}</strong> project.</p>
+            
+            <div class="highlight">
+                <strong>Quotation Summary:</strong><br><br>
+                • <strong>Quotation ID:</strong> #{{QuotationId}}<br>
+                • <strong>Total Requirements:</strong> {{RequirementCount}}<br>
+                • <strong>Project:</strong> {{ProjectName}}<br><br>
+                
+                <div class="requirement-list">
+                    <strong>Requirements Included:</strong><br>
+                    <div style="margin-top: 10px;">{{RequirementSummary}}</div>
+                </div>
+            </div>
+            
+            <div class="cost-highlight">
+                Total Quotation Cost: {{TotalCost}}
+            </div>
+            
+            <div class="details">
+                <h3 style="color: #2b4b93; margin-top: 0;">Contact Information</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-label">Client Name</div>
+                        <div class="contact-value">{{ClientAdminName}}</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">Phone</div>
+                        <div class="contact-value">{{ClientContact}}</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value">{{ClientEmail}}</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-label">Project</div>
+                        <div class="contact-value">{{ProjectName}}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="next-steps">
+                <h3>What's Next?</h3>
+                <ul>
+                    <li><strong>Review</strong> the attached detailed quotation PDF document</li>
+                    <li><strong>Contact us</strong> if you have any questions or need clarifications</li>
+                    <li><strong>Approve</strong> the quotation to proceed with the requirements</li>
+                    <li><strong>Timeline</strong> will commence upon your approval and project kickoff</li>
+                </ul>
+            </div>
+            
+            <div class="additional-notes">
+                <strong>Additional Notes:</strong> {{AdditionalNotes}}
+            </div>
+            
+            <p>Please find the detailed quotation attached as a PDF document. Our team is committed to delivering high-quality solutions that meet your specific requirements and timeline expectations.</p>
+            
+            <p>If you have any questions or need further clarification, please don't hesitate to contact us. We're here to ensure your project's success.</p>
+            
+            <div class="signature">
+                <p>Thank you for choosing G3NEXUS for your software development needs!</p>
+                
+                <p>
+                    <span class="company-logo">G3</span>
+                    <strong>G3NEXUS Development Team</strong><br>
+                    <em style="color: #2b4b93;">Delivering Excellence in Software Solutions</em>
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>&copy; 2025 G3NEXUS. All rights reserved.</strong></p>
+            <p>Professional Software Development | Innovation-Driven Solutions</p>
+        </div>
+    </div>
+</body>
+</html>

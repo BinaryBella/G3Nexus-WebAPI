@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace G3NexusBackend.Data.Config;
+
 public class VerificationConfiguration : IEntityTypeConfiguration<Verification>
 {
     public void Configure(EntityTypeBuilder<Verification> builder)
@@ -15,6 +17,9 @@ public class VerificationConfiguration : IEntityTypeConfiguration<Verification>
         builder.Property(v => v.VerificationCode)
             .IsRequired()
             .HasMaxLength(6);
+
+        builder.Property(v => v.Email)
+            .IsRequired();
 
         builder.Property(v => v.ExpiryDate)
             .IsRequired();

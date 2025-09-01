@@ -1,6 +1,7 @@
-﻿using G3NexusBackend.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace G3NexusBackend.Data.Config;
 
 public class RequirementConfiguration : IEntityTypeConfiguration<Requirement>
 {
@@ -9,28 +10,42 @@ public class RequirementConfiguration : IEntityTypeConfiguration<Requirement>
         // Table name
         builder.ToTable("Requirements");
 
-        // Primary key
+        // Primary Key
         builder.HasKey(r => r.RequirementId);
 
         // Properties
         builder.Property(r => r.RequirementTitle)
             .IsRequired()
-            .HasMaxLength(200);
+            .HasMaxLength(100);
 
         builder.Property(r => r.Priority)
             .IsRequired()
-            .HasMaxLength(20);
+            .HasMaxLength(50); // Define based on priority categories like "High", "Medium", "Low", etc.
 
         builder.Property(r => r.RequirementDescription)
-            .HasMaxLength(1000);
+            .IsRequired()
+            .HasMaxLength(500); // Adjust length according to your requirements
 
         builder.Property(r => r.Attachment)
-            .HasMaxLength(255);
+            .HasMaxLength(200); // Assuming this is a URL or file path
 
-        // Foreign Key for Project
+        builder.Property(r => r.IsActive)
+            .IsRequired()
+            .HasMaxLength(50); // Status such as "Active", "Inactive", etc.
+
+        builder.Property(r => r.IsNew)
+            .IsRequired()
+            .HasDefaultValue(true); // Assuming new requirements are active by default
+
+        // Foreign Keys and Relationships
+        builder.HasOne(r => r.Client)
+            .WithMany(c => c.Requirements)
+            .HasForeignKey(r => r.ClientId)
+            .OnDelete(DeleteBehavior.Cascade); // Adjust delete behavior as per your needs
+
         builder.HasOne(r => r.Project)
-            .WithMany()
+            .WithMany(p => p.Requirements)
             .HasForeignKey(r => r.ProjectId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade); // Adjust delete behavior as per your needs
     }
 }

@@ -1,14 +1,11 @@
-﻿using G3NexusBackend.Models;
-using System.Threading.Tasks;
+﻿using G3NexusBackend.Data.DTO;
 
-namespace G3NexusBackend.Services
+namespace G3NexusBackend.Services.Interfaces;
+
+public interface IUserService
 {
-    public interface IUserService
-    {
-        Task<User> AddUserAsync(User user);
-        Task<User> UpdateUserAsync(int userId, User user);
-        Task<IEnumerable<User>> GetAllUsersAsync();
-        Task<User> GetUserByIdAsync(int userId);
-
-    }
+    Task<ApiResponse> AddUser(LoginDTO loginDto);
+    Task<ApiResponse> EditUser(LoginDTO loginDto);
+    Task<ApiResponse> GetAllUsers();
+    Task<ApiResponse> GetUserById(int userId);
 }

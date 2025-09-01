@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace G3NexusBackend.Data.Config;
+
 public class ProjectConfiguration : IEntityTypeConfiguration<Project>
 {
     public void Configure(EntityTypeBuilder<Project> builder)
@@ -36,10 +38,18 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(p => p.TotalBudget)
             .HasColumnType("decimal(18, 2)");
 
-        // Foreign Key for User (Client)
-        builder.HasOne(p => p.User)
-            .WithMany()
-            .HasForeignKey(p => p.UserId)
+        builder.Property(b => b.IsActive)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.HasOne(b => b.Company)
+            .WithMany(c => c.Projects)
+            .HasForeignKey(b => b.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.Quotations)
+            .WithOne(q => q.Project)
+            .HasForeignKey(q => q.ProjectId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
